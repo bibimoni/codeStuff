@@ -1,0 +1,69 @@
+/**
+ * File              : C.cpp
+ * Author            : distiled
+ * Date              : 18.05.2023
+ * Last Modified Date: 09.06.2023
+ * Last Modified By  : distiled
+ */
+#include<bits/stdc++.h>
+using namespace std;
+
+void __print(int x) {cerr << x;}
+void __print(long x) {cerr << x;}
+void __print(long long x) {cerr << x;}
+void __print(unsigned x) {cerr << x;}
+void __print(unsigned long x) {cerr << x;}
+void __print(unsigned long long x) {cerr << x;}
+void __print(float x) {cerr << x;}
+void __print(double x) {cerr << x;}
+void __print(long double x) {cerr << x;}
+void __print(char x) {cerr << '\'' << x << '\'';}
+void __print(const char *x) {cerr << '\"' << x << '\"';}
+void __print(const string &x) {cerr << '\"' << x << '\"';}
+void __print(bool x) {cerr << (x ? "true" : "false");}
+ 
+template<typename T, typename V>
+void __print(const pair<T, V> &x);
+template<typename T>
+void __print(const T &x) {int f = 0; cerr << '{'; for (auto &i: x) cerr << (f++ ? ", " : ""), __print(i); cerr << "}";}
+template<typename T, typename V>
+void __print(const pair<T, V> &x) {cerr << '{'; __print(x.first); cerr << ", "; __print(x.second); cerr << '}';}
+void _print() {cerr << "]\n";}
+template <typename T, typename... V>
+void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v...);}
+#ifdef DEBUG
+#define dbg(x...) cerr << "\e[91m"<<__func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << "\e[39m" << endl;
+#else
+#define dbg(x...)
+#endif
+
+#define int long long
+#define mod 1000000007
+#define endl '\n'
+#define FAST ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
+#define MULTI int t;cin>>t;while(t--)
+
+int nxt() {int n; cin >> n; return n;}
+
+signed main() {
+  FAST; 
+//  freopen("PRIZE.INP", "r", stdin);
+//  freopen("PRIZE.OUT", "w", stdout);
+  int n, m; cin >> m >> n;
+  int p[m];
+  for(int i = 0; i < m; i++) cin >> p[i];
+  //sap xep theo gia tri tang dan` diem tich luy
+  sort(p, p + m);
+  int res = 0;
+  //di tu gia tri cao nhat den gia tri thap nhat,
+  //neu n >= m thi di het tat ca gia tri cua p
+  //neu n < m thi di tu p[m - 1] -> p[m - n]
+  //tai p[i] thi gia tri phan thuong la p[i] * (m - i) vi p[i] la phan tu nho nhat trong cac phan tu tu` i -> m - 1
+  for(int i = m - 1; i >= max(0LL, m - n); i--) {
+    res = max(res, p[i] * (m - i));
+    //luu kq toi uu
+  }
+  cout << res;
+  //dpt O(mlogm)
+}
+
