@@ -1,8 +1,8 @@
 /**
- * File              : test.cpp
+ * File              : guardmark.cpp
  * Author            : distiled
  * Date              : 18.05.2023
- * Last Modified Date: 22.09.2023
+ * Last Modified Date: 11.09.2023
  * Last Modified By  : distiled
  */
 #include<bits/stdc++.h>
@@ -25,13 +25,33 @@ using namespace std;
 #define endl          '\n'
 #define TLE           ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MULTI         int t;cin>>t;while(t--)
-#define INF           (int) 1e18
+#define INF           (int) 1e9
 #define MAXN          (int) 1e6 + 5
 
 int nxt() {int n; cin >> n; return n;}
 
+int dp[1048586] = {}, he[1048586] = {};
+
 signed main() {
   TLE;
-  cout << "HELLO WORLD";
+  freopen("guard.in", "r", stdin);
+  freopen("guard.out", "w", stdout);
+  int n, height; cin >> n >> height;
+  int h[n], w[n], s[n];
+  for(int i = 0; i < n; i++) {
+   cin >> h[i] >> w[i] >> s[i];
+  }
+  int ans = -INF; dp[0] = INF;
+  for(int i = 1; i < (1 << n); i++) dp[i] = -INF;
+  for(int i = 0; i < (1 << n); i++) {
+    if(he[i] >= height) ans = max(ans, dp[i]);
+    for(int j = 0; j < n; j++) {
+      if(!(i & (1 << j))) {
+        dp[i | (1 << j)] = max(dp[i | (1 << j)], min(dp[i] - w[j], s[j]));
+        he[i | (1 << j)] = he[i] + h[j];
+      }  
+    }
+  }
+  if(ans < 0) cout << "Mark is too tall";
+  else cout << ans;
 }
-

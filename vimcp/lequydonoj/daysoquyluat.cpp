@@ -1,8 +1,8 @@
 /**
- * File              : test.cpp
+ * File              : daysoquyluat.cpp
  * Author            : distiled
  * Date              : 18.05.2023
- * Last Modified Date: 22.09.2023
+ * Last Modified Date: 13.09.2023
  * Last Modified By  : distiled
  */
 #include<bits/stdc++.h>
@@ -32,6 +32,13 @@ int nxt() {int n; cin >> n; return n;}
 
 signed main() {
   TLE;
-  cout << "HELLO WORLD";
+  int n; cin >> n;
+  int i = 0, res = 0;
+  while(n) {
+    res += (n & 1) * pow(3, i); 
+    i++; 
+    n >>= 1;
+  }
+  cout << res;
 }
 
