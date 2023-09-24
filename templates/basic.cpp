@@ -15,7 +15,7 @@ using namespace std;
 #endif
 
 #define int            long long
-#define pb             push_back()
+#define pb             push_back
 #define all(x)         x.begin(), x.end()
 #define sz(x)          (int) x.size()
 #define make_unique(x) sort(all(x)); x.erase(unique(all(x)), x.end());
