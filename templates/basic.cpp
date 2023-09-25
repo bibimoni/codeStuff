@@ -18,7 +18,7 @@ using namespace std;
 #define pb             push_back
 #define all(x)         x.begin(), x.end()
 #define sz(x)          (int) x.size()
-#define makeUnique(x) sort(all(x)); x.erase(unique(all(x)), x.end());
+#define makeUnique(x)  sort(all(x)); x.erase(unique(all(x)), x.end());
 #define endl           '\n'
 #define MULTI          int t;cin>>t;while(t--)
 const int 
