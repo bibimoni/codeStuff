@@ -11,6 +11,9 @@ using namespace std;
 #endif
 
 #define int            long long
+#define pb             push_back
+#define all(x)         x.begin(), x.end()
+#define sz(x)          (int) x.size()
 #define endl           '\n'
 #define MULTI          int t;cin>>t;while(t--)
 inline int nxt() { int n; cin >> n; return n; }
