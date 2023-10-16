@@ -1,3 +1,10 @@
+/**
+ * File              : bignum.cpp
+ * Author            : distiled
+ * Date              : 01.10.2023
+ * Last Modified Date: 01.10.2023
+ * Last Modified By  : distiled
+ */
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -408,7 +415,14 @@ struct bigint {
 
 int main(){
 	ios::sync_with_stdio(0), cin.tie(0);
-	bigint a=99999999;
-	a*=1000200000003000LL;
-	cout<<a<<'\n';
+	bigint a, b; cin >> a >> b;
+	if(a > b) {
+    cout << '>';
+  }
+  else if(a < b) {
+    cout << '<';
+  }
+  else {
+    cout << '=';
+  }
 }
