@@ -1,0 +1,42 @@
+[
+	{
+		"correct_answers":
+		[
+			"1"
+		],
+		"test": "1 2 10\n"
+	},
+	{
+		"correct_answers":
+		[
+			"2"
+		],
+		"test": "6 9 10\n"
+	},
+	{
+		"correct_answers":
+		[
+			"55",
+			"75"
+		],
+		"test": "0 10 100000000\n",
+		"uncorrect_answers":
+		[
+			"1"
+		]
+	},
+	{
+		"correct_answers":
+		[
+			"3"
+		],
+		"test": "92818212312 7281928732 1000\n\n\n\n"
+	},
+	{
+		"correct_answers":
+		[
+			"756900390626"
+		],
+		"test": "999999999 1999999998\n1000000000000\n"
+	}
+]

@@ -1,0 +1,40 @@
+[
+	{
+		"correct_answers":
+		[
+			"6"
+		],
+		"test": "2 4\naa\nbb\n"
+	},
+	{
+		"correct_answers":
+		[
+			"8"
+		],
+		"test": "3 3\naba\nbba\n"
+	},
+	{
+		"correct_answers":
+		[
+			"8"
+		],
+		"test": "4 5\nabbb\nbaaa\n"
+	},
+	{
+		"correct_answers":
+		[
+			"10"
+		],
+		"test": "10 1\nbbbaaaabbb\nbbbbaaabbb\n"
+	},
+	{
+		"correct_answers":
+		[
+			"52"
+		],
+		"test": "10 10\naabaaaabba\naabbaaabba\n"
+	},
+	{
+		"test": "10 1\naaaabbabaa\nbaaaaaaaba\n"
+	}
+]

@@ -11,7 +11,7 @@ using namespace std;
 #define ll long long
 
 const int MAX_N = 1e5 + 5;
-const ll MOD = 1e9 + 7;
+int MOD;
 const ll INF = 1e9;
 
 template<int _MOD> struct Modular {
@@ -86,6 +86,7 @@ template <class T> struct matrix {
 using mint = Modular<MOD>;
 
 void solve() {
+    cin MOD;
     ll n; cin >> n;
     matrix<mint> A(1, 2, 0); 
     A.m[0][0] = 0; A.m[0][1] = 1;

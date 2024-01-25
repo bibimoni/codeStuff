@@ -30,6 +30,4 @@ void __print(const pair<T, V> &x) {cerr << '{'; __print(x.first); cerr << ", "; 
 void _print() {cerr << "]\n";}
 template <typename T, typename... V> 
 void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v...);}
-#define dbg(x...)     cerr << "\e[91m"<<__func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << "\e[39m" << endl;
-
-
+#define dbg(x...)     cerr << __func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << endl;
