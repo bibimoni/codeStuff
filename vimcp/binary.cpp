@@ -1,54 +1,57 @@
 /**
- * File              : binary.cpp
- * Author            : distiled
- * Date              : 18.05.2023
- * Last Modified Date: 03.10.2023
- * Last Modified By  : distiled
+ * Author: distiled
  */
 #include<bits/stdc++.h>
 using namespace std;
 
 #ifdef DEBUG
-#include </home/distiled/templates/debug.h>
+#include </Users/distiled/codeStuff/templates/debug.h>
 #else
 #define dbg(x...)
 #endif
-
-#define int            long long
-#define pb             push_back
-#define all(x)         x.begin(), x.end()
-#define sz(x)          (int) x.size()
-#define makeUnique(x)  sort(all(x)); x.erase(unique(all(x)), x.end());
-#define endl           '\n'
-#define MULTI          int t;cin>>t;while(t--)
-const int 
-      MAXN = (int) 1e6 + 5, 
-      INF = (int) 1e18, 
-      MOD = (int) 1e9 + 7; //998244353
-inline int nxt() { int n; cin >> n; return n; }
+#define int long long
 
 signed main() {
-  ios_base::sync_with_stdio(false); 
-  cin.tie(NULL); 
-  freopen("BINARY.INP", "r", stdin);
-  freopen("BINARY.OUT", "w", stdout);
+  ios::sync_with_stdio(false); 
+  cin.tie(0);
   string s; cin >> s;
-  int n = sz(s);
-  s = " " + s;
-  int pre[n + 1], nxt0[n + 1]; pre[0] = 0;
-  for(int i = 1; i <= n; i++) {
-    pre[i] = pre[i - 1] + (s[i] == '1');
+  vector<int> cnt;
+  int curr = 0;
+  for(int i = 0; i < s.size(); i++) {
+    if(s[i] == '1') {
+      cnt.push_back(curr);
+      curr = 0;
+    }
+    else {
+      curr++;
+    }
+  }
+  if(curr) cnt.push_back(curr);
+  int n = cnt.size();
+  if(n < 2) {
+    cout << "0\n";
+    return 0;
+  }
+  else if(n < 3) {
+    cout << cnt[0] * cnt[1];
+    return 0;
+  }
+  int ans1 = 0, ans2 = 0,
+    curr1 = (1ll << cnt[0]) - 1, curr2 = (1ll << cnt[1]) - 1;
+  bool ok1 = false, ok2 = false;
+  for(int i = 1; i < n; i += 2) {
+    if(cnt[i] == 0) continue;
+    ans1 += curr1 * ((1ll << cnt[i]) - 1);
+    curr1 += curr1 * ((1ll << cnt[i]) - 1);
+  }
+  for(int i = 2; i < n; i += 2) {
+    if(cnt[i] == 0) continue;
+    ans2 += curr2 * ((1ll << cnt[i]) - 1);
+    curr2 += curr2 * ((1ll << cnt[i]) - 1);
   }
   int ans = 0;
-  for(int i = 1; i < n; i++) {
-    dbg(i);
-    if(s[i] == '1') continue;
-    for(int j = i; j <= n; j++) {
-      if(s[j] == '0' && ((pre[j] - pre[i - 1]) % 2 == 1)) {
-        ans++;
-      }
-    }
-  } 
+  ans += ans1;
+  ans += ans2;
   cout << ans;
 }
 

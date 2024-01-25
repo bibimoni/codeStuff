@@ -52,7 +52,6 @@ void unionSet(int a, int b) {
 
 
 void solveQuery(vector<Edge> edges) {
-  int k, s; cin >> k >> s;
   for(int i = 1; i <= n; i++) parent[i] = i; 
   for(int i = 0, t, c; i < s; i++) {
     cin >> t >> c;

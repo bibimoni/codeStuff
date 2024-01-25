@@ -1,0 +1,17 @@
+[
+	{
+		"test": "3\n4 6\n..LR..\nULRU..\nDLRDUU\n..LRDD\n5 4\n.LR.\n.UU.\nUDDU\nD..D\nLR..\n2 2\n..\n..\n"
+	},
+	{
+		"test": "3\n2 2\nLR\nLR\n2 3\nU.U\nD.D\n4 4\n...U\n...D\n....\n....\n\n"
+	},
+	{
+		"test": "1\n4 4\nLRLR\n.UU.\n.DD.\nLRLR\n\n"
+	},
+	{
+		"test": "1\n4\n4\nU.U.\nDUDU\nUDUD\nD.D.\n"
+	},
+	{
+		"test": "2\n6 6\n.LRUU.\nLR.DD.\n.LRLR.\n.LRUU.\nLR.DD.\n.LRLR.\n4 4\n.LR.\nU..U\nD..U\n.LR.\n"
+	}
+]

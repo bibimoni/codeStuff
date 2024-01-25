@@ -23,46 +23,67 @@ void __print(int x) {cerr << x;}void __print(long x) {cerr << x;}void __print(lo
 #define NO            cout << "NO\n";
 #define mod           1000000007
 #define endl          '\n'
-#define TLE           ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
 #define MULTI         int t;cin>>t;while(t--)
 #define INF           (int) 1e18
-#define MAX_N          (int) 1e6 + 5
-#define MAX_L            30
+#define N             (int) 1e6 + 5
 int nxt() {int n; cin >> n; return n;}
  
-int n, q, par[MAX_N][MAX_L], dep[MAX_N];
-vector<int> adj[MAX_N];
- 
-void dfs(int u, int p = 0) {
+int n, q;
+vector<int> adj[N];
+/**
+ * Description: Finding LCA and Kth Ancestor using Binary Lifting
+ * Caution:
+ *    * adj must be one-indexed
+ *    * root must be 1 (can be modified if required)
+ * Source : https://oj.vnoi.info/submission/4618381
+ * Verification : https://oj.vnoi.info/problem/hbtlca
+ * 
+ * usage LCA lca(n + 1, root) // default root is 1
+ */
+
+struct LCA {
+  vector<vector<int>> par;
+  vector<int> dep;
+  int LG; 
+  void dfs(int u, int p = 0) {
     par[u][0] = p;
-    for (int i = 1; i < MAX_L; i++) 
-        par[u][i] = par[par[u][i - 1]][i - 1];
+    for (int i = 1; i < LG; i++) 
+      par[u][i] = par[par[u][i - 1]][i - 1];
     for (int v : adj[u]) {
-        if (v == p) continue;
-        dep[v] = dep[u] + 1;
-        dfs(v, u);
+      if (v == p) continue;
+      dep[v] = dep[u] + 1;
+      dfs(v, u);
     }
-}
+  }
  
-int ancestor(int u, int k) {
-    for (int i = 0; i < MAX_L; i++) 
-        if (k & (1 << i)) 
-            u = par[u][i];
+  int ancestor(int u, int k) {
+    for (int i = 0; i < LG; i++) 
+      if (k & (1 << i)) 
+        u = par[u][i];
     return u;
-}
+  }
  
-int lca(int u, int v) {
+  int lca(int u, int v) {
     if (dep[u] < dep[v]) swap(u, v);
     u = ancestor(u, dep[u] - dep[v]);
     if (u == v) return u;
-    for (int i = MAX_L - 1; i >= 0; i--)
-        if (par[u][i] != par[v][i])
-            u = par[u][i], v = par[v][i];
+    for (int i = LG - 1; i >= 0; i--)
+      if (par[u][i] != par[v][i])
+        u = par[u][i], v = par[v][i];
     return par[u][0];
-}
+  }
  
+  LCA (int _n, int root = 1) {
+    int n = _n;
+    LG = 64 - __builtin_clzll(n);
+    par.assign(n, vector<int>(LG, 0));
+    dep.assign(n, 0);
+    dfs(root);
+  }
+};
+
 signed main() {
-  TLE;
+  ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL);
   while(cin >> n) {
     if(n == 0) break;
     for(int i = 1; i <= n; i++) adj[i].clear();
@@ -72,7 +93,7 @@ signed main() {
       adj[v].push_back(u);
       adj[u].push_back(v);
     } 
-    dfs(root);
+    LCA lca(n + 1, root);
     MULTI {
       char type; cin >> type;
       if(type != '?') {
@@ -80,10 +101,10 @@ signed main() {
       }
       else {
         int a, b; cin >> a >> b;
-        int rA = lca(root, a), rB = lca(root, b);
-        if(dep[rA] < dep[rB]) swap(rA, rB);
-        int ab = lca(a, b);
-        int res = (dep[ab] >= dep[rA] ? ab : rA);
+        int rA = lca.lca(root, a), rB = lca.lca(root, b);
+        if(lca.dep[rA] < lca.dep[rB]) swap(rA, rB);
+        int ab = lca.lca(a, b);
+        int res = (lca.dep[ab] >= lca.dep[rA] ? ab : rA);
         cout << res << endl;
       }
     }

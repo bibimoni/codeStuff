@@ -1,0 +1,19 @@
+[
+	{
+		"correct_answers":
+		[
+			"3"
+		],
+		"test": "6\nadd 4\nadd 5\nadd 1\nadd 2\nadd 3\nsum\n"
+	},
+	{
+		"correct_answers":
+		[
+			"5\n11\n13"
+		],
+		"test": "14\nadd 1\nadd 7\nadd 2\nadd 5\nsum\nadd 6\nadd 8\nadd 9\nadd 3\nadd 4\nadd 10\nsum\ndel 1\nsum\n"
+	},
+	{
+		"test": "9\nadd 3\nadd 4\nadd 5\nadd 6\nadd 7\nadd 8\nadd 9\nadd 10\nsum\n\n"
+	}
+]

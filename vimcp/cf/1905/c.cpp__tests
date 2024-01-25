@@ -1,0 +1,33 @@
+[
+	{
+		"correct_answers":
+		[
+			"0\n1\n-1\n2\n6\n0"
+		],
+		"test": "6\n5\naaabc\n3\nacb\n3\nbac\n4\nzbca\n15\nczddeneeeemigec\n13\ncdefmopqsvxzz\n"
+	},
+	{
+		"correct_answers":
+		[
+			"2"
+		],
+		"test": "1\n5\nabzdc\n"
+	},
+	{
+		"correct_answers":
+		[
+			"1"
+		],
+		"test": "1\n3\nzzc\n"
+	},
+	{
+		"correct_answers":
+		[
+			"1"
+		],
+		"test": "1\n4\ncaca\n\n"
+	},
+	{
+		"test": "1\n10\nadccccccca\n\n"
+	}
+]

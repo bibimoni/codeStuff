@@ -1,0 +1,20 @@
+[
+	{
+		"correct_answers":
+		[
+			"YES\nNO\nYES\nNO\nNO"
+		],
+		"test": "5\n5\n1 2 3 2 4\n1 3 3 2 4\n5\n3 4 2 2 4\n3 4 3 4 4\n5\n3 2 1 1 1\n3 3 3 2 2\n2\n1 1\n1 2\n3\n1 1 2\n2 1 2\n",
+		"uncorrect_answers":
+		[
+			"main:87 [i, id, maxaj, minbj] = [1, 2, 3, 3]\n\nYES\nNO\nmain:96 [i, id, maxaj, minbj] = [1, 0, 3, 3]\n\nmain:96 [i, id, maxaj, minbj] = [2, 0, 3, 3]\n\nmain:96 [i, id, maxaj, minbj] = [3, 1, 2, 3]\n\nmain:96 [i, id, maxaj, minbj] = [4, 1, 2, 2]\n\nYES\nNO\nNO"
+		]
+	},
+	{
+		"correct_answers":
+		[
+			"YES"
+		],
+		"test": "1\n3\n1 1 2\n2 2 2\n"
+	}
+]
