@@ -1,0 +1,11 @@
+[
+	{
+		"test": "atcoder|beginner|contest\n"
+	},
+	{
+		"test": "|spoiler|\n"
+	},
+	{
+		"test": "||xyz\n"
+	}
+]

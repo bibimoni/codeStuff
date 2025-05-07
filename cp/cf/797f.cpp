@@ -10,26 +10,10 @@ using namespace std;
 #define dbg(x...)
 #endif
 #define int long long
-const int N = (int) 5e3 + 5, LG = 17, INF = (int) 9e9;
-struct Holes {
-  int p, c;
-};
+const int N = (int) 5e3 + 5, LG = 17, INF = (int) 1e18;
 
-template<class T>
-struct RMQ {
-  T st[LG + 1][N];
-  int n;
-  void build (const vector<T> &a) {
-    n = a.size() - 1;
-    for (int i = 1; i <= n; ++i) st[0][i] = a[i];
-    for (int j = 1; j <= LG; ++j)
-        for (int i = 1; i + (1 << j) - 1 <= n; ++i)
-            st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-  }
-  T query(int l, int r) {
-    int k = __lg(r - l + 1);
-    return min(st[k][l], st[k][r - (1 << k) + 1]);
-  }
+struct Hole {
+  int p, c;
 };
 
 signed main() {
@@ -37,8 +21,8 @@ signed main() {
   cin.tie(0);
   int n, m;
   cin >> n >> m;
-  int x[n + 2];
-  Holes holes[m + 1];
+  int x[n + 1];
+  Hole holes[m + 1];
   for(int i = 1; i <= n; i++) {
     cin >> x[i];
   }
@@ -52,39 +36,42 @@ signed main() {
     return 0;
   }
   sort(x + 1, x + 1 + n);
-  sort(holes + 1, holes + m + 1, [&] (Holes a, Holes b) {
+  sort(holes + 1, holes + m + 1, [&] (Hole a, Hole b) {
     return a.p < b.p;
   });
-  vector<vector<int>> dp(m + 1, vector<int>(n + 2, INF));
-  dp[0][1] = 0;
+  vector<vector<int>> dist(m + 1, vector<int>(n + 1, 0));
   for(int i = 1; i <= m; i++) {
-    int curr = 0;
-    dbg(dp[i - 1]);
-    for(int j = 1; j <= n + 1; j++) {
-      if(dp[i][j] == INF) {
-        continue;
-      }
-      dp[i][j] -= curr;
-      curr += abs(x[j] - holes[i].p);
+    for(int j = 1; j <= n; j++) {
+      dist[i][j] = dist[i][j - 1] + abs(holes[i].p - x[j]);
     }
-    curr = 0;
-    RMQ<int> rmq;
-    rmq.build(dp[i - 1]);
-    for(int j = 1; j <= n + 1; j++  ) {
-      int l = max(1ll, j - holes[i].c);
-      int q = (l == j + 1) ? INF : rmq.query(l, j + 1);
-      dbg(q, l, j + 1);
-      if(q == INF) {
-        dp[i][j] = INF;
+  }
+  auto get = [&] (int id, int l, int r) -> int {
+    return dist[id][r] - (l == 0 ? 0 : dist[id][l - 1]);
+  };
+  vector<vector<int>> dp(2, vector<int>(n + 1, INF));
+  int prev = 0;
+  for(int i = 1; i <= m; i++) {
+    deque<int> dq;
+    dp[(i - 1) % 2][0] = 0;
+    dq.push_back(0);
+    for(int j = 1; j <= n; j++) {
+      while(dq.size() && j <= n && (dq.back() > 0 ? dp[(i - 1) % 2][dq.back() - 1] : 0) + get(i, dq.back(), j) >= dp[(i - 1) % 2][j - 1] + get(i, j, j)) {
+        dq.pop_back();
+      }
+      while(dq.size() && j - dq.front() + 1 > holes[i].c) {
+        dq.pop_front();
+      }
+      dq.push_back(j);
+      if(dq.size()) {
+        int k = dq.front();
+        int prev = (k == 0 ? 0 : dp[(i - 1) % 2][k - 1]);
+        dp[i % 2][j] = min(dp[(i - 1) % 2][j], prev + get(i, k, j));
       }
       else {
-        dp[i][j] = q + curr;
+        dp[i % 2][j] = min(dp[(i - 1) % 2][j], dp[(i - 1) % 2][j - 1] + abs(holes[i].p - x[j]));
       }
-      curr += abs(x[j] - holes[i].p);
-      dbg(j, dp[i][j]);
     }
   } 
-  dbg(dp);
-  cout << dp[m].back();
+  cout << dp[m % 2][n];
 }
 

@@ -1,0 +1,5 @@
+[
+	{
+		"test": "8 2\n1 0 1 1 0 1 0 0\n5\nget 1 8\nchange 1 8\nget 1 8\nchange 2 5\nget 3 7\n"
+	}
+]

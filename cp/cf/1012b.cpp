@@ -51,7 +51,8 @@ signed main() {
     dsu.unite(x, y + n);
   }
   vector<bool> vis(n + m + 1, false);
-  for(int i = 1; i <= n + m; i++) vis[dsu.find(i)] = true;
+  for(int i = 1; i <= n + m; i++) 
+    vis[dsu.find(i)] = true;
   int ans = 0; 
   for(int i = 1; i <= n + m; i++) {
     ans += vis[i];

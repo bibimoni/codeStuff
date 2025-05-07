@@ -9,7 +9,7 @@ using namespace std;
 #else
 #define dbg(x...)
 #endif
-#define int            long long
+#define int int64_t 
 
 signed main() {
   ios::sync_with_stdio(false); 

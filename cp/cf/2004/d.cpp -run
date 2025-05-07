@@ -1,0 +1,13 @@
+
+In file included from /Users/distiled/codeStuff/cp/cf/2004/d.cpp:9:
+/Users/distiled/codeStuff/templates/debug.h:33:14: warning: ISO C++ does not permit named variadic macros [-Wvariadic-macros]
+   33 | #define dbg(x...)     cerr << __func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << endl;
+      |              ^~~
+/Users/distiled/codeStuff/cp/cf/2004/d.cpp: In function 'int main()':
+/Users/distiled/codeStuff/cp/cf/2004/d.cpp:83:13: error: 's1' was not declared in this scope; did you mean 's'?
+   83 |         dbg(s1);
+      |             ^~
+/Users/distiled/codeStuff/templates/debug.h:33:86: note: in definition of macro 'dbg'
+   33 | #define dbg(x...)     cerr << __func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << endl;
+      |                                                                                      ^
+

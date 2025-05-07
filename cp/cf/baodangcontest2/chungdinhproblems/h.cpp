@@ -3,7 +3,6 @@
  */
 #include<bits/stdc++.h>
 using namespace std;
-
 #ifdef DEBUG
 #include </Users/distiled/codeStuff/templates/debug.h>
 #else
@@ -19,32 +18,29 @@ signed main() {
   while(tt--) {
     int p, q; 
     cin >> p >> q;
+    int pow2[21], pow3[21];
+    pow2[0] = pow3[0] = 1;
+    for(int i = 1; i <= 20; i++) {
+      pow2[i] = pow2[i - 1] * 2ll;
+      pow3[i] = pow3[i - 1] * 3ll;
+    }
     auto solve = [&] () {
-      for(int x2 = 0; x2 <= 20; x2++) {
-        for(int x3 = 0; x3 <= 20; x3++) {
-          for(int y2 = 0; y2 <= 20; y2++) {
-            for(int y3 = 0; y3 <= 20; y3++) {
-              if(x2 + x3 + y2 + y3 > 20 || x2 + x3 + y2 + y3 == 0) {
-                continue;
-              }
-              if(x2 + x3 == 0 || y2 + y3 == 0) {
-                continue;
-              }
-              int x = pow(2ll, x2) * pow(3ll, x3);
-              int y = pow(2ll, y2) * pow(3ll, y3);
-              int top = x - y;
-              if(top == 0) {
-                continue;
-              }
-              int bot = pow(2ll, x2 + y2) * pow(3ll, x3 + y3);
-              int gcd = __gcd(top, bot);
-              top /= gcd;
-              bot /= gcd;
-              if(p == top && bot == q) {
-                return true;
-              }
-            }
-          }
+      vector<int> nums(21);
+      iota(nums.begin(), nums.end(), 0);
+      for(int cnt3x : nums) 
+      for(int cnt2x : nums)
+      for(int cnt3y : nums)
+      for(int cnt2y : nums) {
+        int same = min(cnt3x, cnt3y) + min(cnt2x, cnt2y);
+        int diff2 = max(cnt2x, cnt2y) - min(cnt2x, cnt2y);
+        int diff3 = max(cnt3x, cnt3y) - min(cnt3x, cnt3y);
+        if(same + diff2 + diff3 > 20 || cnt3x + cnt3y + cnt2x + cnt2y == 0 || same == 0)
+          continue;
+        int x = pow3[cnt3x] * pow2[cnt2x];
+        int y = pow3[cnt3y] * pow2[cnt2y];
+        if(abs(x - y) * q - p * x * y == 0) {
+          dbg(cnt3x, cnt2x, cnt3y, cnt2y);
+          return true;
         }
       }
       return false;

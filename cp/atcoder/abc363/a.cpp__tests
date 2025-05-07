@@ -1,0 +1,54 @@
+[
+	{
+		"correct_answers":
+		[
+			"77"
+		],
+		"test": "123\n"
+	},
+	{
+		"correct_answers":
+		[
+			"50"
+		],
+		"test": "250\n"
+	},
+	{
+		"correct_answers":
+		[
+			"99"
+		],
+		"test": "1\n"
+	},
+	{
+		"correct_answers":
+		[
+			"1"
+		],
+		"test": "99\n"
+	},
+	{
+		"correct_answers":
+		[
+			"1"
+		],
+		"test": "299\n"
+	},
+	{
+		"correct_answers":
+		[
+			"51"
+		],
+		"test": "249\n"
+	},
+	{
+		"correct_answers":
+		[
+			"99"
+		],
+		"test": "101\n\n"
+	},
+	{
+		"test": "100\n"
+	}
+]

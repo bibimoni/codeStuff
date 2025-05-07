@@ -1,0 +1,48 @@
+use std::io;
+
+fn read_i32() -> i32 {
+  let mut number: String = String::new();
+  io::stdin()
+    .read_line(&mut number)
+    .expect("Failed to read int32 in a line");
+  number.trim().parse::<i32>().expect("Not i32")
+}
+
+fn read_vec_i32() -> Vec<i32> {
+  let mut numbers: String = String::new();
+  io::stdin()
+    .read_line(&mut numbers)
+    .expect("Failed to read line");
+  numbers
+    .trim()
+    .split_whitespace()
+    .map(|i: &str| i.parse().unwrap())
+    .collect()
+}
+
+fn main() {
+  // let tests = read_i32();
+  let tests = 1;
+  for _test in 0..tests {
+    let n = read_i32() as usize;
+    let X = read_i32() as usize;
+    let arr = read_vec_i32();
+    let mut ans : i64 = 0;
+    let mut pre = Vec<i64>![0; n];
+    let mut suf = Vec<i64>![0; n];
+    for i in 1..n {
+      let mut curr = 0;
+      for j in 0..i {
+        if a[i] >= a[j]
+          curr = cmp::max(curr, a[i] + a[j]);
+      }
+      pre[i] = curr; 
+    }
+    for i in 0..n - 1 {
+      let mut curr = 0;
+      for j in i + 1..n {
+        ì
+      }
+    }
+  }
+}

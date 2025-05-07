@@ -1,0 +1,11 @@
+[
+	{
+		"test": "4\naba\nabab\nbaabba\nppssppss\n"
+	},
+	{
+		"test": "1\naaaaaa\n"
+	},
+	{
+		"test": "1\nabbaaba\n"
+	}
+]

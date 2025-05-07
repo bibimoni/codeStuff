@@ -1,0 +1,10 @@
+
+In file included from /Users/distiled/codeStuff/cp/cf/2026/d.cpp:9:
+/Users/distiled/codeStuff/templates/debug.h:33:14: warning: ISO C++ does not permit named variadic macros [-Wvariadic-macros]
+   33 | #define dbg(x...)     cerr << __func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << endl;
+      |              ^~~
+/Users/distiled/codeStuff/cp/cf/2026/d.cpp: In function 'int main()':
+/Users/distiled/codeStuff/cp/cf/2026/d.cpp:18:17: error: expected initializer before 'a'
+   18 |   long long int a;
+      |                 ^
+
