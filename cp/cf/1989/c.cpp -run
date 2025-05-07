@@ -1,9 +1,0 @@
-
-/Users/distiled/codeStuff/cp/cf/1989/c.cpp: In function 'int main()':
-/Users/distiled/codeStuff/cp/cf/1989/c.cpp:62:2: error: expected '}' at end of input
-   62 | }
-      |  ^
-/Users/distiled/codeStuff/cp/cf/1989/c.cpp:15:15: note: to match this '{'
-   15 | signed main() {
-      |               ^
-

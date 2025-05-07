@@ -1,8 +1,0 @@
-[
-	{
-		"test": "4\n1 1 1\n1 0 0 1\n9\nget 1\nget 2\nget 3\nget 4\npow 1\nget 1\nget 2\nget 3\nget 4\n"
-	},
-	{
-		"test": "8 \n1 1 1 1 1 1 1\n1 0 1 0 1 0 1 1\n0\n"
-	}
-]

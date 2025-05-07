@@ -1,8 +1,0 @@
-[
-	{
-		"test": "3 3\nROW 2\nCOLUMN 3\nROW 2\n"
-	},
-	{
-		"test": "200000 2\nROW 1\nROW 1\n"
-	}
-]
