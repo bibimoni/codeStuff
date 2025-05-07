@@ -1,0 +1,17 @@
+[
+	{
+		"test": "5\nAABBB\n"
+	},
+	{
+		"test": "4\nA*BB\n"
+	},
+	{
+		"test": "5\nA****\n"
+	},
+	{
+		"test": "5\nA*B*A\n"
+	},
+	{
+		"test": "5\nABABA\n"
+	}
+]

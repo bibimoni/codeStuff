@@ -1,0 +1,17 @@
+[
+	{
+		"test": "9\nABUCDABCD\n"
+	},
+	{
+		"test": "10\nHELLOWORLD\n"
+	},
+	{
+		"test": "9\nGKGKGKGKG\n"
+	},
+	{
+		"test": "9\nAAAAAAAAA\n"
+	},
+	{
+		"test": "9\nABCCFABCC\n"
+	}
+]

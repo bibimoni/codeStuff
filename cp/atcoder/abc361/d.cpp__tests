@@ -1,0 +1,11 @@
+[
+	{
+		"test": "6\nBBBBBB\nWWWWWW\n"
+	},
+	{
+		"test": "14\nBBBWBWWWBBWWBW\nWBWWBBWWWBWBBB\n"
+	},
+	{
+		"test": "6\nBWBWBW\nWWWBBB\n"
+	}
+]

@@ -1,0 +1,11 @@
+[
+	{
+		"test": "abc\naxbxyc\n"
+	},
+	{
+		"test": "aaaa\nbbbbaaaa\n"
+	},
+	{
+		"test": "atcoder\natcoder\n"
+	}
+]

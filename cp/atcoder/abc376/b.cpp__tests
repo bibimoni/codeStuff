@@ -1,0 +1,8 @@
+[
+	{
+		"test": "6 3\nR 4\nL 5\nR 6\n"
+	},
+	{
+		"test": "30 8\nR 23\nR 26\nR 29\nL 20\nR 29\nR 19\nL 7\nL 16\n"
+	}
+]

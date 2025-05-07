@@ -1,0 +1,98 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+void __print(int x) {cerr << x;}
+void __print(long x) {cerr << x;}
+void __print(long long x) {cerr << x;}
+void __print(unsigned x) {cerr << x;}
+void __print(unsigned long x) {cerr << x;}
+void __print(unsigned long long x) {cerr << x;}
+void __print(float x) {cerr << x;}
+void __print(double x) {cerr << x;}
+void __print(long double x) {cerr << x;}
+void __print(char x) {cerr << '\'' << x << '\'';}
+void __print(const char *x) {cerr << '\"' << x << '\"';}
+void __print(const string &x) {cerr << '\"' << x << '\"';}
+void __print(bool x) {cerr << (x ? "true" : "false");}
+ 
+template<typename T, typename V>
+void __print(const pair<T, V> &x);
+template<typename T>
+void __print(const T &x) {int f = 0; cerr << '{'; for (auto &i: x) cerr << (f++ ? ", " : ""), __print(i); cerr << "}";}
+template<typename T, typename V>
+void __print(const pair<T, V> &x) {cerr << '{'; __print(x.first); cerr << ", "; __print(x.second); cerr << '}';}
+void _print() {cerr << "]\n";}
+template <typename T, typename... V>
+void _print(T t, V... v) {__print(t); if (sizeof...(v)) cerr << ", "; _print(v...);}
+#ifdef DEBUG
+#define dbg(x...) cerr << "\e[91m"<<__func__<<":"<<__LINE__<<" [" << #x << "] = ["; _print(x); cerr << "\e[39m" << endl;
+#else
+#define dbg(x...)
+#endif
+
+#define int long long
+#define mod 1000000007
+#define endl '\n'
+#define FAST ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
+#define MULTI int t;cin>>t;while(t--)
+
+int nxt() {int n; cin >> n; return n;}
+
+int A[51][51];
+bool visited[51][51] = {false};
+int n, m;
+
+bool valid(int x, int y) {
+    return x >= 0 && y >= 0 && x < n && y < m && !visited[x][y];
+}
+int cnt = 0;
+int d[] = {-1, 0, 1, 0, -1};
+
+void BFS(int x, int y, int type) {
+    int currCells = 1;
+    int maxX = x, maxY = y, minX = x, minY = y;
+    queue<pair<int, int>> Q;
+    Q.push({x, y});
+    while(!Q.empty()) {
+        auto [uX, uY] = Q.front(); Q.pop();
+        for(int i = 0; i < 4; i++) {
+            int vX = uX + d[i];
+            int vY = uY + d[i + 1];
+            if(!valid(vX, vY)) continue;
+            if(A[vX][vY] != type) continue;
+            Q.push({vX, vY});
+            maxX = max(maxX, vX); minX = min(minX, vX);
+            maxY = max(maxY, vY); minY = min(minY, vY);
+            currCells ++;
+            visited[vX][vY] = true;
+        }
+    }
+    if((maxX - minX + 1) * (maxY - minY + 1) == currCells) cnt++;
+}
+
+signed main() {
+    FAST;
+    //int n, m; 
+    cin >> n >> m;
+    int totalRect = (((n - 1) * n) / 2) * m + ((m * (m - 1)) / 2) * n + n * m;  
+    //= (m * n * (n + 1) * (m + 1)) / 4;
+    //int A[n][m];
+    
+    dbg(totalRect);
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            cin >> A[i][j];
+        }
+    }
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(!visited[i][j]) {
+                BFS(i, j, A[i][j]);
+            }
+            
+        }
+    }
+    dbg(cnt);
+    cout << totalRect - cnt;
+}
+

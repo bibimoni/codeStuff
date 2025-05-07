@@ -1,0 +1,25 @@
+
+/Users/distiled/codeStuff/cp/cf/620e.cpp: In member function 'void lazySegTree<T, SZ>::down(long long int)':
+/Users/distiled/codeStuff/cp/cf/620e.cpp:56:16: error: 'l' was not declared in this scope
+   56 |     int mid = (l + r) >> 1;
+      |                ^
+/Users/distiled/codeStuff/cp/cf/620e.cpp:56:20: error: 'r' was not declared in this scope
+   56 |     int mid = (l + r) >> 1;
+      |                    ^
+/Users/distiled/codeStuff/cp/cf/620e.cpp: In instantiation of 'void lazySegTree<T, SZ>::build(const std::vector<_Tp>&, long long int, long long int, long long int) [with T = long long int; long long int SZ = 400005]':
+/Users/distiled/codeStuff/cp/cf/620e.cpp:124:12:   required from here
+/Users/distiled/codeStuff/cp/cf/620e.cpp:41:12: warning: comparison of integer expressions of different signedness: 'long long int' and 'std::vector<long long int>::size_type' {aka 'long unsigned int'} [-Wsign-compare]
+   41 |       if(l < a.size()) {
+      |          ~~^~~~~~~~~~
+/Users/distiled/codeStuff/cp/cf/620e.cpp: In instantiation of 'std::set<T> lazySegTree<T, SZ>::query(long long int, long long int, long long int, long long int, long long int) [with T = long long int; long long int SZ = 400005]':
+/Users/distiled/codeStuff/cp/cf/620e.cpp:136:7:   required from here
+/Users/distiled/codeStuff/cp/cf/620e.cpp:86:9: warning: unused variable 'mid' [-Wunused-variable]
+   86 |     int mid = (l + r) >> 1;
+      |         ^~~
+/Users/distiled/codeStuff/cp/cf/620e.cpp: In instantiation of 'void lazySegTree<T, SZ>::down(long long int) [with T = long long int; long long int SZ = 400005]':
+/Users/distiled/codeStuff/cp/cf/620e.cpp:72:5:   required from 'void lazySegTree<T, SZ>::update(long long int, long long int, T, long long int, long long int, long long int) [with T = long long int; long long int SZ = 400005]'
+/Users/distiled/codeStuff/cp/cf/620e.cpp:131:17:   required from here
+/Users/distiled/codeStuff/cp/cf/620e.cpp:56:9: warning: unused variable 'mid' [-Wunused-variable]
+   56 |     int mid = (l + r) >> 1;
+      |         ^~~
+

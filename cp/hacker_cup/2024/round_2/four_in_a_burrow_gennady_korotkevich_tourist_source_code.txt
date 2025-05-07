@@ -1,0 +1,114 @@
+/**
+ *    author:  tourist
+ *    created: 19.10.2024 10:25:26
+**/
+#undef _GLIBCXX_DEBUG
+
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#ifdef LOCAL
+#include "algo/debug.h"
+#else
+#define debug(...) 42
+#endif
+
+int main() {
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr);
+  int tt;
+  cin >> tt;
+  for (int qq = 1; qq <= tt; qq++) {
+    cout << "Case #" << qq << ": ";
+    vector<string> s(6);
+    map<char, int> cnt;
+    for (int i = 0; i < 6; i++) {
+      cin >> s[i];
+      for (int j = 0; j < 7; j++) {
+        cnt[s[i][j]] += 1;
+      }
+    }
+    assert(cnt['C'] == 21 && cnt['F'] == 21);
+    auto CheckFour = [&](const vector<string>& g) {
+      for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+          if (g[i][j] != '.') {
+            for (int di = -1; di <= 1; di++) {
+              for (int dj = -1; dj <= 1; dj++) {
+                if (di * di + dj * dj != 0) {
+                  int good = 0;
+                  for (int dist = 0; dist < 4; dist++) {
+                    int ni = i + di * dist;
+                    int nj = j + dj * dist;
+                    if (ni >= 0 && nj >= 0 && ni < 6 && nj < 7) {
+                      if (g[ni][nj] == g[i][j]) {
+                        good += 1;
+                      }
+                    }
+                  }
+                  if (good == 4) {
+                    return true;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return false;
+    };
+    bool can_c = false;
+    bool can_f = false;
+    vector<string> g = s;
+    vector<int> new_cnt(256);
+    auto Dfs = [&](auto&& self, int col) -> void {
+      if (col == 7) {
+        new_cnt['C'] = new_cnt['F'] = 0;
+        for (int i = 0; i < 6; i++) {
+          for (int j = 0; j < 7; j++) {
+            new_cnt[g[i][j]] += 1;
+          }
+        }
+        char turn = '?';
+        if (new_cnt['C'] == new_cnt['F']) turn = 'C'; else
+        if (new_cnt['C'] == new_cnt['F'] + 1) turn = 'F';
+        else return;
+        if (CheckFour(g)) {
+          return;
+        }
+        for (int j = 0; j < 7; j++) {
+          for (int i = 5; i >= 0; i--) {
+            if (g[i][j] == '.') {
+              if (s[i][j] == turn) {
+                g[i][j] = s[i][j];
+                if (CheckFour(g)) {
+                  (turn == 'C' ? can_c : can_f) = true;
+                }
+                g[i][j] = '.';
+              }
+              break;
+            }
+          }
+        }
+        return;
+      }
+      for (int row = 0; row <= 6; row++) {
+        self(self, col + 1);
+        if (row < 6) {
+          g[row][col] = '.';
+        }
+      }
+      for (int row = 0; row < 6; row++) {
+        g[row][col] = s[row][col];
+      }
+    };
+    Dfs(Dfs, 0);
+    if (can_c && can_f) cout << "?\n"; else
+    if (can_c && !can_f) cout << "C\n"; else
+    if (!can_c && can_f) cout << "F\n";
+    else cout << "0\n";
+    debug(qq, tt, clock());
+  }
+  return 0;
+}

@@ -1,0 +1,44 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     c
+relocations:
+  - { offsetInCU: 0x9C, offset: 0x9C, size: 0x8, addend: 0x0, symName: __Z7__printi, symObjAddr: 0x0, symBinAddr: 0x100003680, symSize: 0x10 }
+  - { offsetInCU: 0x17118, offset: 0x17118, size: 0x8, addend: 0x0, symName: __ZStL8__ioinit, symObjAddr: 0xA3CB0, symBinAddr: 0x100008000, symSize: 0x0 }
+  - { offsetInCU: 0x217C5, offset: 0x217C5, size: 0x8, addend: 0x0, symName: __GLOBAL__sub_I_c.cpp, symObjAddr: 0x594, symBinAddr: 0x100003BF4, symSize: 0x3C }
+  - { offsetInCU: 0x21AD9, offset: 0x21AD9, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x3A0, symBinAddr: 0x100003A00, symSize: 0x1F4 }
+  - { offsetInCU: 0x21AE1, offset: 0x21AE1, size: 0x8, addend: 0x0, symName: __GLOBAL__sub_I_c.cpp, symObjAddr: 0x594, symBinAddr: 0x100003BF4, symSize: 0x3C }
+  - { offsetInCU: 0x21E10, offset: 0x21E10, size: 0x8, addend: 0x0, symName: __Z6_printv, symObjAddr: 0x364, symBinAddr: 0x1000039E4, symSize: 0x18 }
+  - { offsetInCU: 0x21E1E, offset: 0x21E1E, size: 0x8, addend: 0x0, symName: __Z6_printv, symObjAddr: 0x364, symBinAddr: 0x1000039E4, symSize: 0x18 }
+  - { offsetInCU: 0x21E5E, offset: 0x21E5E, size: 0x8, addend: 0x0, symName: __Z7__printb, symObjAddr: 0x330, symBinAddr: 0x1000039B0, symSize: 0x34 }
+  - { offsetInCU: 0x21E66, offset: 0x21E66, size: 0x8, addend: 0x0, symName: __Z6_printv, symObjAddr: 0x364, symBinAddr: 0x1000039E4, symSize: 0x18 }
+  - { offsetInCU: 0x21EFA, offset: 0x21EFA, size: 0x8, addend: 0x0, symName: __Z7__printRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, symObjAddr: 0x290, symBinAddr: 0x100003910, symSize: 0xA0 }
+  - { offsetInCU: 0x21F02, offset: 0x21F02, size: 0x8, addend: 0x0, symName: __Z7__printb, symObjAddr: 0x330, symBinAddr: 0x1000039B0, symSize: 0x34 }
+  - { offsetInCU: 0x21FEA, offset: 0x21FEA, size: 0x8, addend: 0x0, symName: __Z7__printPKc, symObjAddr: 0x1A0, symBinAddr: 0x100003820, symSize: 0xF0 }
+  - { offsetInCU: 0x21FF2, offset: 0x21FF2, size: 0x8, addend: 0x0, symName: __Z7__printRKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE, symObjAddr: 0x290, symBinAddr: 0x100003910, symSize: 0xA0 }
+  - { offsetInCU: 0x221C9, offset: 0x221C9, size: 0x8, addend: 0x0, symName: __Z7__printc, symObjAddr: 0x90, symBinAddr: 0x100003710, symSize: 0x110 }
+  - { offsetInCU: 0x22310, offset: 0x22310, size: 0x8, addend: 0x0, symName: __Z7__printe, symObjAddr: 0x80, symBinAddr: 0x100003700, symSize: 0x10 }
+  - { offsetInCU: 0x22336, offset: 0x22336, size: 0x8, addend: 0x0, symName: __Z7__printe, symObjAddr: 0x80, symBinAddr: 0x100003700, symSize: 0x10 }
+  - { offsetInCU: 0x2237A, offset: 0x2237A, size: 0x8, addend: 0x0, symName: __Z7__printd, symObjAddr: 0x70, symBinAddr: 0x1000036F0, symSize: 0x10 }
+  - { offsetInCU: 0x223A0, offset: 0x223A0, size: 0x8, addend: 0x0, symName: __Z7__printd, symObjAddr: 0x70, symBinAddr: 0x1000036F0, symSize: 0x10 }
+  - { offsetInCU: 0x223E4, offset: 0x223E4, size: 0x8, addend: 0x0, symName: __Z7__printf, symObjAddr: 0x60, symBinAddr: 0x1000036E0, symSize: 0x10 }
+  - { offsetInCU: 0x223EC, offset: 0x223EC, size: 0x8, addend: 0x0, symName: __Z7__printd, symObjAddr: 0x70, symBinAddr: 0x1000036F0, symSize: 0x10 }
+  - { offsetInCU: 0x2240A, offset: 0x2240A, size: 0x8, addend: 0x0, symName: __Z7__printf, symObjAddr: 0x60, symBinAddr: 0x1000036E0, symSize: 0x10 }
+  - { offsetInCU: 0x22412, offset: 0x22412, size: 0x8, addend: 0x0, symName: __Z7__printd, symObjAddr: 0x70, symBinAddr: 0x1000036F0, symSize: 0x10 }
+  - { offsetInCU: 0x2244E, offset: 0x2244E, size: 0x8, addend: 0x0, symName: __Z7__printy, symObjAddr: 0x50, symBinAddr: 0x1000036D0, symSize: 0x10 }
+  - { offsetInCU: 0x22456, offset: 0x22456, size: 0x8, addend: 0x0, symName: __Z7__printf, symObjAddr: 0x60, symBinAddr: 0x1000036E0, symSize: 0x10 }
+  - { offsetInCU: 0x2247C, offset: 0x2247C, size: 0x8, addend: 0x0, symName: __Z7__printf, symObjAddr: 0x60, symBinAddr: 0x1000036E0, symSize: 0x10 }
+  - { offsetInCU: 0x224B8, offset: 0x224B8, size: 0x8, addend: 0x0, symName: __Z7__printm, symObjAddr: 0x40, symBinAddr: 0x1000036C0, symSize: 0x10 }
+  - { offsetInCU: 0x224C0, offset: 0x224C0, size: 0x8, addend: 0x0, symName: __Z7__printy, symObjAddr: 0x50, symBinAddr: 0x1000036D0, symSize: 0x10 }
+  - { offsetInCU: 0x224E6, offset: 0x224E6, size: 0x8, addend: 0x0, symName: __Z7__printy, symObjAddr: 0x50, symBinAddr: 0x1000036D0, symSize: 0x10 }
+  - { offsetInCU: 0x22522, offset: 0x22522, size: 0x8, addend: 0x0, symName: __Z7__printj, symObjAddr: 0x30, symBinAddr: 0x1000036B0, symSize: 0x10 }
+  - { offsetInCU: 0x2252A, offset: 0x2252A, size: 0x8, addend: 0x0, symName: __Z7__printm, symObjAddr: 0x40, symBinAddr: 0x1000036C0, symSize: 0x10 }
+  - { offsetInCU: 0x22550, offset: 0x22550, size: 0x8, addend: 0x0, symName: __Z7__printm, symObjAddr: 0x40, symBinAddr: 0x1000036C0, symSize: 0x10 }
+  - { offsetInCU: 0x2258C, offset: 0x2258C, size: 0x8, addend: 0x0, symName: __Z7__printx, symObjAddr: 0x20, symBinAddr: 0x1000036A0, symSize: 0x10 }
+  - { offsetInCU: 0x22594, offset: 0x22594, size: 0x8, addend: 0x0, symName: __Z7__printj, symObjAddr: 0x30, symBinAddr: 0x1000036B0, symSize: 0x10 }
+  - { offsetInCU: 0x225BA, offset: 0x225BA, size: 0x8, addend: 0x0, symName: __Z7__printj, symObjAddr: 0x30, symBinAddr: 0x1000036B0, symSize: 0x10 }
+  - { offsetInCU: 0x225F6, offset: 0x225F6, size: 0x8, addend: 0x0, symName: __Z7__printl, symObjAddr: 0x10, symBinAddr: 0x100003690, symSize: 0x10 }
+  - { offsetInCU: 0x225FE, offset: 0x225FE, size: 0x8, addend: 0x0, symName: __Z7__printx, symObjAddr: 0x20, symBinAddr: 0x1000036A0, symSize: 0x10 }
+  - { offsetInCU: 0x22624, offset: 0x22624, size: 0x8, addend: 0x0, symName: __Z7__printx, symObjAddr: 0x20, symBinAddr: 0x1000036A0, symSize: 0x10 }
+  - { offsetInCU: 0x22660, offset: 0x22660, size: 0x8, addend: 0x0, symName: __Z7__printi, symObjAddr: 0x0, symBinAddr: 0x100003680, symSize: 0x10 }
+  - { offsetInCU: 0x22668, offset: 0x22668, size: 0x8, addend: 0x0, symName: __Z7__printl, symObjAddr: 0x10, symBinAddr: 0x100003690, symSize: 0x10 }
+...

@@ -1,0 +1,51 @@
+[
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [62]\n\n62"
+		],
+		"test": "4\n11 2 5 10\n"
+	},
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [3]\n\n3"
+		],
+		"test": "3\n1 3 2\n"
+	},
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [83]\n\n83"
+		],
+		"test": "7\n2 5 6 5 2 1 7\n"
+	},
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [4]\n\n4"
+		],
+		"test": "4\n1 0 1 0\n"
+	},
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [3]\n\n3"
+		],
+		"test": "4\n1 1 0 1\n"
+	},
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [5]\n\n5"
+		],
+		"test": "4\n0 0 1 0\n"
+	},
+	{
+		"correct_answers":
+		[
+			"main:33 [tmp] = [4]\n\n4"
+		],
+		"test": "4\n1 0 0 1\n"
+	}
+]
