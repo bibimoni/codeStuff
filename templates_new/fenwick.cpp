@@ -1,4 +1,4 @@
-class Fenwick {
+template <class T> class Fenwick {
   vector<T> a;
   int n;
 

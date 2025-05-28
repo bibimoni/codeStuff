@@ -1,0 +1,112 @@
+/**
+ * Author: distiled
+ */
+#include <bits/stdc++.h>
+using namespace std;
+#ifdef DEBUG
+#include </Users/distiled/codeStuff/templates/debug.h>
+#else
+#define dbg(x...)
+#endif
+#define int int64_t
+
+struct SCC {
+  // vector<int> low(n + 1), num(n + 1), del(n + 1), root(n + 1), val(n + 1);
+  vector<int> low, num, del, root;
+  int n;
+  vector<vector<int>> adj;
+  int timeDfs, scc;
+  SCC(int _n, vector<vector<int>> &_adj) : n(_n), adj(_adj) {
+    low = vector<int>(n);
+    num = vector<int>(n);
+    del = vector<int>(n);
+    root = vector<int>(n);
+    timeDfs = scc = 0;
+  }
+
+  void dfs(int u) {
+
+    timeDfs += 1;
+    num[u] = low[u] = timeDfs;
+    st.push(u);
+    for (int v : adj[u]) {
+      if (del[v]) {
+        continue;
+      }
+      if (!num[v]) {
+        self(self, v);
+        low[u] = min(low[u], low[v]);
+      } else {
+        low[u] = min(low[u], num[v]);
+      }
+    }
+    if (low[u] == num[u]) {
+      scc += 1;
+      int v;
+      do {
+        v = st.top();
+        st.pop();
+        root[v] = scc;
+        val[scc] += h[v];
+        del[v] = 1;
+      } while (v != u);
+    }
+  }
+};
+
+signed main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  int tt;
+  cin >> tt;
+  while (tt--) {
+    int n;
+    cin >> n;
+    vector<int> h(n + 1);
+    for (int i = 1; i <= n; i++)
+      cin >> h[i];
+
+    vector<int> a(n + 1);
+    for (int i = 1; i <= n; i++)
+      cin >> a[i];
+
+    vector<vector<int>> adj(n + 1);
+    for (int u = 1; u <= n; u++) {
+      adj[u].push_back((u + a[u] - 1) % n + 1);
+      adj[u].push_back((u - a[u] - 1 + n) % n + 1);
+    }
+
+    vector<int> low(n + 1), num(n + 1), del(n + 1), root(n + 1), val(n + 1);
+    int timeDfs = 0, scc = 0;
+    stack<int> st;
+    auto dfs = [&](auto &&self, int u) -> void {
+      timeDfs += 1;
+      num[u] = low[u] = timeDfs;
+      st.push(u);
+      for (int v : adj[u]) {
+        if (del[v]) {
+          continue;
+        }
+        if (!num[v]) {
+          self(self, v);
+          low[u] = min(low[u], low[v]);
+        } else {
+          low[u] = min(low[u], num[v]);
+        }
+      }
+      if (low[u] == num[u]) {
+        scc += 1;
+        int v;
+        do {
+          v = st.top();
+          st.pop();
+          root[v] = scc;
+          val[scc] += h[v];
+          del[v] = 1;
+        } while (v != u);
+      }
+    };
+
+    dfs(dfs, 1);
+  }
+}

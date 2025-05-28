@@ -1,4 +1,4 @@
-class Fenwick2D {
+template <class T> class Fenwick2D {
   vector<Fenwick<T>> ft;
   int n, m;
 
