@@ -22,9 +22,13 @@ int main(int argc, char *argv[]) {
   int tt = opt<int>("tt");
   cout << tt << '\n';
   while (tt--) {
-    int n = rnd.next(1, N);
-    int m = rnd.next(1, n);
-    int t = rnd.next(1, n);
+    int n = rnd.next(3, N);
+    int m = rnd.next(3, n);
+    int t = rnd.next(3, n);
+    if (rnd.next(5)) {
+      m = rnd.wnext(n - 2, -10) + 3;
+      t = rnd.wnext(n - 2, 10) + 3;
+    }
     cout << n << ' ';
     cout << m << ' ' << t << '\n';
     vector<int> p(n + 1);

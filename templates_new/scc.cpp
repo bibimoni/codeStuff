@@ -29,8 +29,9 @@ struct SCC {
     num = vector<int>(n);
     del = vector<int>(n);
     root = vector<int>(n);
+    joint = vector<int>(n);
     timeDfs = scc = 0;
-    for (int u = 1; u <= n; u++) {
+    for (int u = 1; u < n; u++) {
       if (!num[u]) {
         dfs(u, u);
       }

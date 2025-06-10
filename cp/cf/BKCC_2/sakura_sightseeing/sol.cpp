@@ -42,7 +42,7 @@ struct SCC {
     del = vector<int>(n);
     root = vector<int>(n);
     timeDfs = scc = 0;
-    for (int u = 1; u <= n; u++) {
+    for (int u = 1; u < n; u++) {
       if (!num[u]) {
         dfs(u, u);
       }
@@ -110,7 +110,7 @@ signed main() {
       adj[u].push_back((u - a[u] - 1 + n) % n + 1);
     }
 
-    SCC scc(n + 1, adj, 1);
+    SCC scc(n + 1, adj);
 
     vector<int> val(n + 1);
     for (int u = 1; u <= n; u++) {
@@ -139,11 +139,18 @@ signed main() {
       }
       int cur = 0;
       for (auto v : g[u]) {
-        cur += self(self, v);
+        cur = max(cur, self(self, v) + val[u]);
       }
       return dp[u] = cur;
     };
 
-    cout << dfs(dfs, scc.root[1]) << '\n';
+    int ans = 0;
+    for (int u = 1; u <= n; u++) {
+      if (scc.root[u] == 0) {
+        continue;
+      }
+      ans = max(ans, dfs(dfs, scc.root[u]));
+    }
+    cout << ans << '\n';
   }
 }

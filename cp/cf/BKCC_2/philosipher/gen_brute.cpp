@@ -1,8 +1,14 @@
 /**
  * Author: distiled
  */
+#include <algorithm>
 #include <cassert>
+#include <iomanip>
 #include <iostream>
+#include <list>
+#include <numeric>
+#include <random>
+#include <vector>
 using namespace std;
 
 #include "testlib.h"
@@ -17,17 +23,19 @@ int main(int argc, char *argv[]) {
   cin.tie(0);
   registerGen(argc, argv, 1);
   int n = opt<int>("n");
-  int tt = (1 << (2 * n)) - (2 * (1 << n) - 1);
-  cout << tt << '\n';
   int cnt = 0;
+  vector<array<int, 3>> f1;
+  vector<vector<int>> f2;
+  vector<vector<int>> f3;
   for (int a = 0; a < (1 << n); a++) {
     for (int b = 0; b < (1 << n); b++) {
       int m = __builtin_popcount(a);
       int t = __builtin_popcount(b);
-      if (!m || !t) {
+      if (m <= 2 || t <= 2) {
         continue;
       }
-      cout << n << ' ' << m << ' ' << t << '\n';
+      // cout << n << ' ' << m << ' ' << t << '\n';
+      f1.push_back({n, m, t});
       cnt += 1;
 
       vector<int> ar, br;
@@ -39,10 +47,19 @@ int main(int argc, char *argv[]) {
           br.push_back(i + 1);
         }
       }
-      println(ar);
-      println(br);
+      f2.push_back(ar);
+      f3.push_back(br);
     }
   }
-  dbg(tt, cnt);
-  assert(cnt == tt);
+  vector<int> p(cnt);
+  iota(p.begin(), p.end(), 0);
+  shuffle(p.begin(), p.end());
+  const int BOUND = 500;
+  cnt = min(cnt, BOUND);
+  cout << cnt << "\n";
+  for (int i = 0; i < cnt; i++) {
+    println(f1[p[i]]);
+    println(f2[p[i]]);
+    println(f3[p[i]]);
+  }
 }
