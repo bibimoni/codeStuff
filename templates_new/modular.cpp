@@ -7,12 +7,12 @@ private:
   static int minv(int a, int m) {
     a %= m;
     assert(a);
-    return a == 1 ? 1 : m - minv(m, a) * m / a;
+    return a == 1 ? 1 : m - static_cast<int64_t>(minv(m, a)) * m / a;
   }
 
 public:
   modnum() : v(0) {}
-  modnum(int v_) : v(v_ % MOD) {
+  modnum(int64_t v_) : v(v_ % MOD) {
     if (v < 0)
       v += MOD;
   }
@@ -71,7 +71,7 @@ public:
     return *this;
   }
   modnum &operator*=(const modnum &o) {
-    v = v * o.v % MOD;
+    v = static_cast<int64_t>(v) * o.v % MOD;
     return *this;
   }
   modnum &operator/=(const modnum &o) { return *this *= o.inv(); }

@@ -1,0 +1,33 @@
+/**
+ * Author: distiled
+ */
+#include <bits/stdc++.h>
+using namespace std;
+
+#ifdef DEBUG
+#include </Users/distiled/codeStuff/templates/debug.h>
+#else
+#define dbg(x...)
+#endif
+// #define int int64_t
+
+signed main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  int tt;
+  cin >> tt;
+  while (tt--) {
+    int n, x, y;
+    cin >> n >> x >> y;
+    string s;
+    cin >> s;
+    s = " " + s;
+    vector<int> p(n + 1);
+    for (int i = 1; i <= n; i++) {
+      cin >> p[i];
+    }
+
+    auto tob = [&](int x) -> int { return x + n + 1; } vector<vector<int>> adj(
+                              2 * n + 5);
+  }
+}

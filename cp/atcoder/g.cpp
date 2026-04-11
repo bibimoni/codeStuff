@@ -1,7 +1,7 @@
 /**
  * Author: distiled
  */
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
 #ifdef DEBUG
@@ -15,22 +15,18 @@ const int INF = 1e9 + 7;
 
 struct Node {
   vector<int> dp;
-  vector<Node *>nxt;
+  vector<Node *> nxt;
   Node() {
     dp.assign(26, INF);
-    nxt = vector<Node*>(26, nullptr);
+    nxt = vector<Node *>(26, nullptr);
   }
 };
 
 struct Trie {
   Node *root;
-  Trie() {
-    root = new Node();
-  }
+  Trie() { root = new Node(); }
 
-  int insert(string &s) {
-    return insert(root, s);
-  }
+  int insert(string &s) { return insert(root, s); }
 
   int insert(Node *cur, string &s) {
     int ans = s.size();
@@ -48,7 +44,7 @@ struct Trie {
 };
 
 signed main() {
-  ios::sync_with_stdio(false); 
+  ios::sync_with_stdio(false);
   cin.tie(0);
   int n;
   cin >> n;
@@ -59,4 +55,3 @@ signed main() {
     cout << trie.insert(s) << '\n';
   }
 }
-

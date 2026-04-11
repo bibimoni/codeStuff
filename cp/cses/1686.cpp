@@ -1,7 +1,7 @@
 /**
  * Author: distiled
  */
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
 
 #ifdef DEBUG
@@ -11,53 +11,97 @@ using namespace std;
 #endif
 #define int int64_t
 
-const int N = 1e5 + 5;
-
-vector<vector<int>> adj(N + 1);
-vector<int> a(N + 1);
-vector<int> root(N + 1);
-stack<int> st;
-vector<int> low(N + 1), id(N + 1);
-vector<int> was(N + 1, 0);
-vector<int> val(N + 1, 0);
-int time_dfs = 0, sccs = 0;
-void dfs(int u) {
-  time_dfs += 1;
-  low[u] = id[u] = time_dfs;
-  st.push(u);
-  for (int v : adj[u]) {
-    if (was[u]) {
-      continue;
-    }
-    if (id[v]) {
-      low[u] = min(low[u], id[v]);
-    } else {
-      dfs(v);
-      low[u] = min(low[u], low[v]);
+/*
+ * Find Strongest connected component, joint, bridge of a DAG
+ * Usage:
+ * vector<vector<int>> adj(n + 1);
+ * SCC scc(n + 1, adj, 1); (OR) SCC scc(n + 1, adj)
+ *    Note: this work on 1 based index graph with n node (so you need to set n
+ * here is n + 1, size of adj is also n + 1)
+ *
+ */
+struct SCC {
+  vector<int> low, num, del, root;
+  int n;
+  vector<vector<int>> adj;
+  int timeDfs, scc;
+  stack<int> st;
+  vector<pair<int, int>> bridge;
+  vector<int> joint;
+  SCC(int _n, vector<vector<int>> &_adj, int src) : n(_n), adj(_adj) {
+    low = vector<int>(n);
+    num = vector<int>(n);
+    del = vector<int>(n);
+    root = vector<int>(n);
+    joint = vector<int>(n);
+    timeDfs = scc = 0;
+    dfs(src, src);
+  }
+  SCC(int _n, vector<vector<int>> &_adj) : n(_n), adj(_adj) {
+    low = vector<int>(n);
+    num = vector<int>(n);
+    del = vector<int>(n);
+    root = vector<int>(n);
+    joint = vector<int>(n);
+    timeDfs = scc = 0;
+    for (int u = 1; u < n; u++) {
+      if (!num[u]) {
+        dfs(u, u);
+      }
     }
   }
-  if (low[u] == id[u]) {
-    int v;
-    sccs += 1;
-    do {
-      v = st.top();
-      st.pop();
-      was[v] = 1;
-      root[v] = sccs;
-      val[sccs] += a[v];
-    } while (u != v);
+
+  void dfs(int u, int pre) {
+    timeDfs += 1;
+    num[u] = low[u] = timeDfs;
+    st.push(u);
+    int child = 0;
+    for (int v : adj[u]) {
+      if (del[v]) {
+        continue;
+      }
+      if (!num[v]) {
+        dfs(v, u);
+        low[u] = min(low[u], low[v]);
+        if (low[v] == num[u]) {
+          bridge.push_back({u, v});
+        }
+        if (u == pre) {
+          if (child > 1) {
+            joint[u] = 1;
+          }
+        } else if (low[v] >= num[u]) {
+          joint[u] = 1;
+        }
+      } else {
+        low[u] = min(low[u], num[v]);
+      }
+    }
+    if (low[u] == num[u]) {
+      scc += 1;
+      int v;
+      do {
+        v = st.top();
+        st.pop();
+        root[v] = scc;
+        del[v] = 1;
+      } while (v != u);
+    }
   }
 };
 
 signed main() {
-  ios::sync_with_stdio(false); 
+  ios::sync_with_stdio(false);
   cin.tie(0);
   int n, m;
   cin >> n >> m;
+  vector<int> a(n + 1);
   for (int i = 1; i <= n; i++) {
     cin >> a[i];
   }
+
   vector<pair<int, int>> edges;
+  vector<vector<int>> adj(n + 1);
   for (int i = 0; i < m; i++) {
     int u, v;
     cin >> u >> v;
@@ -65,53 +109,43 @@ signed main() {
     edges.push_back({u, v});
   }
 
-  for (int i = 1; i <= n; i++) {
-    if (!id[i]) {
-      dfs(i);
-      time_dfs = 0;
+  SCC scc(n + 1, adj);
+
+  vector<int> val(n + 1);
+  vector<vector<int>> g(n + 1);
+  vector<int> deg(n + 1);
+  for (auto [u, v] : edges) {
+    if (scc.root[u] != scc.root[v]) {
+      g[scc.root[u]].push_back(scc.root[v]);
+      deg[scc.root[v]] += 1;
     }
   }
 
-  vector<vector<int>> g(n + 1);
-  vector<int> ind(n + 1, 0);
-  for (auto [u, v] : edges) {
-    if (root[u] == root[v]) {
+  for (int i = 1; i <= n; i++) {
+    val[scc.root[i]] += a[i];
+  }
+
+  vector<int> was(n + 1), dp(n + 1);
+  auto dfs = [&](auto &&self, int u, int p) -> void {
+    was[u] = 1;
+    for (int v : g[u]) {
+      if (v == p) {
+        continue;
+      }
+      if (!was[v]) {
+        self(self, v, u);
+      }
+      dp[u] = max(dp[u], dp[v]);
+    }
+    dp[u] += val[u];
+  };
+
+  for (int u = 1; u <= n; u++) {
+    if (was[u]) {
       continue;
     }
-    g[root[u]].push_back(root[v]);
-    ind[root[v]] += 1;
+    dfs(dfs, u, u);
   }
 
-  queue<int> que;
-  for (int i = 1; i <= sccs; i++) {
-    if (!ind[i]) {
-      que.push(i);
-    }
-  }
-
-  while (que.size()) {
-    int u = que.front();
-    que.pop();
-    for (int v : g[u]) {
-      
-    }
-  }
-
-  vector<int> memo(n + 1, -1);
-  auto dp = [&] (auto &&self, int u) -> int {
-    if (memo[u] != -1) {
-      return memo[u];
-    }
-    memo[u] = val[u];
-    for (int v : g[u]) {
-      memo[u] = max(memo[u], self(self, v) + val[u]);
-    }
-    return memo[u];
-  };
-  int ans = 0;
-  for (int i = 1; i <= sccs; i++) {
-    ans = max(ans, dp(dp, i));
-  }
-  cout << ans << "\n";
+  cout << *max_element(dp.begin(), dp.end());
 }
-

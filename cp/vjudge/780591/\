@@ -1,0 +1,37 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#ifdef DEBUG
+#include </Users/distiled/codeStuff/templates/debug.h>
+#else
+#define dbg(x...)
+#endif
+#define int int64_t
+
+signed main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  int n, p;
+  cin >> n >> p;
+  vector<int> a(n + 1);
+  vector<int> sum(n + 1, 0);
+  for (int i = 1; i <= n; ++i) {
+    cin >> a[i];
+    sum[i] = sum[i - 1] + a[i];
+  }
+
+  int l = 0, r = n + 1;
+  auto check = [&](int m) -> bool {
+    if (sum[m - 1] + m * (a[m] - 1) < p)
+      return true;
+    return false;
+  };
+  while (r - l > 1) {
+    int m = (r + l) >> 1;
+    if (check(m))
+      l = m;
+    else
+      r = m;
+  }
+  cout << l << "\n";
+}

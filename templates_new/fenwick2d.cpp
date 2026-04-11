@@ -5,7 +5,9 @@ template <class T> class Fenwick2D {
 public:
   Fenwick2D() {}
 
-  Fenwick2D(int _n, int m) : n(_n) { ft.assign(n + 5, Fenwick<T>(m + 5)); }
+  Fenwick2D(int _n, int _m) : n(_n), m(_m) {
+    ft.assign(n + 5, Fenwick<T>(m + 5));
+  }
 
   void update(int r, int c, T del) {
     for (; r <= n; r += (r & -r)) {

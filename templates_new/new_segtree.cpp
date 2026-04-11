@@ -3,9 +3,7 @@
 //
 // build:
 // SegTree<T, F, U> seg(<cap>, <default>, <trash>)
-// SegTree<int,
-//    [&] (int v_1, int v_2) { return min(v_1, v_2); },
-//    [&] (int v_1, int v_2) { return v_1 + v_2; }>
+// SegTree<int, F, U>
 //  st_mn(n, 0, int(1e9));
 //
 //  vector<int> a(n + 1);
@@ -152,3 +150,6 @@ template <class T, T (*F)(T, T), T (*U)(T, T)> struct SegTree {
     return ret;
   }
 };
+
+int F(int u, int v) { return min(u, v); }
+int U(int u, int v) { return u + v; }

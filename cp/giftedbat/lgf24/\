@@ -1,0 +1,73 @@
+/**
+ * Author: distiled
+ */
+#include <bits/stdc++.h>
+using namespace std;
+
+#ifdef DEBUG
+#include </Users/distiled/codeStuff/templates/debug.h>
+#else
+#define dbg(x...)
+#endif
+#define int int64_t
+
+signed main() {
+  ios::sync_with_stdio(false);
+  cin.tie(0);
+  int n, m;
+  cin >> n >> m;
+
+  vector<vector<int>> ga(n + 1);
+  for (int i = 0; i < n - 1; i++) {
+    int u, v;
+    cin >> u >> v;
+    ga[u].push_back(v);
+    ga[v].push_back(u);
+  }
+
+  vector<vector<int>> gb(n + 1);
+  for (int i = 0; i < m - 1; i++) {
+    int u, v;
+    cin >> u >> v;
+    gb[u].push_back(v);
+    gb[v].push_back(u);
+  }
+
+  auto find_d = [&](vector<vector<int>> &g, int ns) -> vector<int> {
+    vector<int> ret(ns + 1);
+    if (ns == 1) {
+      return ret;
+    }
+    assert(ns > 1);
+    vector<int> d(ns + 1);
+    auto dfs = [&](auto &&self, int u, int p) -> void {
+      for (int v : g[u]) {
+        if (v == p) {
+          continue;
+        }
+        d[v] = d[u] + 1;
+        self(self, v, u);
+      }
+    };
+    dfs(dfs, 1, 1);
+
+    int node = max_element(d.begin(), d.end()) - d.begin();
+    d = vector<int>(ns + 1);
+    dfs(dfs, node, node);
+
+    node = max_element(d.begin(), d.end()) - d.begin();
+    d = vector<int>(ns + 1);
+    int last_dist = d[node];
+    auto dfs_1 = [&](auto &&self, int u, int p, int cur) -> void {
+      ret[u] = max(last_dist, d[u]);
+      for (int v : g[u]) {
+        if (v == p) {
+          continue;
+        }
+        d[v] = d[u] + 1;
+        self(self, v, u);
+      }
+    };
+    return ret;
+  };
+}
