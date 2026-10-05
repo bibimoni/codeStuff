@@ -1,0 +1,10 @@
+You are given the suffix array of an unknown string $s$ of length $n$. Your task is to find the minimum number of distinct characters required to construct a string $s$ that produces this exact suffix array.
+
+Let $T = t_1 t_2 \dots t_n$ be a string of length $n$. Denote by $T[i \ldots j]$ the substring $t_i t_{i+1} \dots t_j$; the $i$-th \emph{suffix} of $T$ is the substring $T[i \ldots n]$.
+
+The \emph{suffix array} of $T$ is the permutation $p = (p_1, p_2, \dots, p_n)$ of $1, 2, \dots, n$ providing the starting positions of the suffixes of $T$ in lexicographical order$^{\dagger}$, that is,
+$$T[p_1 \ldots n] < T[p_2 \ldots n] < \dots < T[p_n \ldots n].$$
+
+For example, the suffix array of the string $T = \text{``bobapop''}$ is $(4, 3, 1, 2, 6, 7, 5)$, because:$$\text{``apop''} < \text{``bapop''} < \text{``bobapop''} < \text{``obapop''} < \text{``op''} < \text{``p''} < \text{``pop''}$$
+
+{\small $^{\dagger}$ The lexicographical order is defined as follows: string $p$ is lexicographically smaller than string $q$ if there exists a position $i$ such that $p_i < q_i$, and $p_j = q_j$ for all $j < i$. If no such position exists, then $p$ is lexicographically smaller than $q$ exactly when $p$ is shorter than $q$.}

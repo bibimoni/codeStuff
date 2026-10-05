@@ -1,0 +1,9 @@
+You are given $n$ distinct elements, numbered $1$ through $n$, connected by $n - 1$ dependency relations that form a weakly connected graph. Each relation between element $u$ and element $v$ carries a status indicator $w \in \{0, 1, 2\}$:
+
+\begin{itemize}
+  \item $w = 0$: a flexible dependency; exactly one of the two directions must be chosen --- either $u$ must come before $v$ ($u \to v$) or $v$ must come before $u$ ($v \to u$);
+  \item $w = 1$: a strict prerequisite ($u \to v$) --- $u$ must come before $v$;
+  \item $w = 2$: a reverse prerequisite ($v \to u$) --- $v$ must come before $u$.
+\end{itemize}
+
+For every fixed choice of directions for the flexible relations, count the number of permutations of $(1, 2, \dots, n)$ consistent with all constraints ($u \to v$ means $u$ stands before $v$ in the permutation). Compute the total number of such permutations, summed over all possible choices of directions for the flexible relations. Print the result modulo $998\,244\,353$.

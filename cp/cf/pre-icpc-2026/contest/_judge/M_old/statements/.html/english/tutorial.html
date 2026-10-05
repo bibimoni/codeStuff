@@ -1,0 +1,17 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>K-th Inversion Permutation</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">K-th Inversion Permutation</DIV></DIV><DIV class="tutorial"><P>Let $$$dp[len][inv]$$$ be the number of permutations of length $$$len$$$ with exactly $$$inv$$$ inversions. We only need to distinguish counts up to $$$10^{18}$$$, so every value may be capped at $$$10^{18}$$$.</P><P>Consider the first element of a permutation of length $$$len$$$. If it is the value with zero-based rank $$$r$$$ among the currently available values, then exactly the $$$r$$$ smaller available values occur later, contributing $$$r$$$ inversions. Therefore</P><P>$$$$$$dp[len][inv] = \sum_{r=0}^{\min(inv,len-1)} dp[len-1][inv-r].$$$$$$</P><P>For a fixed $$$len$$$, these sums are sliding windows over the previous row, so the entire table is computed in $$$O(nm)$$$ time. Keep the uncapped window sum in a sufficiently wide integer type while adding and removing capped table entries.</P><P>To construct the answer, maintain the available values in increasing order. At a position with $$$len$$$ values left and $$$rem$$$ inversions still needed, try candidates from smallest to largest. A candidate of rank $$$r$$$ leaves $$$rem-r$$$ inversions for the suffix, hence it begins exactly $$$dp[len-1][rem-r]$$$ valid permutations. If this count is smaller than $$$k$$$, subtract it and continue; otherwise choose the candidate and proceed to the next position. If initially $$$dp[n][m]  \lt  k$$$, the answer does not exist.</P><P>The DP takes $$$O(nm)$$$ time and $$$O(nm)$$$ memory. Reconstruction takes $$$O(n^2)$$$ time with a vector of available values. Here $$$m \le n(n-1)/2$$$.</P></DIV></DIV>   
+
+</BODY></HTML>

@@ -1,0 +1,16 @@
+14:56:14 chat: Racing M — reading the sheet.
+14:56:14 -> read M.txt
+14:56:27 -> read muse-spark-1.3
+14:56:29 chat: DP is order-only — writing the solver.
+14:56:33 -> write M.cpp
+14:56:37 $ python3 contest/judge.py submit M contest/teams/muse-spark-1.3/M.cpp --team muse-spark-1.3
+14:57:26 chat: Judge caught a counting bug — fixing the cap logic.
+14:57:31 -> write M.cpp
+14:57:35 $ python3 contest/judge.py submit M contest/teams/muse-spark-1.3/M.cpp --team muse-spark-1.3
+14:57:38 chat: DONE
+14:57:39 $ echo DONE
+14:57:43 chat: DONE
+14:57:43 $ true
+14:57:45 chat: DONE
+14:57:46 $ true
+14:57:56 chat: DONE

@@ -1,0 +1,24 @@
+# Swarm Report: contest pi-lane: gpt-5.6-sol
+
+**Mode:** swarm | **Tier:** auto | **Status:** completed
+
+## Tasks
+
+### ✓ coder: __contest_gpt-5.6-sol__
+- **Model:** openai-codex:gpt-5.6-sol | **Duration:** 31s | **Turns:** 5
+- **Tokens:** ↑22k ↓1.3k | **Cost:** $0.15
+
+  **Output:**
+
+  ```
+  Contest complete: all 12 problems A–L verified `OK`.
+  
+  - Updated `STRATEGY.md`
+  - Wrote required `feedback.md`
+  - Only failed submission: initial C typo, then corrected to `OK`
+  - Official results: `contest/results/gpt-5.6-sol.jsonl`
+  ```
+
+## Total
+- **Cost:** $0.15
+- **Duration:** 31s

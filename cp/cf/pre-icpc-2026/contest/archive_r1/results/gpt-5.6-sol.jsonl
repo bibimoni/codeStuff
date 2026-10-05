@@ -1,0 +1,15 @@
+{"ts": 1790457281.081048, "letter": "F", "verdict": "OK", "first_fail": null, "passed": 102, "total": 102, "time_ms": 573, "file": "F.cpp"}
+{"ts": 1790457284.490874, "letter": "D", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 570, "file": "D.cpp"}
+{"ts": 1790457288.377538, "letter": "A", "verdict": "OK", "first_fail": null, "passed": 103, "total": 103, "time_ms": 581, "file": "A.cpp"}
+{"ts": 1790457291.7596312, "letter": "G", "verdict": "OK", "first_fail": null, "passed": 19, "total": 19, "time_ms": 672, "file": "G.cpp"}
+{"ts": 1790457293.446763, "letter": "K", "verdict": "OK", "first_fail": null, "passed": 40, "total": 40, "time_ms": 565, "file": "K.cpp"}
+{"ts": 1790457295.549799, "letter": "I", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 576, "file": "I.cpp"}
+{"ts": 1790457361.6034958, "letter": "H", "verdict": "OK", "first_fail": null, "passed": 24, "total": 24, "time_ms": 583, "file": "H.cpp"}
+{"ts": 1790457363.86734, "letter": "J", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 587, "file": "J.cpp"}
+{"ts": 1790457387.984833, "letter": "C", "verdict": "WA", "first_fail": 1, "passed": 0, "total": 15, "time_ms": 0, "file": "C.cpp"}
+{"ts": 1790457484.1666718, "letter": "C", "verdict": "OK", "first_fail": null, "passed": 15, "total": 15, "time_ms": 1549, "file": "C.cpp"}
+{"ts": 1790457573.858336, "letter": "B", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 578, "file": "B.cpp"}
+{"ts": 1790457720.116767, "letter": "E", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 570, "file": "E.cpp"}
+{"ts": 1790457855.02387, "letter": "L", "verdict": "OK", "first_fail": null, "passed": 42, "total": 42, "time_ms": 571, "file": "L.cpp"}
+{"ts": 1790495952.53651, "letter": "M", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 408, "file": "M.cpp"}
+{"ts": 1790495972.129893, "letter": "M", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 210, "file": "M.cpp"}

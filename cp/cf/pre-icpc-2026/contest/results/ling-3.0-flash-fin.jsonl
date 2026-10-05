@@ -1,0 +1,11 @@
+{"ts": 1790527646.491912, "letter": "F", "verdict": "OK", "first_fail": null, "passed": 102, "total": 102, "time_ms": 648, "file": "sol_F.cpp"}
+{"ts": 1790527646.655621, "letter": "D", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 1057, "file": "sol_D.cpp"}
+{"ts": 1790527646.669945, "letter": "H", "verdict": "TL", "first_fail": 17, "passed": 16, "total": 24, "time_ms": 1500, "file": "sol_H.cpp"}
+{"ts": 1790527711.882426, "letter": "F", "verdict": "OK", "first_fail": null, "passed": 102, "total": 102, "time_ms": 340, "file": "sol_F.cpp"}
+{"ts": 1790527714.585939, "letter": "H", "verdict": "TL", "first_fail": 15, "passed": 14, "total": 24, "time_ms": 1346, "file": "sol_H.cpp"}
+{"ts": 1790527721.21755, "letter": "D", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 385, "file": "sol_D.cpp"}
+{"ts": 1790527744.1908338, "letter": "H", "verdict": "WA", "first_fail": 2, "passed": 1, "total": 24, "time_ms": 581, "file": "sol_H.cpp"}
+{"ts": 1790527771.8068779, "letter": "H", "verdict": "OK", "first_fail": null, "passed": 24, "total": 24, "time_ms": 578, "file": "sol_H.cpp"}
+{"ts": 1790527777.808658, "letter": "G", "verdict": "TL", "first_fail": 10, "passed": 9, "total": 19, "time_ms": 587, "file": "sol_G.cpp"}
+{"ts": 1790527827.8364558, "letter": "G", "verdict": "WA", "first_fail": 7, "passed": 6, "total": 19, "time_ms": 585, "file": "sol_G.cpp"}
+{"ts": 1790527847.0103931, "letter": "G", "verdict": "OK", "first_fail": null, "passed": 19, "total": 19, "time_ms": 603, "file": "sol_G.cpp"}

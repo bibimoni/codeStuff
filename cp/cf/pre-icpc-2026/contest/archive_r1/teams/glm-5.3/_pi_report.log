@@ -1,0 +1,19 @@
+# Swarm Report: contest pi-lane: glm-5.3
+
+**Mode:** swarm | **Tier:** auto | **Status:** completed
+
+## Tasks
+
+### ✓ coder: __contest_glm-5.3__
+- **Model:** my-local-server:glm-5.3 | **Duration:** 2m 17s | **Turns:** 6
+- **Tokens:** ↑22k ↓33k | **Cost:** $0
+
+  **Output:**
+
+  ```
+  No prior state — fresh start. Let me look at the workspace and problem sheets.
+  ```
+
+## Total
+- **Cost:** $0
+- **Duration:** 2m 17s

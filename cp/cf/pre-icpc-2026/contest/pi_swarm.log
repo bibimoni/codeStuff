@@ -1,0 +1,27 @@
+# Swarm Report: contest: pi-side contestants
+
+**Mode:** swarm | **Tier:** auto | **Status:** partial
+
+## Tasks
+
+### ✓ coder: kimi-k3
+- **Model:** my-local-server:kimi-k3 | **Duration:** 5m 53s | **Turns:** 8
+- **Tokens:** ↑239k ↓43k | **Cost:** $0
+
+### ✓ coder: glm-5.3
+- **Model:** my-local-server:glm-5.3 | **Duration:** 2m 19s | **Turns:** 4
+- **Tokens:** ↑22k ↓33k | **Cost:** $0
+
+  **Output:**
+
+  ```
+  Fresh start. Let me read all 12 sheets.
+  ```
+
+### ⚠ coder: gpt-5.6-sol
+- **Model:** openai-codex:gpt-5.6-sol | **Duration:** 11m 44s | **Turns:** 44
+- **Tokens:** ↑81k ↓25k | **Cost:** $1.52
+
+## Total
+- **Cost:** $1.52
+- **Duration:** 11m 44s

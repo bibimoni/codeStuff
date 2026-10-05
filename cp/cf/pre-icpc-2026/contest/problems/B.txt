@@ -1,0 +1,58 @@
+# Problem B — Blackout on the Neural Grid
+Time limit: 3s per test | Memory limit: 512 MB
+
+## Statement
+You are managing a neural network consisting of $N$ terminals connected by $M$ bidirectional links. Each terminal is currently either offline (0) or online (1). Triggering a reboot signal on terminal $u$ toggles the state of terminal $u$ and all terminals directly connected to it (changing 0 to 1 and 1 to 0). You are given $Q$ independent emergency scenarios, each providing the initial state of all $N$ terminals. For each scenario, find a set of terminals to reboot so that all $N$ terminals end up online (1), or determine that it is impossible.
+
+## Input
+The first line contains three integers $N$, $M$, and $Q$ ($1 \le N \le 3000$, $0 \le M \le 3000$, $1 \le Q \le 500$) --- the number of terminals, the number of links, and the number of emergency scenarios.
+
+Each of the next $M$ lines contains two integers $u$ and $v$ ($1 \le u, v \le N$, $u \neq v$) --- an undirected link between terminals $u$ and $v$. It is guaranteed that no link appears twice.
+
+Each of the next $Q$ lines contains a string of $N$ characters, each either \texttt{0} or \texttt{1}; the $i$-th character denotes the initial state of terminal $i$ (\texttt{0} --- offline, \texttt{1} --- online).
+
+## Output
+For each scencarios, output a single line:
+
+
+--- If it is impossible to make all terminals online, print -1.
+
+
+--- Otherwise, print an integer $K$ ($0 \le K \le N$), followed by $K$ distinct space-separated 1-indexed integers indicating the chosen terminals to operate on. If there are multiple valid solutions, you may output any.
+
+## Notes
+For the second query the network starts as shown (bold vertices are the online terminals):
+
+\begin{center}
+  \def \htmlPixelsInCm {45}
+  \includegraphics[width=10cm]{fig1.png}
+\end{center}
+
+Triggering terminal $1$ toggles terminals $1$, $2$, $3$, and then triggering terminal $3$ toggles $3$, $1$, $5$, $6$ --- all terminals end up online. Triggering terminals $4$ and $7$ would work equally well. In the fifth query no set of reboots can turn all terminals online, hence the answer $-1$.
+
+## Example 1 — input
+```
+7 9 5
+1 2
+1 3
+2 4
+2 5
+3 5
+3 6
+4 7
+5 7
+6 7
+0 0 0 1 1 1 1
+1 0 1 1 0 0 1
+1 1 1 1 1 1 1
+0 0 0 0 0 0 0
+1 1 1 1 1 1 0
+```
+## Example 1 — output
+```
+1 1 
+2 1 3 
+0 
+2 3 4 
+-1
+```

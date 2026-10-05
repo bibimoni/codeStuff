@@ -1,0 +1,12 @@
+{
+	"$schema": "./apps/ccusage/config-schema.json",
+	"defaults": {
+		"pricingOverrides": {
+			"glm-5.2-nvfp4": {
+				"inputCostPerToken": 0.0000014,
+				"outputCostPerToken": 0.0000044,
+				"cacheReadInputTokenCost": 0.000000026
+			}
+		}
+	}
+}

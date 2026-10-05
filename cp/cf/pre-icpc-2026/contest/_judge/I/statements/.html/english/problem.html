@@ -1,0 +1,46 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Impact on Polaris Deep</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Impact on Polaris Deep</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>The research outpost <SPAN class="tex-font-style-it">Polaris Deep</SPAN> orbits a dying star, and its only protection from the heat is a coolant network laid out on a grid of $$$n \times m$$$ tiles. Each tile is either empty or holds a junction. A junction has openings in two, three, or four of the four cardinal directions &mdash; up, right, down, left. A junction with exactly one opening is physically impossible: the pressure would burst it instantly.</P><P>Two junctions in orthogonally adjacent tiles are <SPAN class="tex-font-style-underline">connected</SPAN> if and only if both have openings facing each other. A <SPAN class="tex-font-style-underline">loop</SPAN> is a route that starts at some junction, moves along connections, and returns to the starting junction without using any connection twice.</P><P>The chief engineer measures the network's resilience by the number of <SPAN class="tex-font-style-underline">independent loops</SPAN>$$$^{\dagger}$$$ it contains.</P><P>Each tile is described by a single integer $$$g_{i,j}$$$: $$$0$$$ for an empty tile, and otherwise the sum of $$$1$$$ for an opening facing up, $$$2$$$ for right, $$$4$$$ for down, and $$$8$$$ for left. For instance, a junction whose openings face up and right is written as $$$g_{i,j} = 1 + 2 = 3$$$:</P><P></P><CENTER>  <IMG class="tex-graphics" src="c325f40300bc877bf4fc90357e7993c0752bf23a.png" width="135px"> </CENTER><P></P><P>Openings facing outside the grid connect to nothing.</P><P>During a micrometeorite storm the junctions are destroyed one by one. Telemetry predicts the whole sequence of $$$q$$$ impacts in advance: every impact hits a tile containing a working junction, and no tile is hit twice.</P><P>After each impact, report the number of independent loops remaining in the network.</P><P><SPAN class="tex-font-size-small">$$$^{\dagger}$$$ Formally, the <SPAN class="tex-font-style-underline">number of independent loops</SPAN> of the network is the largest $$$t$$$ for which one can choose a sequence of loops $$$L_1, L_2, \ldots, L_t$$$ such that every loop $$$L_i$$$ passes through at least one connection that none of the earlier loops $$$L_1, L_2, \ldots, L_{i-1}$$$ pass through.</SPAN></P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$t$$$ ($$$1 \le t \le 2 \cdot 10^5$$$) &mdash; the number of test cases.</P><P>The first line of each test case contains two integers $$$n$$$ and $$$m$$$ ($$$1 \le n, m$$$, $$$n \cdot m \le 2 \cdot 10^5$$$) &mdash; the dimensions of the grid.</P><P>Each of the next $$$n$$$ lines contains $$$m$$$ integers $$$g_{i,1}, g_{i,2}, \ldots, g_{i,m}$$$ ($$$0 \le g_{i,j} \le 15$$$) &mdash; the tiles of the $$$i$$$-th row, encoded as described in the statement, rows listed from top to bottom.</P><P>The next line contains a single integer $$$q$$$ ($$$0 \le q$$$) &mdash; the number of impacts.</P><P>Each of the next $$$q$$$ lines contains two integers $$$r$$$ and $$$c$$$ ($$$1 \le r \le n$$$, $$$1 \le c \le m$$$) &mdash; the tile destroyed by the next impact.</P><P>It is guaranteed that no tile is hit twice, that every impacted tile contains a junction, that $$$q$$$ does not exceed the number of junctions, and that the sum of $$$n \cdot m$$$ over all test cases does not exceed $$$2 \cdot 10^5$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each test case, print a single line containing $$$q$$$ integers: the $$$i$$$-th integer must be the number of independent loops remaining after the first $$$i$$$ impacts.</P><P>If $$$q = 0$$$, print an empty line.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Example</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+2 3
+15 15 15
+15 15 15
+3
+1 1
+1 2
+2 2
+3 3
+6 10 12
+5 10 5
+3 10 9
+2
+2 2
+1 2
+1 3
+5 6 5
+2
+1 2
+1 3
+1 1
+0
+0
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">15 15 15</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">15 15 15</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">6 10 12</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">5 10 5</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 10 9</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">5 6 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">1 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">0</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">0</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="1 0 0
+1 0
+0 0
+
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">1 0 0</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 0</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">0 0</DIV><DIV class="test-example-line test-example-line-even test-example-line-4"><BR></DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>In the first test case every tile holds a $$$4$$$-opening junction, giving two independent loops (the two unit squares). Destroying tile $$$(1,1)$$$ breaks the left one and destroying tile $$$(1,2)$$$ breaks the other, hence $$$1\ 0\ 0$$$. In the second test case the eight outer junctions form a single loop around the centre, while the centre tile is connected to nothing, so removing it first changes nothing: $$$1\ 0$$$. In the third test case there are no connections at all, and in the fourth $$$q = 0$$$, so the answer line is empty.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

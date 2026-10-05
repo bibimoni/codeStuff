@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="13" short-name="zero-segment" url="https://polygon.codeforces.com/p1C2hop/distiled/zero-segment">
+    <names>
+        <name language="english" value="Karesansui Garden"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <tutorials latex-pdf-mode="obsolete">
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/english/tutorial.tex" type="application/x-tex"/>
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/tutorial.html" type="text/html"/>
+        <tutorial language="english" path="statements/.pdf/english/tutorial.pdf" type="application/pdf"/>
+    </tutorials>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>2000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>40</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test cmd="gen sample1" method="generated" sample="true"/>
+                <test cmd="gen sample2" method="generated"/>
+                <test cmd="gen tiny" method="generated"/>
+                <test cmd="gen keqn" method="generated"/>
+                <test cmd="gen keq1" method="generated"/>
+                <test cmd="gen alleq" method="generated"/>
+                <test cmd="gen mono" method="generated"/>
+                <test cmd="gen farmin" method="generated"/>
+                <test cmd="gen ones" method="generated"/>
+                <test cmd="gen mini 1" method="generated"/>
+                <test cmd="gen rand 200 1 20 0 0 100 101" method="generated"/>
+                <test cmd="gen rand 100 5 50 0 0 1000 102" method="generated"/>
+                <test cmd="gen rand 50 10 100 1 0 1000000000 103" method="generated"/>
+                <test cmd="gen rand 50 10 100 2 0 1000000000 104" method="generated"/>
+                <test cmd="gen rand 30 50 200 3 0 1000000000 105" method="generated"/>
+                <test cmd="gen rand 50 10 200 4 0 1000000000 106" method="generated"/>
+                <test cmd="gen rand 50 10 200 5 2 1000000000 107" method="generated"/>
+                <test cmd="gen rand 50 10 200 0 1 1000000000 108" method="generated"/>
+                <test cmd="gen rand 40 10 300 0 2 1000000000 109" method="generated"/>
+                <test cmd="gen rand 200 1 500 0 3 1000000000 110" method="generated"/>
+                <test cmd="gen rand 1000 1 20 0 4 1000000000 111" method="generated"/>
+                <test cmd="gen rand 100 100 500 6 0 100 112" method="generated"/>
+                <test cmd="gen rand 20 500 1000 0 0 1000000000 113" method="generated"/>
+                <test cmd="gen rand 10 1000 2000 4 0 1000000000 114" method="generated"/>
+                <test cmd="gen rand 100 200 500 5 0 1000000000 115" method="generated"/>
+                <test cmd="gen trap 1 301" method="generated"/>
+                <test cmd="gen trap 2 302" method="generated"/>
+                <test cmd="gen trap 4 304" method="generated"/>
+                <test cmd="gen trap 5 305" method="generated"/>
+                <test cmd="gen trap 6 306" method="generated"/>
+                <test cmd="gen rand 1 200000 200000 0 0 1000000000 201" method="generated"/>
+                <test cmd="gen rand 1 200000 200000 1 0 1000000000 202" method="generated"/>
+                <test cmd="gen rand 1 200000 200000 2 0 1000000000 203" method="generated"/>
+                <test cmd="gen rand 1 200000 200000 3 2 1000000000 204" method="generated"/>
+                <test cmd="gen rand 200000 1 1 0 1 1000000000 205" method="generated"/>
+                <test cmd="gen rand 200 1000 1000 0 0 1000000000 206" method="generated"/>
+                <test cmd="gen rand 2 100000 100000 4 3 1000000000 207" method="generated"/>
+                <test cmd="gen trap 3 100000" method="generated"/>
+                <test cmd="gen trap 3 150000" method="generated"/>
+                <test cmd="gen trap 7 0" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/checker.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker type="testlib">
+            <source path="files/checker.cpp" type="cpp.g++17"/>
+            <copy path="check.cpp" type="cpp.g++17"/>
+            <testset>
+                <test-count>3</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests>
+                    <test verdict="ok"/>
+                    <test verdict="wrong-answer"/>
+                    <test verdict="wrong-answer"/>
+                </tests>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+                <testset>
+                    <test-count>7</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                    </tests>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_hack_band.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_hack_stride.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_hack_topD.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="main">
+                <source path="solutions/sol_main.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="accepted">
+                <source path="solutions/sol_ok.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_skip500.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="time-limit-exceeded">
+                <source path="solutions/sol_tl.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_wa.cpp" type="cpp.g++17"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+    <documents>
+        <document path="documents/description.txt" type="text/plain"/>
+    </documents>
+    <tags>
+        <tag value="greedy"/>
+        <tag value="implementation"/>
+    </tags>
+</problem>

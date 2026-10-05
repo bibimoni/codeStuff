@@ -1,0 +1,22 @@
+\begin{tutorial}{RLU Cache}
+
+Simulate the process with the right data structures.
+
+Give every pair in the cache a timestamp: the index of the last operation that touched it. Initially assign timestamps $1, 2, \ldots, n$ to keys $1, 2, \ldots, n$, and keep a global counter that is incremented by every insertion, update, or successful lookup. A key with a larger timestamp is more recently used, so for a key with timestamp $ts$ its order equals (the number of active timestamps greater than $ts$) $+ 1$.
+
+Maintain three structures, all keyed by timestamp or key:
+
+\begin{itemize}
+  \item a hash map from key to $(\text{value}, \text{timestamp})$;
+  \item a Fenwick tree over the timestamp range $1 \ldots n+q$ counting, for each timestamp, whether it is currently active (this answers "how many active timestamps are $\le ts$", from which the order follows);
+  \item a \texttt{std::set} of pairs $(\text{timestamp}, \text{key})$, whose minimum element is the least recently used key --- exactly what must be evicted.
+\end{itemize}
+
+Each query touches a constant number of elements of each structure, so it costs $O(\log(n+q))$. The total complexity is $O((n+q) \log (n+q))$ per test case.
+
+An $O(n)$-per-query simulation (e.g. keeping pairs in a vector and scanning / shifting it) is hopelessly slow: with $n = q = 2 \cdot 10^5$ it needs up to $4 \cdot 10^{10}$ elementary operations.
+
+A common mistake is to forget that a successful type-2 lookup also counts as \emph{using} the key: it must refresh the key to most recently used, otherwise the key can be discarded too early.
+
+
+\end{tutorial}

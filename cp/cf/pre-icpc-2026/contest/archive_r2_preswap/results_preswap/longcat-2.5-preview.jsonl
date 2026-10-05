@@ -1,0 +1,3 @@
+{"ts": 1790526071.029056, "letter": "A", "verdict": "OK", "first_fail": null, "passed": 103, "total": 103, "time_ms": 621, "file": "A.cpp"}
+{"ts": 1790526074.517885, "letter": "D", "verdict": "WA", "first_fail": 2, "passed": 1, "total": 101, "time_ms": 890, "file": "D.cpp"}
+{"ts": 1790526076.035527, "letter": "F", "verdict": "OK", "first_fail": null, "passed": 102, "total": 102, "time_ms": 575, "file": "F.cpp"}

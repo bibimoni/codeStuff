@@ -1,0 +1,7 @@
+In the first test case of the first example, one way to spend exactly $3$ coins is as follows. Pay $1$ coin to set $a_1 := 0$. Apply the free operation with $(l, m, r) = (1, 2, 5)$: this sets $a_2 := \max(a_1, a_5) = \max(0, 5) = 5$ — note that this does not help at all. Now pay $2$ coins to set $a_3 := 0$, and apply the free operation with $(l, m, r) = (1, 2, 3)$ to set $a_2 := \max(a_1, a_3) = 0$. The segment $[1, 3]$ is all zeros. Trying to zero a longer segment, say $[2, 4]$, turns out to cost more, and careful consideration of every possibility shows that cost $3$ cannot be beaten.
+
+In the second test case of the first example the answer is $40$: a suitable sequence of operations achieves it, and one can check that no cheaper sequence exists.
+
+In the third test case of the first example, $k = 1$, so after paying $7$ coins for the only element the array already contains a zero segment of length $1$.
+
+In the second example, for the first test case the cheapest single payment has cost $1$, which is sufficient. For the second test case, the optimal cost is $9$.

@@ -1,0 +1,18 @@
+\begin{tutorial}{The Coral Loop}
+
+Since a route never revisits a vertex, it uses the Nook at most once. On the ring, between $s$ and $t$ ($s < t \le n$) there are only two arc directions: clockwise $cw = P_{t-1} - P_{s-1}$ and counterclockwise $ccw = C - cw$, where $P$ is the prefix-sum array of $a$ and $C = P_n$.
+
+If the route visits the Nook, it has the form $s \leadsto k \to \text{Nook} \to j \leadsto t$ with $k \neq j$, where both ring arcs are vertex-disjoint. Fixing which of the two cyclic regions (inside the clockwise $s$-to-$t$ arc, or its complement) each arc lies in gives four cases:
+
+\begin{itemize}
+\item Both arcs inside: the cost equals $cw - \bigl((P_{j-1} - b_j) - (P_{k-1} + b_k)\bigr)$ for $s \le k < j \le t$, so we need $\max$ over pairs $k < j$ in a query interval of $B_j - A_k$ where $A_i = P_{i-1} + b_i$, $B_i = P_{i-1} - b_i$.
+\item Both arcs in the complement: the same pair query on the mirrored interval.
+\item Arcs in different regions: the answer splits into two independent range-minimum/range-maximum queries on $A$ and $B$.
+\end{itemize}
+
+For $t = n+1$ the route is one ring arc plus a single flight: one range-min of $A$ and one range-max of $B$.
+
+Linearize the ring into a duplicated array of length $2n$ so every cyclic interval becomes a normal range. All needed aggregates live in one mergeable node $(\min A, \max B, \max_{k<j}(B_j - A_k))$ --- merging is like the max-subarray segment tree. An update $a_x := w$ shifts all prefix sums on a suffix: apply a range-add on the duplicated array (the pair value is shift-invariant, so the lazy tag only touches $\min A$ and $\max B$). An update $b_x := w$ is a point update. Each event costs $O(\log n)$.
+
+
+\end{tutorial}

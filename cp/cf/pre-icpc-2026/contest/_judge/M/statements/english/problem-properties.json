@@ -1,0 +1,29 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATQNCiFjMTszIDEgMQ0KIWMyOzMgMSAyDQohYzM7NCAwIDENCiFjNDs0IDYgMg0K",
+    "example.01.a.mu": "TVXzASFjMTsxIDMgMg0KIWMyOzIgMSAzDQohYzM7MSAyIDMgNA0KIWM0Oy0xDQo="
+  },
+  "scoring": null,
+  "notes": "In the first test case, the lineups with exactly one insubordination are $(1,3,2)$ and $(2,1,3)$, in this order.\n\nIn the fourth test case, only one lineup has six insubordinations, so the second such lineup does not exist.\n",
+  "legend": "The court marshal must parade all $n$ knights of the realm in single file. Court etiquette numbers the knights $1$ to $n$ by seniority, so a lineup is a permutation of length $n$ --- an array containing each integer from $1$ to $n$ exactly once.\n\nWhenever a knight with a larger seniority number marches ahead of a knight with a smaller number, the court gossips about an \\emph{insubordination}. Formally, an insubordination of a lineup $p$ is a pair of positions $(i,j)$ such that $i<j$ and $p_i>p_j$.\n\nThe king has read every treatise on heraldry and fixed his mind on exactly $m$ insubordinations. Among all lineups of length $n$ with exactly $m$ insubordinations, ordered lexicographically, he demands the $k$-th one.\n\nLineup $a$ is lexicographically smaller than lineup $b$ if, at the first position where they differ, $a$ marches a knight with a smaller seniority number than $b$.\nIf fewer than $k$ such lineups exist, print $-1$.\n",
+  "authorLogin": "chungdinh",
+  "language": "english",
+  "timeLimit": 2000,
+  "output": "For each test case, print the $k$-th lexicographically smallest lineup of length $n$ having exactly $m$ insubordinations.\n\nIf it does not exist, print $-1$ instead.\n",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains one integer $t$ ($1 \\le t \\le 300$), the number of test cases.\n\nEach test case consists of one line containing three integers $n$, $m$, and $k$ ($1 \\le n \\le 300$, $0 \\le m \\le \\frac{n(n-1)}{2}$, $1 \\le k \\le 10^{18}$).\n\nIt is guaranteed that the sum of $n$ over all test cases does not exceed $300$.\n",
+  "authorName": "Chung Dinh",
+  "sampleTests": [
+    {
+      "output": "1 3 2\n2 1 3\n1 2 3 4\n-1\n",
+      "input": "4\n3 1 1\n3 1 2\n4 0 1\n4 6 2\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    }
+  ],
+  "name": "M-th Permutation by Inversions",
+  "interaction": null,
+  "memoryLimit": 268435456,
+  "tutorial": "Let $dp[len][inv]$ be the number of permutations of length $len$ with exactly $inv$ inversions. We only need to distinguish counts up to $10^{18}$, so every value may be capped at $10^{18}$.\n\nConsider the first element of a permutation of length $len$. If it is the value with zero-based rank $r$ among the currently available values, then exactly the $r$ smaller available values occur later, contributing $r$ inversions. Therefore\n\n$$dp[len][inv] = \\sum_{r=0}^{\\min(inv,len-1)} dp[len-1][inv-r].$$\n\nFor a fixed $len$, these sums are sliding windows over the previous row, so the entire table is computed in $O(nm)$ time. Keep the uncapped window sum in a sufficiently wide integer type while adding and removing capped table entries.\n\nTo construct the answer, maintain the available values in increasing order. At a position with $len$ values left and $rem$ inversions still needed, try candidates from smallest to largest. A candidate of rank $r$ leaves $rem-r$ inversions for the suffix, hence it begins exactly $dp[len-1][rem-r]$ valid permutations. If this count is smaller than $k$, subtract it and continue; otherwise choose the candidate and proceed to the next position. If initially $dp[n][m] < k$, the answer does not exist.\n\nThe DP takes $O(nm)$ time and $O(nm)$ memory. Reconstruction takes $O(n^2)$ time with a vector of available values. Here $m \\le n(n-1)/2$.\n"
+}

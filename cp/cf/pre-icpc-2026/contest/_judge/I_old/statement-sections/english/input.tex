@@ -1,0 +1,11 @@
+The first line contains a single integer $t$ ($1 \le t \le 2 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $m$ ($1 \le n, m$, $n \cdot m \le 2 \cdot 10^5$) --- the dimensions of the grid.
+
+Each of the next $n$ lines contains $m$ integers $g_{i,1}, g_{i,2}, \ldots, g_{i,m}$ ($0 \le g_{i,j} \le 15$) --- the tiles of the $i$-th row, encoded as described in the statement, rows listed from top to bottom.
+
+The next line contains a single integer $q$ ($0 \le q$) --- the number of impacts.
+
+Each of the next $q$ lines contains two integers $r$ and $c$ ($1 \le r \le n$, $1 \le c \le m$) --- the tile destroyed by the next impact.
+
+It is guaranteed that no tile is hit twice, that every impacted tile contains a junction, that $q$ does not exceed the number of junctions, and that the sum of $n \cdot m$ over all test cases does not exceed $2 \cdot 10^5$.

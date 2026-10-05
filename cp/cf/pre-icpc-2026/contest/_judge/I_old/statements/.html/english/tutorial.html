@@ -1,0 +1,17 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Coolant Loops</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Coolant Loops</DIV></DIV><DIV class="tutorial"><P>Process the impacts in reverse order: instead of deleting junctions, add them back one by one.</P><P>Start from the state after all $$$q$$$ impacts and count the active junctions $$$V$$$, the connections $$$E$$$ between them, and their connected components $$$C$$$ directly. Keep the components in a disjoint-set-union structure.</P><P>When a junction is restored, add its vertex ($$$V$$$ and $$$C$$$ increase by $$$1$$$), then look at its at most four neighbours. For every active neighbour such that the restored junction and the neighbour open towards each other, add the corresponding edge ($$$E$$$ increases by $$$1$$$); if the two endpoints were in different components, unite them ($$$C$$$ decreases by $$$1$$$).</P><P>After each restoration the number of independent loops equals $$$E - V + C$$$. Recording these values while time runs backwards and printing them in reverse order answers every impact. Each edge is considered at most once, so the running time is $$$O((n \cdot m + q)\, \alpha(n \cdot m))$$$ per test case.</P><P>Forward simulation does not work directly: deleting one junction can change the number of loops by an amount that depends on how its neighbours are connected after its removal, which is expensive to determine online.</P><P>(Why does counting with the formula $$$E - V + C$$$ match the definition in the legend? For a spanning forest of the network, every non-tree connection closes exactly one loop containing a connection no previous loop used, giving $$$E - V + C$$$ admissible loops; conversely, any loop with a fresh connection can be charged to that connection, so no sequence can be longer.)</P></DIV></DIV>   
+
+</BODY></HTML>

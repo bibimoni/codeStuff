@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="1" short-name="dp-counting-med" url="https://polygon.codeforces.com/p1lGo4f/chungdinh/dp-counting-med">
+    <names>
+        <name language="english" value="K-th Inversion Permutation"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <tutorials latex-pdf-mode="obsolete">
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/english/tutorial.tex" type="application/x-tex"/>
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/tutorial.html" type="text/html"/>
+        <tutorial language="english" path="statements/.pdf/english/tutorial.pdf" type="application/pdf"/>
+    </tutorials>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>2000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>34</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test cmd="gen sample1" method="generated" sample="true"/>
+                <test cmd="gen sample2" method="generated" sample="true"/>
+                <test cmd="gen edges 0" method="generated"/>
+                <test cmd="gen edges 1" method="generated"/>
+                <test cmd="gen edges 2" method="generated"/>
+                <test cmd="gen edges 3" method="generated"/>
+                <test cmd="gen tiny 0" method="generated"/>
+                <test cmd="gen tiny 1" method="generated"/>
+                <test cmd="gen tiny 2" method="generated"/>
+                <test cmd="gen tiny 3" method="generated"/>
+                <test cmd="gen rand 0 0" method="generated"/>
+                <test cmd="gen rand 0 1" method="generated"/>
+                <test cmd="gen rand 0 2" method="generated"/>
+                <test cmd="gen rand 1 0" method="generated"/>
+                <test cmd="gen rand 1 1" method="generated"/>
+                <test cmd="gen rand 1 2" method="generated"/>
+                <test cmd="gen rand 2 0" method="generated"/>
+                <test cmd="gen rand 2 1" method="generated"/>
+                <test cmd="gen rand 2 2" method="generated"/>
+                <test cmd="gen rand 3 0" method="generated"/>
+                <test cmd="gen rand 3 1" method="generated"/>
+                <test cmd="gen rand 3 2" method="generated"/>
+                <test cmd="gen rand 4 0" method="generated"/>
+                <test cmd="gen rand 4 1" method="generated"/>
+                <test cmd="gen max 0" method="generated"/>
+                <test cmd="gen max 1" method="generated"/>
+                <test cmd="gen max 2" method="generated"/>
+                <test cmd="gen max 3" method="generated"/>
+                <test cmd="gen max 4" method="generated"/>
+                <test cmd="gen split 0" method="generated"/>
+                <test cmd="gen split 1" method="generated"/>
+                <test cmd="gen split 2" method="generated"/>
+                <test cmd="gen split 3" method="generated"/>
+                <test cmd="gen many" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/checker.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker type="testlib">
+            <source path="files/checker.cpp" type="cpp.g++17"/>
+            <copy path="check.cpp" type="cpp.g++17"/>
+            <testset>
+                <test-count>2</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests>
+                    <test verdict="ok"/>
+                    <test verdict="wrong-answer"/>
+                </tests>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+                <testset>
+                    <test-count>8</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                    </tests>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="main">
+                <source path="solutions/sol_main.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="accepted">
+                <source path="solutions/sol_ok.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="time-limit-exceeded">
+                <source path="solutions/sol_tl.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_wa.cpp" type="cpp.g++17"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+    <tags>
+        <tag value="combinatorics"/>
+        <tag value="dp"/>
+    </tags>
+</problem>

@@ -1,0 +1,18 @@
+An \textbf{RLU cache} stores key--value pairs with a fixed capacity of $n$ pairs. At any moment the pairs in the cache have a \emph{recency order}: the most recently used pair has order $1$, the next one has order $2$, and so on; the pair with the largest order is the \emph{least recently used} one.
+
+Initially the cache is full: it contains exactly the keys $1, 2, \ldots, n$, each with value $0$, inserted in this order --- so key $1$ is initially the least recently used key (order $n$) and key $n$ is the most recently used one (order $1$).
+
+You have to process $q$ queries of two types:
+
+\begin{itemize}
+  \item \texttt{1 a b} --- put key $a$ with value $b$ into the cache:
+    \begin{itemize}
+      \item if key $a$ is already in the cache, its value is replaced by $b$ and $a$ becomes the most recently used key;
+      \item otherwise the least recently used key is \emph{discarded} (invalidated) from the cache, and $a$ with value $b$ is inserted as the most recently used key.
+    \end{itemize}
+  \item \texttt{2 a} --- look up key $a$:
+    \begin{itemize}
+      \item if key $a$ is in the cache, print its value and its current order $r$ ($r = 1$ means most recently used, $r = n$ means least recently used); afterwards $a$ becomes the most recently used key;
+      \item otherwise print $-1$ (the key was never inserted or has already been invalidated).
+    \end{itemize}
+\end{itemize}

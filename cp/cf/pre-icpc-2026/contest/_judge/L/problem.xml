@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="5" short-name="coral-loop" url="https://polygon.codeforces.com/p0Ntkxp/distiled/coral-loop">
+    <names>
+        <name language="english" value="Luminous Coral Loop"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <tutorials latex-pdf-mode="obsolete">
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/english/tutorial.tex" type="application/x-tex"/>
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/tutorial.html" type="text/html"/>
+        <tutorial language="english" path="statements/.pdf/english/tutorial.pdf" type="application/pdf"/>
+    </tutorials>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>4000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>42</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test cmd="gen sample" method="generated" sample="true"/>
+                <test cmd="gen edgepack 0 11" method="generated"/>
+                <test cmd="gen edgepack 1 12" method="generated"/>
+                <test cmd="gen edgepack 2 13" method="generated"/>
+                <test cmd="gen biganswer" method="generated"/>
+                <test cmd="gen trap 8 40 21" method="generated"/>
+                <test cmd="gen trap 12 40 22" method="generated"/>
+                <test cmd="gen trap 6 40 23" method="generated"/>
+                <test cmd="gen rand 50 50 -5 5 40 101" method="generated"/>
+                <test cmd="gen rand 60 80 -9 2 50 102" method="generated"/>
+                <test cmd="gen rand 100 100 -9 9 30 103" method="generated"/>
+                <test cmd="gen rand 150 120 0 9 20 104" method="generated"/>
+                <test cmd="gen rand 200 300 -9 9 60 105" method="generated"/>
+                <test cmd="gen rand 300 200 -1000000000 1000000000 40 106" method="generated"/>
+                <test cmd="gen rand 500 500 -9 9 10 107" method="generated"/>
+                <test cmd="gen rand 700 700 -9 9 50 108" method="generated"/>
+                <test cmd="gen rand 1000 1000 -9 9 40 109" method="generated"/>
+                <test cmd="gen rand 1200 800 -1000000000 -1 30 110" method="generated"/>
+                <test cmd="gen rand 1500 1500 -9 9 80 111" method="generated"/>
+                <test cmd="gen rand 2000 1500 -9 2 40 112" method="generated"/>
+                <test cmd="gen rand 2500 2500 -9 9 40 113" method="generated"/>
+                <test cmd="gen rand 3000 1000 -1000000000 1000000000 20 114" method="generated"/>
+                <test cmd="gen rand 3000 3000 -9 9 40 115" method="generated"/>
+                <test cmd="gen rand 4000 4000 -9 9 20 116" method="generated"/>
+                <test cmd="gen trap 1000 2000 31" method="generated"/>
+                <test cmd="gen trap 3000 3000 32" method="generated"/>
+                <test cmd="gen trap 5000 5000 33" method="generated"/>
+                <test cmd="gen rand 6000 6000 -9 9 50 117" method="generated"/>
+                <test cmd="gen rand 8000 8000 -1000000000 1000000000 40 118" method="generated"/>
+                <test cmd="gen rand 10000 10000 -9 9 30 119" method="generated"/>
+                <test cmd="gen maxrand 201" method="generated"/>
+                <test cmd="gen maxrand 202" method="generated"/>
+                <test cmd="gen maxquery 203" method="generated"/>
+                <test cmd="gen maxupd 204" method="generated"/>
+                <test cmd="gen maxneg 205" method="generated"/>
+                <test cmd="gen maxmix 206" method="generated"/>
+                <test cmd="gen maxmono 207" method="generated"/>
+                <test cmd="gen maxhub 208" method="generated"/>
+                <test cmd="gen trap 300000 300000 41" method="generated"/>
+                <test cmd="gen trap 300000 300000 42" method="generated"/>
+                <test cmd="gen sumpack 301" method="generated"/>
+                <test cmd="gen tmax 302" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/checker.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker type="testlib">
+            <source path="files/checker.cpp" type="cpp.g++17"/>
+            <copy path="check.cpp" type="cpp.g++17"/>
+            <testset>
+                <test-count>2</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests>
+                    <test verdict="ok"/>
+                    <test verdict="wrong-answer"/>
+                </tests>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+                <testset>
+                    <test-count>9</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                    </tests>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="main">
+                <source path="solutions/sol_main.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="accepted">
+                <source path="solutions/sol_ok.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="time-limit-exceeded">
+                <source path="solutions/sol_tl.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_wa.cpp" type="cpp.g++17"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+    <tags>
+        <tag value="data structures"/>
+        <tag value="graphs"/>
+        <tag value="shortest paths"/>
+    </tags>
+</problem>

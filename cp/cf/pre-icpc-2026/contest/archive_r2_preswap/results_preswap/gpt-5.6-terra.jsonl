@@ -1,0 +1,15 @@
+{"ts": 1790525392.854323, "letter": "M", "verdict": "WA", "first_fail": 6, "passed": 5, "total": 34, "time_ms": 1656, "file": "M.cpp"}
+{"ts": 1790525392.84376, "letter": "D", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 571, "file": "D.cpp"}
+{"ts": 1790525392.845952, "letter": "F", "verdict": "OK", "first_fail": null, "passed": 102, "total": 102, "time_ms": 1098, "file": "F.cpp"}
+{"ts": 1790525392.8476229, "letter": "H", "verdict": "TL", "first_fail": 1, "passed": 0, "total": 24, "time_ms": 0, "file": "H.cpp"}
+{"ts": 1790525431.100173, "letter": "M", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 583, "file": "M.cpp"}
+{"ts": 1790525431.099147, "letter": "H", "verdict": "OK", "first_fail": null, "passed": 24, "total": 24, "time_ms": 1063, "file": "H.cpp"}
+{"ts": 1790525498.905788, "letter": "G", "verdict": "OK", "first_fail": null, "passed": 19, "total": 19, "time_ms": 575, "file": "G.cpp"}
+{"ts": 1790525498.930967, "letter": "I", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 1169, "file": "I.cpp"}
+{"ts": 1790525527.0776691, "letter": "K", "verdict": "OK", "first_fail": null, "passed": 40, "total": 40, "time_ms": 588, "file": "K.cpp"}
+{"ts": 1790525574.278374, "letter": "A", "verdict": "OK", "first_fail": null, "passed": 103, "total": 103, "time_ms": 566, "file": "A.cpp"}
+{"ts": 1790525616.119703, "letter": "C", "verdict": "OK", "first_fail": null, "passed": 15, "total": 15, "time_ms": 1062, "file": "C.cpp"}
+{"ts": 1790525680.446651, "letter": "B", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 600, "file": "B.cpp"}
+{"ts": 1790525722.558424, "letter": "J", "verdict": "WA", "first_fail": 1, "passed": 0, "total": 34, "time_ms": 0, "file": "J.cpp"}
+{"ts": 1790525736.441513, "letter": "J", "verdict": "OK", "first_fail": null, "passed": 34, "total": 34, "time_ms": 591, "file": "J.cpp"}
+{"ts": 1790525820.687855, "letter": "E", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 600, "file": "E.cpp"}

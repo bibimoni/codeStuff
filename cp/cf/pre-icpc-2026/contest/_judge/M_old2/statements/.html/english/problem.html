@@ -1,0 +1,39 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Marshal's Parade</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Marshal's Parade</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>The court marshal must parade all $$$n$$$ knights of the realm in single file. Court etiquette numbers the knights $$$1$$$ to $$$n$$$ by seniority, so a lineup is a permutation of length $$$n$$$ &mdash; an array containing each integer from $$$1$$$ to $$$n$$$ exactly once.</P><P>Whenever a knight with a larger seniority number marches ahead of a knight with a smaller number, the court gossips about an <SPAN class="tex-font-style-underline">insubordination</SPAN>. Formally, an insubordination of a lineup $$$p$$$ is a pair of positions $$$(i,j)$$$ such that $$$i \lt j$$$ and $$$p_i \gt p_j$$$.</P><P>The king has read every treatise on heraldry and fixed his mind on exactly $$$m$$$ insubordinations. Among all lineups of length $$$n$$$ with exactly $$$m$$$ insubordinations, ordered lexicographically, he demands the $$$k$$$-th one.</P><P>Lineup $$$a$$$ is lexicographically smaller than lineup $$$b$$$ if, at the first position where they differ, $$$a$$$ marches a knight with a smaller seniority number than $$$b$$$. If fewer than $$$k$$$ such lineups exist, print $$$-1$$$.</P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains one integer $$$t$$$ ($$$1 \le t \le 300$$$), the number of test cases.</P><P>Each test case consists of one line containing three integers $$$n$$$, $$$m$$$, and $$$k$$$ ($$$1 \le n \le 300$$$, $$$0 \le m \le \frac{n(n-1)}{2}$$$, $$$1 \le k \le 10^{18}$$$).</P><P>It is guaranteed that the sum of $$$n$$$ over all test cases does not exceed $$$300$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each test case, print the $$$k$$$-th lexicographically smallest lineup of length $$$n$$$ having exactly $$$m$$$ insubordinations.</P><P>If it does not exist, print $$$-1$$$ instead.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Examples</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+3 1 1
+3 1 2
+4 0 1
+4 6 2
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">3 1 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">4 0 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">4 6 2</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="1 3 2
+2 1 3
+1 2 3 4
+-1
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">1 3 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2 1 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 2 3 4</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">-1</DIV></PRE></DIV><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+4 3 1
+4 3 6
+5 5 10
+1 0 2
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">4 3 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">4 3 6</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">5 5 10</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">1 0 2</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="1 4 3 2
+4 1 2 3
+3 2 4 5 1
+-1
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">1 4 3 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">4 1 2 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">3 2 4 5 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">-1</DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>In the first test case, the lineups with exactly one insubordination are $$$(1,3,2)$$$ and $$$(2,1,3)$$$, in this order.</P><P>In the fourth test case, only one lineup has six insubordinations, so the second such lineup does not exist.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

@@ -1,0 +1,29 @@
+{
+ "void": [
+  {
+   "team": "ling-3.0-flash-fin",
+   "letter": "J",
+   "reason": "peek-assisted solve: read contest/_judge/J/tests/02 and 02.a (hidden test input + expected answers) between WA at 04:18 and OK at 04:20. J permanently voided; later OKs for J do not count."
+  },
+  {
+   "team": "ling-3.0-flash-fin",
+   "letter": "E",
+   "reason": "preemptive void after second _judge breach (listed contest/_judge/E/tests/ during a 6-WA streak). Any E verdict does not count."
+  }
+ ],
+ "warnings": [
+  {
+   "team": "nemotron-3.5-lightning",
+   "reason": "listed contest/_judge/A/tests/, _judge/F/tests/ and _judge/ root (filenames only, no content read). Formal warning."
+  },
+  {
+   "team": "ling-3.0-flash-fin",
+   "reason": "SECOND breach (final warning): probed contest/_judge/E/tests/ at ~05:29 after 6 honest WAs on E. Next breach = full disqualification."
+  }
+ ],
+ "penalty_shift_min": {
+  "kimi-k3": 37,
+  "glm-5.3": 37,
+  "_note": "late-join compensation: pi-lane harness failures kept them out for the first ~37 min of the contest; per-problem solve-minutes are shifted by this value (floored at 0) before 20-min-problem fees are added. Ordered by the organizer."
+ }
+}

@@ -1,0 +1,5 @@
+In the first test case, pay $1$ coin at index $1$ ($a_1 := 1 - 1 = 0$) and $2$ coins at index $3$ ($a_3 := 2 - 2 = 0$), then apply the free operation with $(l, m, r) = (1, 2, 3)$: $a_2$ becomes $\max(0, 0) = 0$, so the segment $[1, 3]$ is all zeros, for a total of $3$ coins.
+
+In the second test case, pay $10$ coins at index $1$ and settle index $3$ in two payments of $25$ and $5$ coins (so $a_3$ becomes $30 \to 5 \to 0$); one free operation with $(1, 2, 3)$ then zeroes $a_2$ --- $40$ coins in total.
+
+In the third test case $k = 1$, so paying all $7$ coins for the only element suffices. In the fourth test case, paying for indices $2$ and $3$ ($1 + 1$ coins) zeroes the segment $[2, 3]$.

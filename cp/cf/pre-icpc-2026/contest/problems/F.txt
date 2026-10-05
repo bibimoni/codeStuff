@@ -1,0 +1,68 @@
+# Problem F — Fairest of Them All
+Time limit: 1s per test | Memory limit: 256 MB
+
+## Statement
+One day, Snow White and the seven dwarfs were taking a walk in the park.
+
+At that time, there were $n$ men in the park. 
+All $n$ of these men told Snow White their names and heights. 
+Despite living with the seven dwarfs for a long time, Snow White had never asked for their names. 
+Snow White only remembered that all seven dwarfs had the exact same height, and no one else had the same height as these dwarfs.
+
+Since the number of men is very large, Snow White asks you to write a program that reads the names and heights of the $n$ men in the park and prints the names of the seven dwarfs.
+
+## Input
+The first line contains a single integer $n$ ($7 \le n \le 100$) --- the number of men in the park.
+
+Each of the next $n$ lines contains a string $S$ and an integer $H$ ($1 \le |S| \le 10$, $1 \le H \le 1000$) --- the name of a man, consisting of English letters, and his height.
+
+It is guaranteed that exactly seven of the men have the same height, and that no other man has that height, so the seven dwarfs can be uniquely identified.
+
+## Output
+Print seven strings --- the names of the seven dwarfs, ordered according to their appearance in the input.
+
+## Example 1 — input
+```
+9
+city 1
+of 1
+shining 1
+stars 1
+are 2
+me 2
+just 1
+for 1
+you 1
+```
+## Example 1 — output
+```
+city
+of
+shining
+stars
+just
+for
+you
+```
+
+## Example 2 — input
+```
+7
+sieu 882
+cap 882
+ba 882
+khi 882
+back 882
+khoa 882
+hcmut 882
+```
+## Example 2 — output
+```
+sieu
+cap
+ba
+khi
+back
+khoa
+hcmut
+```

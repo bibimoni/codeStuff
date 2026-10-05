@@ -1,0 +1,62 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Coolant Loops</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Coolant Loops</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>The research outpost <SPAN class="tex-font-style-it">Polaris Deep</SPAN> orbits a dying star, and its only protection from the heat is a coolant network laid out on a grid of $$$n \times m$$$ tiles. Each tile is either empty or holds a junction. A junction has openings in two, three, or four of the four cardinal directions &mdash; up, right, down, left. A junction with exactly one opening is physically impossible: the pressure would burst it instantly.</P><P>Two junctions in orthogonally adjacent tiles are <SPAN class="tex-font-style-underline">connected</SPAN> if and only if both have openings facing each other. A <SPAN class="tex-font-style-underline">loop</SPAN> is a route that starts at some junction, moves along connections, and returns to the starting junction without using any connection twice.</P><P>The chief engineer measures the network's resilience by the number of <SPAN class="tex-font-style-underline">independent loops</SPAN>$$$^{\dagger}$$$ it contains.</P><P>Each tile is described by a single integer $$$g_{i,j}$$$: $$$0$$$ for an empty tile, and otherwise the sum of $$$1$$$ for an opening facing up, $$$2$$$ for right, $$$4$$$ for down, and $$$8$$$ for left. For instance, a junction whose openings face up and right is written as $$$g_{i,j} = 1 + 2 = 3$$$:</P><P></P><CENTER>  <IMG class="tex-graphics" src="d160a3f2f194705803b1ad1035dda5c06b8235b8.png" width="135px"> </CENTER><P></P><P>During a micrometeorite storm the junctions are destroyed one by one. Telemetry predicts the whole sequence of $$$q$$$ impacts in advance: every impact hits a tile containing a working junction, and no tile is hit twice.</P><P>After each impact, report the number of independent loops remaining in the network.</P><P><SPAN class="tex-font-size-small">$$$^{\dagger}$$$ Formally, the <SPAN class="tex-font-style-underline">number of independent loops</SPAN> of the network is the largest $$$t$$$ for which one can choose a sequence of loops $$$L_1, L_2, \ldots, L_t$$$ such that every loop $$$L_i$$$ passes through at least one connection that none of the earlier loops $$$L_1, L_2, \ldots, L_{i-1}$$$ pass through.</SPAN></P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$t$$$ ($$$1 \le t \le 2 \cdot 10^5$$$) &mdash; the number of test cases.</P><P>The first line of each test case contains two integers $$$n$$$ and $$$m$$$ ($$$1 \le n, m$$$, $$$n \cdot m \le 2 \cdot 10^5$$$) &mdash; the dimensions of the grid.</P><P>Each of the next $$$n$$$ lines contains $$$m$$$ integers $$$g_{i,j}$$$ ($$$0 \le g_{i,j} \le 15$$$) describing the tiles as explained in the statement, from the top row to the bottom row. It is guaranteed that no value has exactly one bit set. Openings facing outside the grid simply connect to nothing.</P><P>The next line contains a single integer $$$q$$$ &mdash; the number of impacts.</P><P>Each of the next $$$q$$$ lines contains two integers $$$r$$$ and $$$c$$$ ($$$1 \le r \le n$$$, $$$1 \le c \le m$$$) &mdash; the tile destroyed by the next impact. All impacted tiles are pairwise distinct, and each of them contains a junction.</P><P>It is guaranteed that $$$q$$$ does not exceed the number of junctions, and that the sum of $$$n \cdot m$$$ over all test cases does not exceed $$$2 \cdot 10^5$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each test case, print a single line containing $$$q$$$ integers: the $$$i$$$-th integer must be the number of independent loops remaining after the first $$$i$$$ impacts.</P><P>If $$$q = 0$$$, print an empty line.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Examples</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+2 3
+15 15 15
+15 15 15
+3
+1 1
+1 2
+2 2
+3 3
+6 10 12
+5 10 5
+3 10 9
+2
+2 2
+1 2
+1 3
+5 6 5
+2
+1 2
+1 3
+1 1
+0
+0
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">15 15 15</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">15 15 15</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">6 10 12</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">5 10 5</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 10 9</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">5 6 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">1 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">0</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">0</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="1 0 0
+1 0
+0 0
+
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">1 0 0</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 0</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">0 0</DIV><DIV class="test-example-line test-example-line-even test-example-line-4"><BR></DIV></PRE></DIV><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="1
+4 5
+6 10 12 6 12
+5 10 5 5 5
+3 10 9 3 9
+0 0 0 0 0
+6
+2 2
+1 2
+2 5
+1 5
+3 1
+2 4
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">4 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">6 10 12 6 12</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">5 10 5 5 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">3 10 9 3 9</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">0 0 0 0 0</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">6</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">3 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 4</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="2 1 0 0 0 0
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">2 1 0 0 0 0</DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>The picture below shows the networks of the first two test cases of the first example; tiles are labeled with their input values.</P><P></P><CENTER>  <IMG class="tex-graphics" src="21a27307517525bc4fd1f56730eb7554ce649236.png" width="360px">   <SPAN class="tex-font-size-small">First test case: every junction opens in all four directions; the two highlighted squares are one choice of independent loops &mdash; they share the middle connection, yet two cuts are needed to break them both.</SPAN> </CENTER><P></P><P></P><CENTER>  <IMG class="tex-graphics" src="a85029cacf88b6053f86ab9169de546690d8bfc7.png" width="360px">   <SPAN class="tex-font-size-small">Second test case: one single loop around the center; the center junction opens to the left and to the right, but nobody answers, so it is isolated.</SPAN> </CENTER><P></P><P>In the first test case every tile holds a $$$4$$$-opening junction, and two loops exist initially &mdash; for example, the left and the right unit squares. The first impact destroys tile $$$(1,1)$$$, breaking the left square, so only one loop (the right square) remains. The second impact destroys tile $$$(1,2)$$$ and breaks that loop as well, and the third impact changes nothing. Hence the answers are $$$1, 0, 0$$$.</P><P>In the second test case eight junctions form a single loop around the center. The center tile $$$10$$$ opens to the left and to the right, but none of its neighbours opens back, so it is connected to nothing. The first impact destroys this isolated junction and the loop survives &mdash; the answer is $$$1$$$. The second impact destroys tile $$$(1,2)$$$, cutting the ring into a path, so the answer becomes $$$0$$$.</P><P>In the third test case no two adjacent junctions ever face each other: tile $$$5$$$ does not open to the right and tile $$$6$$$ does not open to the left. There is not a single connection in the network, let alone a loop.</P><P>The fourth test case of the first example has $$$q = 0$$$, so the expected output for it is an empty line.</P><P>In the second example the network initially has two independent loops &mdash; one around the left $$$3 \times 3$$$ block and one around the right $$$2 \times 3$$$ block &mdash; plus one isolated junction. The first impact removes the isolated junction (answers start with $$$2$$$), the second and third impacts break the left and the right loop respectively, and the remaining impacts only shorten paths: $$$2, 1, 0, 0, 0, 0$$$.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

@@ -1,0 +1,29 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATYNCiFjMTs0DQoxIDIgMSAyDQohYzI7NA0KMSAtMSAxIC0xDQohYzM7Mg0KMSAxDQohYzQ7MQ0KNQ0KIWM1OzINCi0xIC0xDQohYzY7Ng0KMSAyIDMgMCAyIDQNCg==",
+    "example.01.a.mu": "TVXzASFjMTsyDQohYzI7Mg0KIWMzOzINCiFjNDsxDQohYzU7Mg0KIWM2OzMNCg=="
+  },
+  "scoring": null,
+  "notes": "The example contains six test cases.\n\n\\begin{itemize}\n  \\item $a = [1, 2, 1, 2]$, total sum $6$. Balanced divisions: the whole array (one segment of sum $6$), and $[1, 2]\\;[1, 2]$ (two segments of sum $3$). Three segments of sum $2$ would require a prefix of sum $2$, which does not exist. Answer: $2$.\n  \\item $a = [1, -1, 1, -1]$, total sum $0$, so every segment must sum to $0$. The only position $i < n$ with prefix sum $0$ is $i = 2$, and we may either cut there or not. Answer: $2$.\n  \\item $a = [1, 1]$: $[1, 1]$ or $[1]\\;[1]$. Answer: $2$.\n  \\item $a = [5]$: only the single segment. Answer: $1$.\n  \\item $a = [-1, -1]$: same as the third case with a negative total. Answer: $2$.\n  \\item $a = [1, 2, 3, 0, 2, 4]$, total sum $12$. With $k = 2$ segments (sum $6$ each) the cut can be made after index $3$ or after index $4$, since both prefix sums equal $6$ --- that gives $2$ divisions. No $k \\in \\{3, 4, 6\\}$ works (e.g. for $k = 3$ a prefix of sum $4$ is required but absent). Together with the single-segment division, the answer is $3$.\n\\end{itemize}\n",
+  "legend": "Master jeweler Jade has acquired a necklace of $n$ gemstones strung in a row; gem $i$ is appraised at $a_i$ ducats --- a few \\emph{debt stones} among them are actually IOUs, so appraisals may be negative.\n\nFor the guild fair, Jade must split the row into one or more contiguous strands so that every gem belongs to exactly one strand. A split is called \\emph{balanced} if all its strands carry the same total appraisal.\n\nCount the number of balanced splits. Two splits are considered different if their sets of cut positions are different (a cut can be made between positions $i$ and $i+1$ for any $1 \\le i < n$).\n\nNote that selling the necklace whole --- a single strand, no cuts --- is always balanced.\n\nSince the number of splits can be huge, print it modulo $10^9 + 7$.\n",
+  "authorLogin": "distiled",
+  "language": "english",
+  "timeLimit": 2000,
+  "output": "For each test case, print a single integer --- the number of balanced splits of the necklace, modulo $10^9 + 7$.\n",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains a single integer $t$ ($1 \\le t \\le 10^5$) --- the number of test cases.\n\nThe first line of each test case contains a single integer $n$ ($1 \\le n \\le 10^5$) --- the size of the array.\n\nThe second line of each test case contains $n$ integers $a_1, a_2, \\ldots, a_n$ ($-10^9 \\le a_i \\le 10^9$) --- the appraisals of the gems, in necklace order.\n\nIt is guaranteed that the sum of $n$ over all test cases does not exceed $10^5$.\n",
+  "authorName": "Bao Dang",
+  "sampleTests": [
+    {
+      "output": "2\n2\n2\n1\n2\n3\n",
+      "input": "6\n4\n1 2 1 2\n4\n1 -1 1 -1\n2\n1 1\n1\n5\n2\n-1 -1\n6\n1 2 3 0 2 4\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    }
+  ],
+  "name": "Just Split Evenly",
+  "interaction": null,
+  "memoryLimit": 268435456,
+  "tutorial": "Let $p_i = a_1 + \\dots + a_i$ be the prefix sums and $S = p_n$.\n\nIf $S = 0$, all segment sums must be $0$, which happens iff every cut is made at an index with $p_i = 0$. Each subset of the $c = \\#\\{i < n : p_i = 0\\}$ valid cut positions gives a balanced division, so the answer is $2^c$.\n\nNow let $S \\neq 0$. A balanced division into $k$ segments has segment sum $t = S / k$, so $k$ must divide $S$ (check divisibility of the absolute value) and $k \\le n$. Conversely, for such $k$, cuts $c_1 < c_2 < \\dots < c_{k-1}$ must satisfy $p_{c_j} = j \\cdot t$. The number of such chains is counted by a single left-to-right sweep: maintain $\\text{dp}[j]$ = number of ways to place the first $j$ cuts in the processed prefix; when $p_i = j t$ for $1 \\le j < k$, do $\\text{dp}[j] \\mathrel{+}= \\text{dp}[j-1]$. The contribution of this $k$ is $\\text{dp}[k-1]$. Note that a plain product of per-value counters is wrong for signed arrays --- positions with prefix sums $t, 2t, \\ldots$ can interleave, so order matters.\n\nCandidate values of $k$ are exactly the divisors of $|S|$ not exceeding $n$. Scan $i$ from $1$ to $\\min(n, \\lfloor\\sqrt{|S|}\\rfloor)$: every valid $k$ appears either as $i$ or as $|S|/i$. Since $|S| \\le 10^{14}$, this scan is $O(\\min(n, \\sqrt{|S|})) \\le O(n)$ per test case. A cheap precheck (every multiple $j t$, $1 \\le j < k$, present among prefix values) lets the $O(n)$ sweep run only for $k$ that can actually contribute.\n\nThe total complexity is $O(n \\cdot d)$ per test case with $d$ the number of contributing divisors, easily fast enough; 64-bit integers are required for prefix sums (up to $10^{14}$ in absolute value).\n"
+}

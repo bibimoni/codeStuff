@@ -1,0 +1,1 @@
+Ad-hoc easy (pre-ICPC 2026): min cost to build a zero segment of length >= k using paid zeroing and free max-propagation. Answer = cheapest pair (a_i + a_j) with j - i + 1 >= k; k = 1 is the bare minimum. O(n) per test.

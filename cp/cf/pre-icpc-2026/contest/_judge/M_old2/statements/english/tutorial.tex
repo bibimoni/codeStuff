@@ -1,0 +1,16 @@
+\begin{tutorial}{Marshal's Parade}
+
+Let $dp[len][inv]$ be the number of permutations of length $len$ with exactly $inv$ inversions. We only need to distinguish counts up to $10^{18}$, so every value may be capped at $10^{18}$.
+
+Consider the first element of a permutation of length $len$. If it is the value with zero-based rank $r$ among the currently available values, then exactly the $r$ smaller available values occur later, contributing $r$ inversions. Therefore
+
+$$dp[len][inv] = \sum_{r=0}^{\min(inv,len-1)} dp[len-1][inv-r].$$
+
+For a fixed $len$, these sums are sliding windows over the previous row, so the entire table is computed in $O(nm)$ time. Keep the uncapped window sum in a sufficiently wide integer type while adding and removing capped table entries.
+
+To construct the answer, maintain the available values in increasing order. At a position with $len$ values left and $rem$ inversions still needed, try candidates from smallest to largest. A candidate of rank $r$ leaves $rem-r$ inversions for the suffix, hence it begins exactly $dp[len-1][rem-r]$ valid permutations. If this count is smaller than $k$, subtract it and continue; otherwise choose the candidate and proceed to the next position. If initially $dp[n][m] < k$, the answer does not exist.
+
+The DP takes $O(nm)$ time and $O(nm)$ memory. Reconstruction takes $O(n^2)$ time with a vector of available values. Here $m \le n(n-1)/2$.
+
+
+\end{tutorial}

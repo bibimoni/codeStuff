@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="10" short-name="grid-reboot" url="https://polygon.codeforces.com/p4ejXyC/bakhibk/grid-reboot">
+    <names>
+        <name language="english" value="Blackout on the Neural Grid"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>3000</time-limit>
+            <memory-limit>536870912</memory-limit>
+            <test-count>101</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test method="manual" sample="true"/>
+                <test cmd="gen 1 1" method="generated"/>
+                <test cmd="gen 1 2" method="generated"/>
+                <test cmd="gen 1 3" method="generated"/>
+                <test cmd="gen 1 4" method="generated"/>
+                <test cmd="gen 1 5" method="generated"/>
+                <test cmd="gen 1 6" method="generated"/>
+                <test cmd="gen 1 7" method="generated"/>
+                <test cmd="gen 1 8" method="generated"/>
+                <test cmd="gen 1 9" method="generated"/>
+                <test cmd="gen 1 10" method="generated"/>
+                <test cmd="gen 1 11" method="generated"/>
+                <test cmd="gen 1 12" method="generated"/>
+                <test cmd="gen 1 13" method="generated"/>
+                <test cmd="gen 1 14" method="generated"/>
+                <test cmd="gen 1 15" method="generated"/>
+                <test cmd="gen 1 16" method="generated"/>
+                <test cmd="gen 1 17" method="generated"/>
+                <test cmd="gen 1 18" method="generated"/>
+                <test cmd="gen 1 19" method="generated"/>
+                <test cmd="gen 1 20" method="generated"/>
+                <test cmd="gen 1 21" method="generated"/>
+                <test cmd="gen 1 22" method="generated"/>
+                <test cmd="gen 1 23" method="generated"/>
+                <test cmd="gen 1 24" method="generated"/>
+                <test cmd="gen 1 25" method="generated"/>
+                <test cmd="gen 1 26" method="generated"/>
+                <test cmd="gen 1 27" method="generated"/>
+                <test cmd="gen 1 28" method="generated"/>
+                <test cmd="gen 1 29" method="generated"/>
+                <test cmd="gen 1 30" method="generated"/>
+                <test cmd="gen 1 31" method="generated"/>
+                <test cmd="gen 1 32" method="generated"/>
+                <test cmd="gen 1 33" method="generated"/>
+                <test cmd="gen 1 34" method="generated"/>
+                <test cmd="gen 1 35" method="generated"/>
+                <test cmd="gen 1 36" method="generated"/>
+                <test cmd="gen 1 37" method="generated"/>
+                <test cmd="gen 1 38" method="generated"/>
+                <test cmd="gen 1 39" method="generated"/>
+                <test cmd="gen 1 40" method="generated"/>
+                <test cmd="gen 1 41" method="generated"/>
+                <test cmd="gen 1 42" method="generated"/>
+                <test cmd="gen 1 43" method="generated"/>
+                <test cmd="gen 1 44" method="generated"/>
+                <test cmd="gen 1 45" method="generated"/>
+                <test cmd="gen 1 46" method="generated"/>
+                <test cmd="gen 1 47" method="generated"/>
+                <test cmd="gen 1 48" method="generated"/>
+                <test cmd="gen 1 49" method="generated"/>
+                <test cmd="gen 1 50" method="generated"/>
+                <test cmd="gen 1 51" method="generated"/>
+                <test cmd="gen 1 52" method="generated"/>
+                <test cmd="gen 1 53" method="generated"/>
+                <test cmd="gen 1 54" method="generated"/>
+                <test cmd="gen 1 55" method="generated"/>
+                <test cmd="gen 1 56" method="generated"/>
+                <test cmd="gen 1 57" method="generated"/>
+                <test cmd="gen 1 58" method="generated"/>
+                <test cmd="gen 1 59" method="generated"/>
+                <test cmd="gen 1 60" method="generated"/>
+                <test cmd="gen 1 61" method="generated"/>
+                <test cmd="gen 1 62" method="generated"/>
+                <test cmd="gen 1 63" method="generated"/>
+                <test cmd="gen 1 64" method="generated"/>
+                <test cmd="gen 1 65" method="generated"/>
+                <test cmd="gen 1 66" method="generated"/>
+                <test cmd="gen 1 67" method="generated"/>
+                <test cmd="gen 1 68" method="generated"/>
+                <test cmd="gen 1 69" method="generated"/>
+                <test cmd="gen 1 70" method="generated"/>
+                <test cmd="gen 1 71" method="generated"/>
+                <test cmd="gen 1 72" method="generated"/>
+                <test cmd="gen 1 73" method="generated"/>
+                <test cmd="gen 1 74" method="generated"/>
+                <test cmd="gen 1 75" method="generated"/>
+                <test cmd="gen 1 76" method="generated"/>
+                <test cmd="gen 1 77" method="generated"/>
+                <test cmd="gen 1 78" method="generated"/>
+                <test cmd="gen 1 79" method="generated"/>
+                <test cmd="gen 1 80" method="generated"/>
+                <test cmd="gen 1 81" method="generated"/>
+                <test cmd="gen 1 82" method="generated"/>
+                <test cmd="gen 1 83" method="generated"/>
+                <test cmd="gen 1 84" method="generated"/>
+                <test cmd="gen 1 85" method="generated"/>
+                <test cmd="gen 1 86" method="generated"/>
+                <test cmd="gen 1 87" method="generated"/>
+                <test cmd="gen 1 88" method="generated"/>
+                <test cmd="gen 1 89" method="generated"/>
+                <test cmd="gen 1 90" method="generated"/>
+                <test cmd="gen 1 91" method="generated"/>
+                <test cmd="gen 1 92" method="generated"/>
+                <test cmd="gen 1 93" method="generated"/>
+                <test cmd="gen 1 94" method="generated"/>
+                <test cmd="gen 1 95" method="generated"/>
+                <test cmd="gen 1 96" method="generated"/>
+                <test cmd="gen 1 97" method="generated"/>
+                <test cmd="gen 1 98" method="generated"/>
+                <test cmd="gen 1 99" method="generated"/>
+                <test cmd="gen 1 100" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/checker.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker type="testlib">
+            <source path="files/checker.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            <copy path="check.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            <testset>
+                <test-count>0</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests/>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+                <testset>
+                    <test-count>0</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests/>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="time-limit-exceeded">
+                <source path="solutions/TLE1.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="accepted">
+                <source path="solutions/gemini.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/greedy1.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/greedy2.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/greedy3.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="rejected">
+                <source path="solutions/greedy4.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="main">
+                <source path="solutions/solution.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>1</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list>
+            <stress index="1" path="stresses/001"/>
+        </list>
+    </stresses>
+    <tags>
+        <tag value="graph"/>
+        <tag value="math"/>
+    </tags>
+</problem>

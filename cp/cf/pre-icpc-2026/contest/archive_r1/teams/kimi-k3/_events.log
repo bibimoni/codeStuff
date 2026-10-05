@@ -1,0 +1,329 @@
+04:49:43 $ ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/ && ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3/ 2>/dev/null; cat /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results
+04:49:47 -> read D.txt
+04:49:47 -> read G.txt
+04:49:47 -> read A.txt
+04:50:42 -> write A.cpp
+04:50:44 -> write D.cpp
+04:50:46 chat: A, D, G all look easy. Writing solutions for all three now, then testing against samples.
+04:50:46 -> write G.cpp
+04:50:55 $ cd contest/teams/kimi-k3 && g++-14 -O2 -o a.out A.cpp && g++-14 -O2 -o d.out D.cpp && g++-14 -O2 -o g.out G.cpp && printf '4\n4 1 2 3\n' | ./a.out && printf '4\n4 3 2 1\n' | ./a.out && printf '7\n4 3 1 2 6 7 5\n' | ./a.o
+04:50:59 chat: All samples pass. Submitting all three.
+04:51:09 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit A contest/teams/kimi-k3/A.cpp --team kimi-k3 && python3 contest/judge.py submit D contest/teams/kimi-k3/D.cpp --team kimi-k3 && python3 
+04:51:15 -> write STRATEGY.md
+04:51:16 -> read J.txt
+04:51:16 chat: 3 OK. Writing STRATEGY.md and reading the next batch.
+04:51:16 -> read B.txt
+04:54:12 -> write J.cpp
+04:54:18 chat: J is a prefix-sum/divisor DP; B is GF(2) linear algebra with bitset elimination (N≤3000, Q≤500). Writing both.
+04:54:18 -> write B.cpp
+04:54:27 $ cd contest/teams/kimi-k3 && g++-14 -O2 -o j.out J.cpp 2>&1 && g++-14 -O2 -o b.out B.cpp 2>&1 && printf '6\n4\n1 2 1 2\n4\n1 -1 1 -1\n2\n1 1\n1\n5\n2\n-1 -1\n6\n1 2 3 0 2 4\n' | ./j.out && printf '7 9 5\n1 2\n1 3\n2 4\n2 
+04:54:32 chat: J's DP is tricky — brute-force cross-check before submitting.
+04:54:35 $ cd contest/teams/kimi-k3 && python3 - <<'EOF'
+import random, subprocess
+from itertools import product
+MOD=10**9+7
+def brute(a):
+    n=len(a); cnt=0
+    for mask in range(1<<(n-1)):
+        segs=[]; cur=a[0]
+        for i
+04:54:44 $ cd contest/teams/kimi-k3 && python3 - <<'EOF'
+import random, subprocess
+random.seed(2)
+for trial in range(60):
+    N=random.randint(1,9); M=random.randint(0,min(N*(N-1)//2,14)); Q=random.randint(1,6)
+    edges=set()
+    
+04:54:47 chat: Both verified against brute force. Submitting J and B.
+04:55:28 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit J contest/teams/kimi-k3/J.cpp --team kimi-k3 && python3 contest/judge.py submit B contest/teams/kimi-k3/B.cpp --team kimi-k3
+04:56:34 -> write J.cpp
+04:56:37 chat: J: ML — state map too fat. Fix: skip zero-delta inserts + flat open-addressing map. B: TL — per-bit loops (9e6×500) too slow; switch to word-level `&`+`count` parity.
+04:56:37 -> edit B.cpp
+04:56:49 $ cd contest/teams/kimi-k3 && g++-14 -O2 -o j.out J.cpp 2>&1 | grep -v clang: ; g++-14 -O2 -o b.out B.cpp 2>&1 | grep -v clang: ; printf '6\n4\n1 2 1 2\n4\n1 -1 1 -1\n2\n1 1\n1\n5\n2\n-1 -1\n6\n1 2 3 0 2 4\n' | ./j.out && 
+04:57:07 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit J contest/teams/kimi-k3/J.cpp --team kimi-k3 && python3 contest/judge.py submit B contest/teams/kimi-k3/B.cpp --team kimi-k3
+04:58:01 chat: B OK. J: memory fixed, now TL on a heavy test. The killer is per-(position,divisor) ll-division + hashmap ops. Optimizing: memoize per distinct *value* the full work-list (precomputed keys, no divisions), flat map alread
+04:58:01 -> edit J.cpp
+04:58:15 $ cd contest/teams/kimi-k3 && g++-14 -O2 -o j.out J.cpp 2>&1 | grep -v clang: ; python3 - <<'EOF'
+import random, subprocess, time
+# verify correctness again
+MOD=10**9+7
+def brute(a):
+    n=len(a); cnt=0
+    for mask in ran
+04:58:30 chat: T1 0.73s, but maybe judge's test is nastier. Let me instrument counts and build a true worst case.
+04:58:30 $ cd contest/teams/kimi-k3 && python3 - <<'EOF'
+import subprocess, time, random
+def mk(S, pref):
+    n=len(pref)+1
+    a=[pref[0]]+ [pref[i]-pref[i-1] for i in range(1,len(pref))]+[S-pref[-1]]
+    if any(abs(x)>10**9 for x
+04:58:48 chat: Key realization: `|a_i|≤1e9` bounds prefix steps, so the truly adversarial case is weaker. Adding "active divisor" pruning: skip lookups for divisors with no chains yet (delta would be 0 unless fresh start).
+04:58:48 -> edit J.cpp
+04:58:52 -> edit J.cpp
+04:58:57 -> edit J.cpp
+04:59:08 $ cd contest/teams/kimi-k3 && g++-14 -O2 -o j.out J.cpp 2>&1 | grep -v clang: ; python3 - <<'EOF'
+import random, subprocess, time
+MOD=10**9+7
+def brute(a):
+    n=len(a); cnt=0
+    for mask in range(1<<(n-1)):
+        segs=
+04:59:36 chat: The brute passed; my stress harness was feeding invalid inputs (step limit 1e9 actually constrains the adversary). Building a legal worst-case to measure.
+04:59:37 $ cd contest/teams/kimi-k3 && python3 - <<'EOF'
+import subprocess, time
+def ndiv(x):
+    c=0;d=1
+    while d*d<=x:
+        if x%d==0: c+= 2 if d*d!=x else 1
+        d+=1
+    return c
+L=997920000
+print("d(L)=",ndiv(L))
+q=98
+04:59:47 $ cd contest/teams/kimi-k3 && python3 - <<'EOF'
+import subprocess, time
+L=997920000; q=98280; S=L*q
+pref=[]
+for i in range(1,3001): pref.append(i)
+pref.append(L)
+k=1; dk=1; KK=q-2
+while len(pref) < 99998:
+    k += dk
+    i
+05:00:33 chat: Found it: per-distinct-v memo build is O(d(S)) — too heavy. Switching to per-g memo, plus prune divisors with m=S/sd > n (chains can't complete), plus sign-skip before dividing.
+05:00:33 -> edit J.cpp
+05:00:47 $ cd contest/teams/kimi-k3 && g++-14 -O2 -o j.out J.cpp 2>&1 | grep -v clang: ; printf '6\n4\n1 2 1 2\n4\n1 -1 1 -1\n2\n1 1\n1\n5\n2\n-1 -1\n6\n1 2 3 0 2 4\n' | ./j.out && python3 - <<'EOF'
+import random, subprocess, time
+
+05:01:00 chat: heavy case now 0.04s. One more adversarial shape — small rich S with everything activated:
+05:02:03 chat: The loop `d = 1; d < 4; d += 2` iterates over d = 1, 3 (right, left) — not right/down. That double-counts horizontals and skips verticals. Fixing with an explicit direction list:
+05:02:05 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/nemotron-3-ultra && python3 - << 'EOF'
+import re
+s = open('I.cpp').read()
+s = s.replace("const int bit[4] = {1, 2, 4, 8};",
+              "const int bit[4] =
+05:06:02 chat: Test 1 passes now but test 2 gives 0 0 instead of 1 0. Let me debug the issue.
+05:06:03 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/nemotron-3-ultra && python3 - << 'EOF'
+code = open('I.cpp').read()
+# Add debug output
+code = code.replace("int main()", "int main()\n    ios::sync_with_stdio
+05:08:10 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/nemotron-3-ultra && ./I << 'EOF'
+1
+4 5
+6 10 12 6 12
+5 10 5 5 5
+3 10 9 3 9
+0 0 0 0 0
+6
+2 2
+1 2
+2 5
+1 5
+3 1
+2 4
+EOF
+05:08:10 chat: All three examples pass. Let me also test Example 2 from the problem statement.
+05:13:43 -> read A.txt
+05:13:43 $ ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3/ 2>/dev/null; ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/
+05:13:48 -> read STRATEGY.md
+05:13:48 $ cat /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/kimi-k3.jsonl 2>/dev/null; echo ---; date
+05:13:56 -> read J.txt
+05:13:56 -> read J.cpp
+05:13:56 chat: Resume detected: A, D, G, B solved. J attempted (ML then TL). Let me pick up J first, then move on.
+05:18:10 $ ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/ && ls -la /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3/ 2>/dev/null; wc -c /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/p
+05:18:14 -> read STRATEGY.md
+05:18:14 -> read kimi-k3.jsonl
+05:18:19 -> read J.txt
+05:18:19 chat: I'm already mid-contest: A, B, D, G solved; J close (31/34, ML then TL). Let me fix J first, then move on.
+05:18:19 -> read J.cpp
+05:21:37 -> write J.cpp
+05:21:40 chat: J needs a rewrite — old one iterated all divisors per position (ML+TL). New plan: viable segment sums must be prefix values dividing S; chain-count per value with binary-search DP. Let me write it plus a brute force stre
+05:21:40 -> write J_brute.cpp
+05:21:45 -> write J_gen.py
+05:21:49 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o j.out J.cpp && g++-14 -O2 -o j_brute.out J_brute.cpp && printf '6\n4\n1 2 1 2\n4\n1 -1 1 -1\n2\n1 1\n1\n5\n2\n-1 -1\n6\n1 2 3 0 2 4\
+05:21:52 chat: Sample passes. Stress against brute:
+05:23:03 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && for i in $(seq 1 2000); do python3 J_gen.py $i > jt.txt; ./j.out < jt.txt > jo.txt; ./j_brute.out < jt.txt > jb.txt; if ! diff -q jo.txt jb.txt > 
+05:23:08 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && python3 -c "
+import random
+random.seed(7)
+# worst 1: all ones
+print(3)
+n=100000
+print(n); print(' '.join(['1']*n))
+# worst 2: K multiples
+K=997920
+05:23:13 chat: Fast (0.03s on max-size adversarial). Submitting J:
+05:23:16 $ python3 contest/judge.py submit J contest/teams/kimi-k3/J.cpp --team kimi-k3
+05:23:24 -> edit STRATEGY.md
+05:23:24 chat: J OK! Update strategy, then read next problems (F, K short sheets).
+05:23:24 -> read F.txt
+05:23:34 -> write STRATEGY.md
+05:23:36 chat: F is trivial. Rewrite STRATEGY.md properly and write F:
+05:23:36 -> write F.cpp
+05:23:42 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o f.out F.cpp && printf '9\ncity 1\nof 1\nshining 1\nstars 1\nare 2\nme 2\njust 1\nfor 1\nyou 1\n' | ./f.out && printf '7\nsieu 882\nc
+05:23:47 $ python3 contest/judge.py submit F contest/teams/kimi-k3/F.cpp --team kimi-k3
+05:23:49 chat: F OK. 6 solved. Next: K.
+05:23:49 -> read K.txt
+05:24:04 chat: K: free-zero closure argument — paying l and r zeroes whole interval, so answer = min a_l + a_r over pairs with r - l ≥ k-1 (k=1: min element). Write and test:
+05:24:04 -> write K.cpp
+05:24:09 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o k.out K.cpp && printf '4\n5 3\n1 4 2 3 5\n3 3\n10 20 30\n1 1\n7\n4 2\n5 1 1 5\n' | ./k.out && printf '2\n6 1\n9 3 8 1 10 2\n5 4\n8 2
+05:24:14 $ python3 contest/judge.py submit K contest/teams/kimi-k3/K.cpp --team kimi-k3
+05:24:17 chat: 7 solved. Next: E.
+05:24:17 -> read E.txt
+05:25:37 chat: E reduces to counting linear extensions of the fixed-edge forest (each schedule corresponds to exactly one orientation of flexible edges). Tree DP with subtree polynomials, O(n²). Writing:
+05:25:37 -> write E.cpp
+05:25:47 chat: Test sample and brute-stress E:
+05:25:47 -> write E_brute.cpp
+05:25:51 -> write E_gen.py
+05:27:36 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o e.out E.cpp && g++-14 -O2 -o e_brute.out E_brute.cpp && printf '5\n1 2 2\n1 3 0\n3 5 1\n3 4 2\n' | ./e.out && for i in $(seq 1 3000)
+05:27:41 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && python3 -c "
+n=4000
+print(n)
+for v in range(2,n+1):
+    print(v-1, v, (v%3))  # path with mixed w
+" > ebig.txt && time ./e.out < ebig.txt && pytho
+05:27:47 $ python3 contest/judge.py submit E contest/teams/kimi-k3/E.cpp --team kimi-k3
+05:27:51 -> edit STRATEGY.md
+05:27:54 -> edit STRATEGY.md
+05:27:54 chat: E OK — 8 solved. Update strategy, read L:
+05:27:54 -> read L.txt
+05:32:17 -> write L.cpp
+05:32:24 chat: L: ring + hub = wheel graph, simple paths only. Sources: 2 ring arcs + hub routes. Using prefix sums P and X(i)=b_i+P(i), Y(i)=b_i-P(i), every hub configuration becomes range-min / "best pair X(u)+Y(v), u<v" queries → se
+05:32:24 -> write L_brute.cpp
+05:32:29 -> write L_gen.py
+05:32:36 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o l.out L.cpp && g++-14 -O2 -o l_brute.out L_brute.cpp && printf '1\n3 6\n4 -2 5\n3 7 1\n1 1 3\n2 2 6\n1 1 3\n3 1 -4\n1 1 3\n1 1 4\n' 
+05:33:02 chat: Two failures — likely the lazy update. Debugging with the minimal case:
+05:33:02 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && printf '1\n2 3\n0 -3\n5 -1\n2 1 4\n1 1 3\n1 1 3\n' | ./l.out; echo ---; printf '1\n2 2\n0 -3\n5 -1\n1 1 3\n1 1 3\n' | ./l.out
+05:33:29 chat: Found it: P-updates must change X by +d but Y by −d (Y = b − P); I added +d to both. Fixing with a two-component lazy:
+05:33:29 -> edit L.cpp
+05:33:34 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && python3 - <<'EOF'
+import re
+p='L.cpp'
+s=open(p).read()
+s=s.replace("if(x<n) seg.upd(x+1, n, d);","if(x<n) seg.updP(x+1, n, d);")
+s=s.replace("seg.
+05:33:37 -> read L.cpp
+05:33:46 -> edit L.cpp
+05:33:53 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o l.out L.cpp && printf '1\n3 6\n4 -2 5\n3 7 1\n1 1 3\n2 2 6\n1 1 3\n3 1 -4\n1 1 3\n1 1 4\n' | ./l.out && printf '1\n2 3\n0 -3\n5 -1\n
+05:34:33 chat: One combo has wrong constant sign: CH must be `P(s) - P(t) + T`, not `+ P(t)`. Fixing:
+05:34:33 -> edit L.cpp
+05:36:37 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o l.out L.cpp && printf '1\n3 6\n4 -2 5\n3 7 1\n1 1 3\n2 2 6\n1 1 3\n3 1 -4\n1 1 3\n1 1 4\n' | ./l.out && for i in $(seq 1 8000); do p
+05:36:42 chat: Sample ✓. Stress slower than expected — rerun with fewer seeds:
+05:37:33 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && for i in $(seq 1 1500); do python3 L_gen.py $i > lt.txt; o1=$(./l.out < lt.txt); o2=$(./l_brute.out < lt.txt); if [ "$o1" != "$o2" ]; then echo "M
+05:37:40 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && python3 -c "
+import random
+random.seed(1)
+n=300000; q=300000
+print(1)
+print(n,q)
+print(' '.join(str(random.randint(-10**9,10**9)) for _ in range(n
+05:37:49 $ python3 contest/judge.py submit L contest/teams/kimi-k3/L.cpp --team kimi-k3
+05:37:52 -> edit STRATEGY.md
+05:37:54 -> edit STRATEGY.md
+05:37:55 chat: L OK first try — 9/12. Update strategy, read H:
+05:37:55 -> read H.txt
+05:38:17 chat: H: LRU with rank queries — online Fenwick over touch-counters. Cache always full, so rank of key = n − (#alive counters < its counter). Eviction = fenwick kth(1). Writing:
+05:38:17 -> write H.cpp
+05:38:42 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o h.out H.cpp && printf '3\n3 12\n2 2\n2 5\n1 4 10\n2 1\n2 4\n1 2 7\n2 2\n1 9 1\n2 3\n2 9\n1 4 8\n2 2\n1 4\n2 1\n1 5 3\n2 1\n2 5\n2 5\
+05:38:50 chat: Matches. Quick randomized stress vs naive sim:
+05:40:28 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && cat > H_brute.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){
+    int tc; scanf("%d",&tc);
+    while(tc--){
+        int n,q;
+05:40:33 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && python3 -c "
+import random
+random.seed(3)
+n=200000; q=200000
+print(1); print(n,q)
+for _ in range(q):
+    if random.random()<0.5: print(1, random.r
+05:40:38 $ python3 contest/judge.py submit H contest/teams/kimi-k3/H.cpp --team kimi-k3
+05:40:41 chat: 10/12. Remaining: C (interactive), I. Reading I:
+05:40:41 -> read I.txt
+05:41:06 -> write I.cpp
+05:41:11 chat: I: "independent loops" = cycle rank = E − V + C. Reverse-delete trick with DSU. Writing solution + brute:
+05:41:11 -> write I_brute.cpp
+05:41:19 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o i.out I.cpp && g++-14 -O2 -o i_brute.out I_brute.cpp && printf '4\n2 3\n15 15 15\n15 15 15\n3\n1 1\n1 2\n2 2\n3 3\n6 10 12\n5 10 5\n
+05:41:25 chat: Samples ✓. Stress:
+05:42:28 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && for i in $(seq 1 2000); do python3 -c "
+import random
+random.seed($i)
+tc=random.randint(1,2)
+print(tc)
+for _ in range(tc):
+    n=random.randint(1,
+05:42:33 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && python3 -c "
+import random
+random.seed(5)
+n=447; m=447
+print(1)
+print(n,m)
+print('\n'.join(' '.join('15' for _ in range(m)) for _ in range(n)))
+ce
+05:42:38 $ python3 contest/judge.py submit I contest/teams/kimi-k3/I.cpp --team kimi-k3
+05:42:42 -> edit STRATEGY.md
+05:42:43 -> edit STRATEGY.md
+05:42:44 chat: 11/12. Only C (interactive) left. Reading it:
+05:42:44 -> read C.txt
+05:43:18 -> write C.cpp
+05:43:24 chat: C: heap-indexed complete binary tree; find depth by walking left, then binary search the last level (probe node existence by walking root→node). ~2d²+d ≤ 7k queries ≤ 8000. Writing solution + local interactor simulator:
+05:43:24 -> write C_sim.py
+05:43:29 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o c.out C.cpp && python3 C_sim.py ./c.out
+05:43:32 chat: All pass, worst 7140 ≤ 8000. Submitting C:
+05:43:38 $ python3 contest/judge.py submit C contest/teams/kimi-k3/C.cpp --team kimi-k3
+05:43:41 chat: C OK — ALL 12 PROBLEMS SOLVED! Verifying history and finalizing:
+05:43:41 $ cat /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/kimi-k3.jsonl
+05:43:48 chat: All 12 confirmed OK (only B: 1 fail, J: 2 fails). Grabbing B's slug for accuracy, then finalizing:
+05:43:48 $ head -2 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/B.txt /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3/B.cpp; head -1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/proble
+05:43:55 -> write STRATEGY.md
+05:44:05 chat: Everything is solved and verified. Writing the final feedback file as my closing action:
+05:44:05 -> write feedback.md
+05:44:07 $ ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3/*.cpp /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3/*.md && grep -c '"verdict": "OK"' /Users/distiled/codeStuff/cp/cf/pre-icpc-
+05:44:12 chat: Contest complete — **12/12 problems solved**. Final tally (official history): A, B, C, D, E, F, G, H, I, J, K, L all `OK`. Only 3 failed submissions total: B (1 TL before fixing) and J (ML+TL before algorithmic rewrite).
+14:56:41 -> read M.txt
+14:57:44 chat: M: standard count DP cnt[n][m] (insertion recurrence, sliding window, saturate at 2e18), then greedy position-by-position construction. Writing and testing immediately:
+14:57:44 -> write M.cpp
+14:58:10 -> edit M.cpp
+14:58:15 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o m.out M.cpp && printf '4\n3 1 1\n3 1 2\n4 0 1\n4 6 2\n' | ./m.out && printf '4\n4 3 1\n4 3 6\n5 5 10\n1 0 2\n' | ./m.out
+14:58:43 chat: Both samples ✓. Fast brute stress (small n, enumerate all perms sorted with m inversions) then submit:
+14:59:10 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && cat > M_brute.py <<'EOF'
+import itertools, sys
+def inv(p): return sum(1 for i in range(len(p)) for j in range(i+1,len(p)) if p[i]>p[j])
+data = sys
+14:59:14 $ python3 contest/judge.py submit M contest/teams/kimi-k3/M.cpp --team kimi-k3
+14:59:46 chat: WA on test 6 — saturation breaks the sliding-window subtraction (Mahonian counts far exceed 2^63). Fix: compute only the monotone increasing half (m ≤ lim/2), mirror by symmetry:
+14:59:46 -> edit M.cpp
+15:00:16 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && g++-14 -O2 -o m.out M.cpp && printf '4\n3 1 1\n3 1 2\n4 0 1\n4 6 2\n' | ./m.out && printf '4\n4 3 1\n4 3 6\n5 5 10\n1 0 2\n' | ./m.out && for i in
+15:00:21 $ python3 contest/judge.py submit M contest/teams/kimi-k3/M.cpp --team kimi-k3
+15:00:34 chat: Now it fails the other way (false -1, test 11). Compare my count table against exact Python DP for larger n to locate the divergence:
+15:00:34 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && cat > M_exact.py <<'EOF'
+import sys
+def solve(n,m,k):
+    # exact counts
+    lim = n*(n-1)//2
+    row = [0]*(lim+1); row[0]=1
+    for nn in range(
+15:01:05 chat: My monotone-saturation argument was wrong (subtract after cap still dips). Bulletproof fix: pin at CAP permanently once saturated within the increasing half — Mahonian unimodality makes that valid, then mirror:
+15:01:05 -> edit M.cpp
+15:01:17 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && cat > M_exact.py <<'EOF'
+import sys
+def solve(n,m,k):
+    rows={0:[1]}
+    row=[1]
+    for nn in range(1, n+1):
+        ln=nn*(nn-1)//2
+        nx
+15:01:37 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && for i in $(seq 1 250); do python3 -c "
+import random
+random.seed($i+50000)
+t=random.randint(1,4)
+print(t)
+for _ in range(t):
+    n=random.randint(
+15:01:44 $ python3 contest/judge.py submit M contest/teams/kimi-k3/M.cpp --team kimi-k3
+15:01:48 chat: M: **OK (34/34)**. Total 13/13. DONE (Also logging M into STRATEGY.md for the record:)
+15:01:48 $ cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/kimi-k3 && printf '\n## BONUS\n- M (k-th-inversion-permutation): OK. Mahonian count DP capped at 2e18. GOTCHA: sliding-window with saturation corrupts subtra
+15:01:51 chat: DONE. Final score: **13/13** (A–L + bonus M), all verified OK by the judge. M took 3 submissions: first version's saturated sliding window corrupted counts both ways (too-high on test 6, too-low on test 11); the fix pins

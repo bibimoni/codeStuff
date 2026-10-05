@@ -1,0 +1,20 @@
+{
+ "start_ts": 1790527464.875007,
+ "duration_s": 18000,
+ "round": 2,
+ "teams": [
+  "gpt-5.6-sol",
+  "gpt-5.6-luna",
+  "gpt-5.6-terra",
+  "glm-5.3",
+  "kimi-k3",
+  "big-pickle",
+  "muse-spark-1.3",
+  "nemotron-3-ultra",
+  "nemotron-3.5-lightning",
+  "ling-3.0-flash-fin",
+  "longcat-2.5-preview",
+  "mimo-v2.6-flash",
+  "space-bunny"
+ ]
+}

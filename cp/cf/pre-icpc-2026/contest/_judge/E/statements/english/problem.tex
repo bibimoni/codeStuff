@@ -1,0 +1,80 @@
+\begin{problem}{Engineer's Schedule}{standard input}{standard output}{2 seconds}{256 megabytes}
+
+BigC's flagship software product is divided into $n$ distinct modules, numbered $1$ through $n$, each assigned to a dedicated team. 
+To streamline development, the company maintains a centralized workflow network of $n - 1$ dependency relations between these modules, forming an underlying weakly directed connected graph.
+
+Each relation between module $u$ and module $v$ carries a status indicator $w \in \{0, 1, 2\}$ set by the engineering board:
+
+\begin{itemize}
+  \item $w = 0$: A flexible dependency. The engineering manager may choose to schedule module $u$ before module $v$ ($u \to v$) or module $v$ before module $u$ ($v \to u$).
+  \item $w = 1$: A strict prerequisite ($u \to v$). Module $u$ must be completed before module $v$.
+  \item $w = 2$: A reverse prerequisite ($v \to u$). Module $v$ must be completed before module $u$.
+\end{itemize}
+
+A schedule is a full linear execution order of all modules, represented as a permutation of $(1, 2, \dots, n)$. The schedule is satisfied if for every pair ($u, v$), and $u$ must be completed before $v$, $u$ must be placed after $v$ in the permutation. For every flexible relation ($w = 0$), the manager must commit to exactly one of the two valid directional choices.
+
+To assess company policy flexibility, the CEO wants to compute the total number of valid execution schedules, summed over all possible directional assignments of the flexible dependencies. Because the result can be extremely large, output it modulo $998\,244\,353$.
+
+\InputFile
+The first line contains a single integer $n$ ($1 \le n \le 4000$) --- the number of modules.
+
+Each of the next $n - 1$ lines contains three integers $u$, $v$, and $w$ ($1 \le u, v \le n$, $w \in \{0, 1, 2\}$) --- a relation of type $w$ between modules $u$ and $v$.
+
+It is guaranteed that the relations form a weakly connected graph.
+
+
+\OutputFile
+Print a single integer --- the total number of valid execution schedules summed over all possible orientation choices for flexible relations, modulo $998\,244\,353$.
+
+\Example
+
+\begin{example}
+\exmpfile{example.01}{example.01.a}%
+\end{example}
+
+\Note
+There are two possible configurations of those dependency relations.
+
+\begin{itemize}
+  \item Case 1: Let module 1 be completed before module 3. The relations are oriented as follows:
+
+\includegraphics[width=10cm]{fig1.png}
+
+A total of $3$ valid execution schedules can be generated from this configuration:
+
+[2, 1, 4, 3, 5]
+
+[2, 4, 1, 3, 5]
+
+[4, 2, 1, 3, 5]
+
+
+
+  \item Case 2: Let module 3 be completed before module 1:
+
+\includegraphics[width=10cm]{fig2.png}
+
+There are $7$ valid execution schedules satisfying the dependency relations in this configuration:
+
+[2, 4, 3, 1, 5]
+
+[2, 4, 3, 5, 1]
+
+[4, 2, 3, 1, 5]
+
+[4, 2, 3, 5, 1]
+
+[4, 3, 2, 1, 5]
+
+[4, 3, 2, 5, 1]
+
+[4, 3, 5, 2, 1]
+
+
+\end{itemize}
+
+
+Summing all valid execution orders across both direction assignments yields $3 + 7 = 10$.
+
+\end{problem}
+

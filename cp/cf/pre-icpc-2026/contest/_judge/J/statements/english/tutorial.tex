@@ -1,0 +1,14 @@
+\begin{tutorial}{Jeweler's Fair Cuts}
+
+Let $p_i = a_1 + \dots + a_i$ be the prefix sums and $S = p_n$.
+
+If $S = 0$, all segment sums must be $0$, which happens iff every cut is made at an index with $p_i = 0$. Each subset of the $c = \#\{i < n : p_i = 0\}$ valid cut positions gives a balanced division, so the answer is $2^c$.
+
+Now let $S \neq 0$. A balanced division into $k$ segments has segment sum $t = S / k$, so $k$ must divide $S$ (check divisibility of the absolute value) and $k \le n$. Conversely, for such $k$, cuts $c_1 < c_2 < \dots < c_{k-1}$ must satisfy $p_{c_j} = j \cdot t$. The number of such chains is counted by a single left-to-right sweep: maintain $\text{dp}[j]$ = number of ways to place the first $j$ cuts in the processed prefix; when $p_i = j t$ for $1 \le j < k$, do $\text{dp}[j] \mathrel{+}= \text{dp}[j-1]$. The contribution of this $k$ is $\text{dp}[k-1]$. Note that a plain product of per-value counters is wrong for signed arrays --- positions with prefix sums $t, 2t, \ldots$ can interleave, so order matters.
+
+Candidate values of $k$ are exactly the divisors of $|S|$ not exceeding $n$. Scan $i$ from $1$ to $\min(n, \lfloor\sqrt{|S|}\rfloor)$: every valid $k$ appears either as $i$ or as $|S|/i$. Since $|S| \le 10^{14}$, this scan is $O(\min(n, \sqrt{|S|})) \le O(n)$ per test case. A cheap precheck (every multiple $j t$, $1 \le j < k$, present among prefix values) lets the $O(n)$ sweep run only for $k$ that can actually contribute.
+
+The total complexity is $O(n \cdot d)$ per test case with $d$ the number of contributing divisors, easily fast enough; 64-bit integers are required for prefix sums (up to $10^{14}$ in absolute value).
+
+
+\end{tutorial}

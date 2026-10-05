@@ -1,0 +1,41 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Zero Segment</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Zero Segment</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>You are given an array $$$a$$$ of $$$n$$$ positive integers, and an integer $$$k$$$.</P><P>You may perform the following operations on the array any number of times, in any order:</P><P></P><UL> <LI> <SPAN class="tex-font-style-bf">Pay:</SPAN> choose an index $$$i$$$ ($$$1 \le i \le n$$$), pay $$$a_i$$$ coins, and set $$$a_i := 0$$$. </LI><LI> <SPAN class="tex-font-style-bf">Free:</SPAN> choose three indices $$$l$$$, $$$m$$$, $$$r$$$ such that $$$1 \le l  \lt  m  \lt  r \le n$$$, and set $$$a_m := \max(a_l, a_r)$$$. This operation costs nothing. </LI></UL><P></P><P>Find the minimum total number of coins you have to pay so that some contiguous segment of length at least $$$k$$$ of the array consists only of zeros.</P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$t$$$ ($$$1 \le t \le 2 \cdot 10^5$$$) &mdash; the number of test cases.</P><P>The first line of each test case contains two integers $$$n$$$ and $$$k$$$ ($$$1 \le k \le n \le 2 \cdot 10^5$$$) &mdash; the size of the array and the minimum length of the required zero segment.</P><P>The second line of each test case contains $$$n$$$ integers $$$a_1, a_2, \ldots, a_n$$$ ($$$1 \le a_i \le 10^9$$$) &mdash; the elements of the array.</P><P>It is guaranteed that the sum of $$$n$$$ over all test cases does not exceed $$$2 \cdot 10^5$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each test case, print a single integer &mdash; the minimum total cost needed to obtain a contiguous zero segment of length at least $$$k$$$.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Examples</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+5 3
+1 4 2 3 5
+3 3
+10 20 30
+1 1
+7
+4 2
+5 1 1 5
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">5 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 4 2 3 5</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">10 20 30</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">7</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">4 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">5 1 1 5</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="3
+40
+7
+2
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">3</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">40</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">7</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">2</DIV></PRE></DIV><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="2
+6 1
+9 3 8 1 10 2
+5 4
+8 2 7 1 9
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">6 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">9 3 8 1 10 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">5 4</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">8 2 7 1 9</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="1
+9
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">9</DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>In the first test case of the first example, one way to spend exactly $$$3$$$ coins is as follows. Pay $$$1$$$ coin to set $$$a_1 := 0$$$. Apply the free operation with $$$(l, m, r) = (1, 2, 5)$$$: this sets $$$a_2 := \max(a_1, a_5) = \max(0, 5) = 5$$$ &mdash; note that this does not help at all. Now pay $$$2$$$ coins to set $$$a_3 := 0$$$, and apply the free operation with $$$(l, m, r) = (1, 2, 3)$$$ to set $$$a_2 := \max(a_1, a_3) = 0$$$. The segment $$$[1, 3]$$$ is all zeros. Trying to zero a longer segment, say $$$[2, 4]$$$, turns out to cost more, and careful consideration of every possibility shows that cost $$$3$$$ cannot be beaten.</P><P>In the second test case of the first example the answer is $$$40$$$: a suitable sequence of operations achieves it, and one can check that no cheaper sequence exists.</P><P>In the third test case of the first example, $$$k = 1$$$, so after paying $$$7$$$ coins for the only element the array already contains a zero segment of length $$$1$$$.</P><P>In the second example, for the first test case the cheapest single payment has cost $$$1$$$, which is sufficient. For the second test case, the optimal cost is $$$9$$$.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

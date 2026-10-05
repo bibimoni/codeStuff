@@ -1,0 +1,9 @@
+=== judge F ===
+OK (102/102, max 415ms) | peak 8.2MB
+=== judge K ===
+OK (40/40, max 374ms) | peak 8.2MB
+=== judge C ===
+JE on test 1 (0/15, max 0ms) | interactor rc=2 wrong output format Unexpected end of file - token expected (test case 1)
+
+=== judge L ===
+OK (42/42, max 584ms) | peak 93.9MB

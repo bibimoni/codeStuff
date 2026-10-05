@@ -1,0 +1,37 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATQNCiFjMTs1IDMNCjEgNCAyIDMgNQ0KIWMyOzMgMw0KMTAgMjAgMzANCiFjMzsxIDENCjcNCiFjNDs0IDINCjUgMSAxIDUNCg==",
+    "example.01.a.mu": "TVXzASFjMTszDQohYzI7NDANCiFjMzs3DQohYzQ7Mg0K",
+    "example.02.mu": "TVXzATINCiFjMTs2IDENCjkgMyA4IDEgMTAgMg0KIWMyOzUgNA0KOCAyIDcgMSA5DQo=",
+    "example.02.a.mu": "TVXzASFjMTsxDQohYzI7OQ0K"
+  },
+  "scoring": null,
+  "notes": "In the first test case of the first example, one way to spend exactly $3$ coins is as follows. Pay $1$ coin to set $a_1 := 0$. Apply the free operation with $(l, m, r) = (1, 2, 5)$: this sets $a_2 := \\max(a_1, a_5) = \\max(0, 5) = 5$ --- note that this does not help at all. Now pay $2$ coins to set $a_3 := 0$, and apply the free operation with $(l, m, r) = (1, 2, 3)$ to set $a_2 := \\max(a_1, a_3) = 0$. The segment $[1, 3]$ is all zeros. Trying to zero a longer segment, say $[2, 4]$, turns out to cost more, and careful consideration of every possibility shows that cost $3$ cannot be beaten.\n\nIn the second test case of the first example the answer is $40$: a suitable sequence of operations achieves it, and one can check that no cheaper sequence exists.\n\nIn the third test case of the first example, $k = 1$, so after paying $7$ coins for the only element the array already contains a zero segment of length $1$.\n\nIn the second example, for the first test case the cheapest single payment has cost $1$, which is sufficient. For the second test case, the optimal cost is $9$.\n",
+  "legend": "You are given an array $a$ of $n$ positive integers, and an integer $k$.\n\nYou may perform the following operations on the array any number of times, in any order:\n\n\\begin{itemize}\n  \\item \\textbf{Pay:} choose an index $i$ ($1 \\le i \\le n$), pay $a_i$ coins, and set $a_i := 0$.\n  \\item \\textbf{Free:} choose three indices $l$, $m$, $r$ such that $1 \\le l < m < r \\le n$, and set $a_m := \\max(a_l, a_r)$. This operation costs nothing.\n\\end{itemize}\n\nFind the minimum total number of coins you have to pay so that some contiguous segment of length at least $k$ of the array consists only of zeros.\n",
+  "authorLogin": "distiled",
+  "language": "english",
+  "timeLimit": 2000,
+  "output": "For each test case, print a single integer --- the minimum total cost needed to obtain a contiguous zero segment of length at least $k$.\n",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains a single integer $t$ ($1 \\le t \\le 2 \\cdot 10^5$) --- the number of test cases.\n\nThe first line of each test case contains two integers $n$ and $k$ ($1 \\le k \\le n \\le 2 \\cdot 10^5$) --- the size of the array and the minimum length of the required zero segment.\n\nThe second line of each test case contains $n$ integers $a_1, a_2, \\ldots, a_n$ ($1 \\le a_i \\le 10^9$) --- the elements of the array.\n\nIt is guaranteed that the sum of $n$ over all test cases does not exceed $2 \\cdot 10^5$.\n",
+  "authorName": "Bao Dang",
+  "sampleTests": [
+    {
+      "output": "3\n40\n7\n2\n",
+      "input": "4\n5 3\n1 4 2 3 5\n3 3\n10 20 30\n1 1\n7\n4 2\n5 1 1 5\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    },
+    {
+      "output": "1\n9\n",
+      "input": "2\n6 1\n9 3 8 1 10 2\n5 4\n8 2 7 1 9\n",
+      "inputFile": "example.02",
+      "outputFile": "example.02.a"
+    }
+  ],
+  "name": "Karesansui Garden",
+  "interaction": null,
+  "memoryLimit": 268435456,
+  "tutorial": "Only paying creates zeros: the free operation can produce a zero only as $\\max$ of two zeros. Thus, if the leftmost and rightmost positions you pay for are $i$ and $j$, every position between them can be zeroed for free, producing a zero segment of length $j - i + 1$. Paying for more than two positions never helps, since only the two extreme paid positions matter.\n\nTherefore, for $k \\ge 2$, the answer is the minimum of $a_i + a_j$ over all pairs with $j - i + 1 \\ge k$. For $k = 1$, the answer is simply the minimum element of the array.\n\nScan $j$ from left to right while maintaining the minimum of $a_i$ over $i \\le j - k + 1$; each step updates the answer with $\\text{prefixMin} + a_j$. This gives an $O(n)$ solution per test case, $64$-bit integers are required since the answer can reach $2 \\cdot 10^9$.\n"
+}

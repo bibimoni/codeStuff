@@ -1,0 +1,15 @@
+- A (suffix-array): easy-medium | solved | min distinct letters = 1 + breaks where rank[p_i+1] > rank[p_{i+1}+1]; exhaustively verified n<=5 that every permutation is realizable (so -1 never).
+- B (grid-reboot): medium | solved | GF(2) system (A+I)x = ~s: Gauss-Jordan once on [M|I] bitset, per query back out via stored transformation T.
+- C (the-hidden-cave): easy-medium | solved | interactive complete-binary-tree count: left-walk for depth, then binary search the last level guided by heap-index bit paths; ~7k of 8000 queries worst case. Mock interactor testing paid off (AC first try).
+- D (mulgame): easy | solved | classic multiply-by-2..9 game: losing strips (9*18^i, 18^{i+1}], verified against game-DP brute up to 2e5.
+- E (scheduling): medium-hard | solved | key theorem: sum over flexible-edge orientations of #linear extensions collapses to #LE of the fixed-edge forest (each permutation pins exactly one orientation). Then mixed-orientation tree LE count via rank-distribution DP with C(a+j,j)*C(szA-1-a+szB-j,szB-j) merges, O(n^2).
+- F (snow-white): easy | solved | find height occurring exactly 7 times; scanf/printf given the 8 MB/0.25 s limit.
+- G (self-crossing-turtle): easy-medium | solved | standard self-crossing three-condition check (LC335); touch counts via >=/<=.
+- H (rlu-cache-easy): easy-medium | solved | LRU with order queries via a GNU pbds order-statistics tree over timestamps (r = size - order_of_key(ts+1) + 1) plus bidirectional key<->ts maps.
+- I (coolant-loops): easy-medium | solved | independent loops = E - V + components; process deletions in reverse with DSU.
+- J (dp-math-hard): medium-hard | solved | total=0 gives 2^(zero prefix sums); otherwise each divisor target T=S/k forces cut prefix values T..(k-1)T at increasing positions - counted with a two-pointer DP over occurrence lists; only prefix values dividing S are candidate T's.
+- K (zero-segment): easy | solved | paid set's rake-closure is exactly [min paid, max paid], so k>=2 costs min a_i+a_j with j-i>=k-1, k=1 costs min a_i.
+- L (coral-loop): medium-hard | solved | simple paths on cycle+hub reduce to 6 min-candidates: two pure arcs, two pair-min cases (min_{i<j} G_i+F_j) and two split-min cases over G and F on the two arcs; one segtree storing (minG, minF, minPair) over a 3x-linearized ring with lazy prefix-add for a-updates. Brute DFS cross-check on n<=7 over random updates.
+- M (dp-counting-med): easy-medium | solved | Mahonian numbers DP + greedy k-th lex permutation (placing j-th smallest remaining adds j inversions). One WA: capping the sliding-window accumulator corrupted later subtractions - fixed with __int128.
+
+Experience: the judge was snappy and informative ("WA on test 6" with token diff pointed straight at my capping bug); the set is well-designed with clear difficulty gradients, and the interactive C had a sane protocol with generous query budget. The 8 MB/0.25 s limit on F sounded scary but was trivial since n<=100; limits on the real problems were comfortable for correct-complexity solutions.

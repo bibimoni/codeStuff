@@ -1,0 +1,13 @@
+gen pledge > $
+gen edge1 > $
+gen pal > $
+gen pal 4 5 300 2 > $
+gen rand 10 50 200 1 > $
+gen rand 10 50 200 2 > $
+gen rand 5 10 1000 3 > $
+gen rand 30 30 300 4 > $
+gen rand 1 100 500 5 > $
+gen rand 1 2 10000 6 > $
+gen manysmall 1 > $
+gen manysmall 2 > $
+gen max 1 > $

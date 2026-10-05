@@ -1,0 +1,38 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Equal Sum Segments</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Equal Sum Segments</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>You are given an array $$$a$$$ of $$$n$$$ integers (elements may be negative).</P><P>A <SPAN class="tex-font-style-underline">division</SPAN> of the array is a partition of it into one or more contiguous segments such that every element belongs to exactly one segment. A division is called <SPAN class="tex-font-style-underline">balanced</SPAN> if all its segments have the same sum.</P><P>Count the number of balanced divisions. Two divisions are considered different if their sets of cut positions are different (a cut can be made between positions $$$i$$$ and $$$i+1$$$ for any $$$1 \le i  \lt  n$$$).</P><P>Note that the division into a single segment (the whole array, no cuts) is always balanced.</P><P>Since the number of divisions can be huge, print it modulo $$$10^9 + 7$$$.</P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$t$$$ ($$$1 \le t \le 10^5$$$) &mdash; the number of test cases.</P><P>The first line of each test case contains a single integer $$$n$$$ ($$$1 \le n \le 10^5$$$) &mdash; the size of the array.</P><P>The second line of each test case contains $$$n$$$ integers $$$a_1, a_2, \ldots, a_n$$$ ($$$-10^9 \le a_i \le 10^9$$$) &mdash; the elements of the array.</P><P>It is guaranteed that the sum of $$$n$$$ over all test cases does not exceed $$$10^5$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each test case, print a single integer &mdash; the number of balanced divisions of the array, modulo $$$10^9 + 7$$$.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Example</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="6
+4
+1 2 1 2
+4
+1 -1 1 -1
+2
+1 1
+1
+5
+2
+-1 -1
+6
+1 2 3 0 2 4
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">6</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 2 1 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">4</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 -1 1 -1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">1</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-5">2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-5">-1 -1</DIV><DIV class="test-example-line test-example-line-even test-example-line-6">6</DIV><DIV class="test-example-line test-example-line-even test-example-line-6">1 2 3 0 2 4</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="2
+2
+2
+1
+2
+3
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2</DIV><DIV class="test-example-line test-example-line-even test-example-line-4">1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-5">2</DIV><DIV class="test-example-line test-example-line-even test-example-line-6">3</DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>The example contains six test cases.</P><P></P><UL> <LI> $$$a = [1, 2, 1, 2]$$$, total sum $$$6$$$. Balanced divisions: the whole array (one segment of sum $$$6$$$), and $$$[1, 2]\;[1, 2]$$$ (two segments of sum $$$3$$$). Three segments of sum $$$2$$$ would require a prefix of sum $$$2$$$, which does not exist. Answer: $$$2$$$. </LI><LI> $$$a = [1, -1, 1, -1]$$$, total sum $$$0$$$, so every segment must sum to $$$0$$$. The only position $$$i  \lt  n$$$ with prefix sum $$$0$$$ is $$$i = 2$$$, and we may either cut there or not. Answer: $$$2$$$. </LI><LI> $$$a = [1, 1]$$$: $$$[1, 1]$$$ or $$$[1]\;[1]$$$. Answer: $$$2$$$. </LI><LI> $$$a = [5]$$$: only the single segment. Answer: $$$1$$$. </LI><LI> $$$a = [-1, -1]$$$: same as the third case with a negative total. Answer: $$$2$$$. </LI><LI> $$$a = [1, 2, 3, 0, 2, 4]$$$, total sum $$$12$$$. With $$$k = 2$$$ segments (sum $$$6$$$ each) the cut can be made after index $$$3$$$ or after index $$$4$$$, since both prefix sums equal $$$6$$$ &mdash; that gives $$$2$$$ divisions. No $$$k \in \{3, 4, 6\}$$$ works (e.g. for $$$k = 3$$$ a prefix of sum $$$4$$$ is required but absent). Together with the single-segment division, the answer is $$$3$$$. </LI></UL></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

@@ -1,0 +1,48 @@
+\begin{problem}{Jeweler's Fair Cuts}{standard input}{standard output}{2 seconds}{256 megabytes}
+
+Master jeweler Jade has acquired a necklace of $n$ gemstones strung in a row; gem $i$ is appraised at $a_i$ ducats --- a few \emph{debt stones} among them are actually IOUs, so appraisals may be negative.
+
+For the guild fair, Jade must split the row into one or more contiguous strands so that every gem belongs to exactly one strand. A split is called \emph{balanced} if all its strands carry the same total appraisal.
+
+Count the number of balanced splits. Two splits are considered different if their sets of cut positions are different (a cut can be made between positions $i$ and $i+1$ for any $1 \le i < n$).
+
+Note that selling the necklace whole --- a single strand, no cuts --- is always balanced.
+
+Since the number of splits can be huge, print it modulo $10^9 + 7$.
+
+
+\InputFile
+The first line contains a single integer $t$ ($1 \le t \le 10^5$) --- the number of test cases.
+
+The first line of each test case contains a single integer $n$ ($1 \le n \le 10^5$) --- the size of the array.
+
+The second line of each test case contains $n$ integers $a_1, a_2, \ldots, a_n$ ($-10^9 \le a_i \le 10^9$) --- the appraisals of the gems, in necklace order.
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $10^5$.
+
+
+\OutputFile
+For each test case, print a single integer --- the number of balanced splits of the necklace, modulo $10^9 + 7$.
+
+
+\Example
+
+\begin{example}
+\exmpfile{example.01}{example.01.a}%
+\end{example}
+
+\Note
+The example contains six test cases.
+
+\begin{itemize}
+  \item $a = [1, 2, 1, 2]$, total sum $6$. Balanced divisions: the whole array (one segment of sum $6$), and $[1, 2]\;[1, 2]$ (two segments of sum $3$). Three segments of sum $2$ would require a prefix of sum $2$, which does not exist. Answer: $2$.
+  \item $a = [1, -1, 1, -1]$, total sum $0$, so every segment must sum to $0$. The only position $i < n$ with prefix sum $0$ is $i = 2$, and we may either cut there or not. Answer: $2$.
+  \item $a = [1, 1]$: $[1, 1]$ or $[1]\;[1]$. Answer: $2$.
+  \item $a = [5]$: only the single segment. Answer: $1$.
+  \item $a = [-1, -1]$: same as the third case with a negative total. Answer: $2$.
+  \item $a = [1, 2, 3, 0, 2, 4]$, total sum $12$. With $k = 2$ segments (sum $6$ each) the cut can be made after index $3$ or after index $4$, since both prefix sums equal $6$ --- that gives $2$ divisions. No $k \in \{3, 4, 6\}$ works (e.g. for $k = 3$ a prefix of sum $4$ is required but absent). Together with the single-segment division, the answer is $3$.
+\end{itemize}
+
+
+\end{problem}
+

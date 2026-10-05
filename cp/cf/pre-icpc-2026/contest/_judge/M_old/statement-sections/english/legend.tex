@@ -1,0 +1,8 @@
+The court marshal must parade all $n$ knights of the realm in single file. Court etiquette numbers the knights $1$ to $n$ by seniority, so a lineup is a permutation of length $n$ --- an array containing each integer from $1$ to $n$ exactly once.
+
+Whenever a knight with a larger seniority number marches ahead of a knight with a smaller number, the court gossips about an \emph{insubordination}. Formally, an insubordination of a lineup $p$ is a pair of positions $(i,j)$ such that $i<j$ and $p_i>p_j$.
+
+The king has read every treatise on heraldry and fixed his mind on exactly $m$ insubordinations. Among all lineups of length $n$ with exactly $m$ insubordinations, ordered lexicographically, he demands the $k$-th one.
+
+Lineup $a$ is lexicographically smaller than lineup $b$ if, at the first position where they differ, $a$ marches a knight with a smaller seniority number than $b$.
+If fewer than $k$ such lineups exist, print $-1$.

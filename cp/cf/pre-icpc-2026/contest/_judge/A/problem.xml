@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="4" short-name="suffix-array" url="https://polygon.codeforces.com/p5nPti8/bakhibk/suffix-array">
+    <names>
+        <name language="english" value="Archive of Lost Letters"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+    </statements>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>1000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>103</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test method="manual" sample="true"/>
+                <test method="manual" sample="true"/>
+                <test method="manual" sample="true"/>
+                <test cmd="gen 1 rand" method="generated"/>
+                <test cmd="gen 1 sorted" method="generated"/>
+                <test cmd="gen 1 rev" method="generated"/>
+                <test cmd="gen 1 string 1" method="generated"/>
+                <test cmd="gen 50 rand" method="generated"/>
+                <test cmd="gen 50 sorted" method="generated"/>
+                <test cmd="gen 50 rev" method="generated"/>
+                <test cmd="gen 50 string 26" method="generated"/>
+                <test cmd="gen 45 string 25" method="generated"/>
+                <test cmd="gen 26 sorted" method="generated"/>
+                <test cmd="gen 45 rand" method="generated"/>
+                <test cmd="gen 49 rand" method="generated"/>
+                <test cmd="gen 4 sorted" method="generated"/>
+                <test cmd="gen 14 rev" method="generated"/>
+                <test cmd="gen 40 sorted" method="generated"/>
+                <test cmd="gen 15 rand" method="generated"/>
+                <test cmd="gen 47 rand" method="generated"/>
+                <test cmd="gen 6 string 6" method="generated"/>
+                <test cmd="gen 18 string 4" method="generated"/>
+                <test cmd="gen 46 sorted" method="generated"/>
+                <test cmd="gen 34 string 9" method="generated"/>
+                <test cmd="gen 19 string 8" method="generated"/>
+                <test cmd="gen 14 sorted" method="generated"/>
+                <test cmd="gen 11 string 10" method="generated"/>
+                <test cmd="gen 36 sorted" method="generated"/>
+                <test cmd="gen 28 rev" method="generated"/>
+                <test cmd="gen 37 sorted" method="generated"/>
+                <test cmd="gen 41 rand" method="generated"/>
+                <test cmd="gen 48 string 23" method="generated"/>
+                <test cmd="gen 25 string 9" method="generated"/>
+                <test cmd="gen 19 sorted" method="generated"/>
+                <test cmd="gen 16 rev" method="generated"/>
+                <test cmd="gen 38 rev" method="generated"/>
+                <test cmd="gen 3 rev" method="generated"/>
+                <test cmd="gen 9 rand" method="generated"/>
+                <test cmd="gen 17 rev" method="generated"/>
+                <test cmd="gen 19 string 9" method="generated"/>
+                <test cmd="gen 15 rev" method="generated"/>
+                <test cmd="gen 20 rev" method="generated"/>
+                <test cmd="gen 31 rev" method="generated"/>
+                <test cmd="gen 45 sorted" method="generated"/>
+                <test cmd="gen 31 string 14" method="generated"/>
+                <test cmd="gen 29 rand" method="generated"/>
+                <test cmd="gen 21 rev" method="generated"/>
+                <test cmd="gen 46 string 7" method="generated"/>
+                <test cmd="gen 12 string 11" method="generated"/>
+                <test cmd="gen 4 rev" method="generated"/>
+                <test cmd="gen 23 rand" method="generated"/>
+                <test cmd="gen 37 rev" method="generated"/>
+                <test cmd="gen 6 rand" method="generated"/>
+                <test cmd="gen 16 string 13" method="generated"/>
+                <test cmd="gen 18 rev" method="generated"/>
+                <test cmd="gen 9 sorted" method="generated"/>
+                <test cmd="gen 12 rand" method="generated"/>
+                <test cmd="gen 34 rand" method="generated"/>
+                <test cmd="gen 4 string 2" method="generated"/>
+                <test cmd="gen 42 rand" method="generated"/>
+                <test cmd="gen 41 rev" method="generated"/>
+                <test cmd="gen 14 rand" method="generated"/>
+                <test cmd="gen 7 string 3" method="generated"/>
+                <test cmd="gen 22 rand" method="generated"/>
+                <test cmd="gen 32 string 9" method="generated"/>
+                <test cmd="gen 31 sorted" method="generated"/>
+                <test cmd="gen 9 string 4" method="generated"/>
+                <test cmd="gen 12 string 12" method="generated"/>
+                <test cmd="gen 37 rand" method="generated"/>
+                <test cmd="gen 3 sorted" method="generated"/>
+                <test cmd="gen 5 string 2" method="generated"/>
+                <test cmd="gen 37 string 5" method="generated"/>
+                <test cmd="gen 22 sorted" method="generated"/>
+                <test cmd="gen 29 sorted" method="generated"/>
+                <test cmd="gen 5 rand" method="generated"/>
+                <test cmd="gen 36 string 25" method="generated"/>
+                <test cmd="gen 31 string 22" method="generated"/>
+                <test cmd="gen 38 rand" method="generated"/>
+                <test cmd="gen 42 sorted" method="generated"/>
+                <test cmd="gen 17 rand" method="generated"/>
+                <test cmd="gen 5 rev" method="generated"/>
+                <test cmd="gen 17 sorted" method="generated"/>
+                <test cmd="gen 32 rand" method="generated"/>
+                <test cmd="gen 45 rev" method="generated"/>
+                <test cmd="gen 18 sorted" method="generated"/>
+                <test cmd="gen 27 string 9" method="generated"/>
+                <test cmd="gen 47 string 1" method="generated"/>
+                <test cmd="gen 7 sorted" method="generated"/>
+                <test cmd="gen 8 rev" method="generated"/>
+                <test cmd="gen 36 rand" method="generated"/>
+                <test cmd="gen 38 string 13" method="generated"/>
+                <test cmd="gen 36 string 1" method="generated"/>
+                <test cmd="gen 23 string 5" method="generated"/>
+                <test cmd="gen 36 rev" method="generated"/>
+                <test cmd="gen 48 string 13" method="generated"/>
+                <test cmd="gen 4 string 3" method="generated"/>
+                <test cmd="gen 16 sorted" method="generated"/>
+                <test cmd="gen 2 sorted" method="generated"/>
+                <test cmd="gen 38 string 10" method="generated"/>
+                <test cmd="gen 14 string 7" method="generated"/>
+                <test cmd="gen 30 string 21" method="generated"/>
+                <test cmd="gen 37 string 2" method="generated"/>
+                <test cmd="gen 15 string 9" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker name="std::lcmp.cpp" type="testlib">
+            <source path="files/check.cpp" type="cpp.g++17"/>
+            <copy path="check.cpp"/>
+            <testset>
+                <test-count>0</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests/>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+                <testset>
+                    <test-count>0</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests/>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="accepted">
+                <source path="solutions/gemini.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="main">
+                <source path="solutions/solution.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+    <tags>
+        <tag value="adhoc"/>
+        <tag value="strings"/>
+    </tags>
+</problem>

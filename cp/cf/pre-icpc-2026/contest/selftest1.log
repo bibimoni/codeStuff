@@ -1,0 +1,6 @@
+=== judge F ===
+OK (102/102, max 623ms) | peak 8.3MB
+=== judge K ===
+JE on test 1 (0/40, max 0ms) | checker compile failed for K: cc1plus: fatal error: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/K/files/check.cpp: No such file or di
+=== judge A ===
+OK (103/103, max 647ms) | peak 8.2MB

@@ -1,0 +1,13 @@
+The Coral Loop is a ring of $n$ tiny islands, numbered from $1$ to $n$ around the atoll. Causeway $i$ connects island $i$ with island $i+1$ (for $1 \le i \le n-1$), and causeway $n$ loops back from island $n$ to island $1$. Crossing causeway $i$ costs $a_i$ shells --- several causeways cross such gorgeous lagoons that the paddlers' cooperative pays \emph{you} a rebate to use them, so some $a_i$ are negative.
+
+In the middle of the atoll floats the Ferry Nook, a seaplane dock. A flight between the Nook and island $i$ costs $b_i$ shells, promos and rebates included, so some $b_i$ are negative as well. All causeways and flights operate in both directions at the same price.
+
+Lani runs the trip kiosk. By the Paddlers' Charter --- twice-paddled water is wasted daylight --- a valid route may visit each location (islands and the Nook) at most once. Over the season she logs $q$ events of three kinds:
+
+\begin{itemize}
+\item A traveler asks for the cheapest valid route from location $s$ to location $t$ ($s < t$);
+\item Causeway $x$ is repriced: $a_x$ becomes $w$;
+\item The flight between the Nook and island $x$ is repriced: $b_x$ becomes $w$.
+\end{itemize}
+
+After every traveler's question Lani must announce the best possible price. The season is long, so help her answer quickly.

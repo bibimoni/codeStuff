@@ -1,0 +1,30 @@
+\begin{problem}{Snow White}{standard input}{standard output}{0.25 seconds}{8 megabytes}
+
+One day, Snow White and the seven dwarfs were taking a walk in the park.
+
+At that time, there were $n$ men in the park. 
+All $n$ of these men told Snow White their names and heights. 
+Despite living with the seven dwarfs for a long time, Snow White had never asked for their names. 
+Snow White only remembered that all seven dwarfs had the exact same height, and no one else had the same height as these dwarfs.
+
+Since the number of men is very large, Snow White asks you to write a program that reads the names and heights of the $n$ men in the park and prints the names of the seven dwarfs.
+
+\InputFile
+The first line contains an integer $n$ ($7 \le n \le 100$) --- the number of men in the park.
+
+In the next $n$ lines, the $i$-th line contains a string $S[i]$ and an integer $H[i]$. 
+Here, $S[i]$ is the name of the $i$-th man, consisting of 1 to 10 English letters, and $H[i]$ ($1 \le H[i] \le 1000$) is his height.
+
+\OutputFile
+Print seven strings representing the names of the seven dwarfs, ordered according to their appearance in the input. 
+The input guarantees that the seven dwarfs can be uniquely identified from the $n$ men according to the rules above.
+
+\Examples
+
+\begin{example}
+\exmpfile{example.01}{example.01.a}%
+\exmpfile{example.02}{example.02.a}%
+\end{example}
+
+\end{problem}
+

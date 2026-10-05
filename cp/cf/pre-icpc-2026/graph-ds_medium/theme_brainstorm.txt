@@ -1,0 +1,53 @@
+# Swarm Report: Statement theme brainstorm
+
+**Mode:** swarm | **Tier:** auto | **Status:** completed
+
+## Tasks
+
+### ✓ explore: ["Theme: ring of islands + ferry hub. Locations ar
+- **Model:** my-local-server:kimi-k3 | **Duration:** 50s | **Turns:** 1
+- **Tokens:** ↑36k ↓6.5k | **Cost:** $0
+
+  **Output:**
+
+  ```
+  **(a) Theme name:** *The Coral Loop* — ring of islands + central ferry hub (picked over the highway/orbital options: rebates on scenic lagoon crossings make negative costs feel native, not bolted on).
+  
+  **(b) Legend draft (~150 words)**
+  
+  > The Coral Loop is a ring of n tiny islands, numbered 1 to n around the atoll. Paddling causeway i, which links island i to island i+1 (causeway n loops back from island n to island 1), costs a[i] shells — though several causeways cross such gorgeous lagoons that the paddlers' cooperative pays you a rebate to use them, so some a[i] are negative. In the middle floats the Ferry Nook, a seaplane dock: a flight between the Nook and island i costs b[i] shells, promos and rebates included.
+  >
+  > Lani runs the trip kiosk. By the Paddlers' Charter — twice-paddled water is wasted daylight — a route may land on each island at most once. Over the season she logs q events: a friend asks today's cheapest route from island s to island t (s < t); causeway x is repriced to w shells; or Nook flight x is repriced to w shells. After every question, Lani announces the best price.
+  
+  **Inline numeric example (n = 3):**
+  
+  Say a = (4, −2, 5) shells and b = (3, 7, 1).
+  - *"Cheapest trip 1 → 3?"* — direct causeway: 5; paddling 1→2→3: 4 − 2 = 2; via the Nook: 3 + 1 = 4. **Answer: 2.**
+  - Causeway 2 (the rebate lagoon) repriced to 6 — now 1→2→3 costs 10, direct costs 5, Nook costs 4. **Answer: 4.**
+  - Nook flight 1 goes on welcome-back promo, b[1] := −4 — trip 1→Nook→3 costs −4 + 1 = **−3**: the cooperative effectively pays the traveler 3 shells.
+  
+  (Fourth event type coverage: that middle event is a type-3/type-2 repricing of each kind, so all three event types appear.)
+  
+  **(c) Notation mapping**
+  
+  | Story term | Variable |
+  |---|---|
+  | Islands in the Coral Loop | n |
+  | Causeway i (island i ↔ i+1, n ↔ 1) | edge cost a[i] |
+  | The Ferry Nook (seaplane dock) | hub vertex n+1 |
+  | Nook flight to island i | edge cost b[i] |
+  | Rebate / promo | negative a[i] or b[i] |
+  | Season's logged events | q |
+  | "Cheapest trip s → t?" (s < t) | type 1 query |
+  | Causeway repricing | type 2: a[x] := w |
+  | Flight repricing | type 3: b[x] := w |
+  | Paddlers' Charter (visit each island ≤ once) | simple-path constraint |
+  
+  **(d) Forced-ness assessment**
+  
+  Low: atolls are literally rings and central docks are real geography, rebates/promos make negative costs intuitive; the only visibly contrived pieces are s < t and the Charter's no-revisit rule, which reads as charming rather than arbitrary.
+  ```
+
+## Total
+- **Cost:** $0
+- **Duration:** 50s

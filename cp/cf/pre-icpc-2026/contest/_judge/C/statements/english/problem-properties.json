@@ -1,0 +1,25 @@
+{
+  "scoring": null,
+  "notes": "In the example, the hidden number of chambers is $6$.\n\nThe first query moves Minh to the right child of the root, which exists.\n\nThe second query attempts to move to its right child. The interactor returns $0$, so chamber $7$ does not exist and Minh remains at chamber $3$.\n\nThe third query moves to the left child of chamber $3$. The interactor returns $1$, so chamber $6$ exists.\n\nSince the tree is complete, chamber $6$ exists while chamber $7$ does not, therefore the total number of chambers is $6$.",
+  "legend": "Minh discovers a mysterious cave system consisting of many interconnected chambers.\n\nThe cave system forms a complete binary tree. The entrance of the cave is the root of the tree, and Minh initially stands at the entrance.\n\nEach chamber may have a passage leading to its left child and a passage leading to its right child. Every chamber except the entrance also has a passage leading back to its parent.\n\nA complete binary tree is a binary tree in which every level, except possibly the last, is completely filled, and all nodes on the last level are as far to the left as possible.\n\nMinh does not know the structure of the cave or the total number of chambers.\n\nYour task is to determine the total number of chambers in the cave by moving through it using the allowed queries.\n\nFor each test case, the number of chambers $N$ satisfies\n\n$$1 \\le N \\le 10^{18}.$$",
+  "authorLogin": "thienminha5k31",
+  "language": "english",
+  "timeLimit": 2000,
+  "output": "",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains an integer $T$ ($1 \\le T \\le 20$), the number of test cases.\n\nFor each test case, the number of chambers $N$ is hidden and is not given directly to your program. It can only be determined through interaction.",
+  "authorName": "Minh Nguyễn Thiện",
+  "sampleTests": [
+    {
+      "output": "? R\n? R\n? L\n! 6",
+      "input": "1\n1\n0\n1",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    }
+  ],
+  "name": "Count the Chambers",
+  "interaction": "The interactor first prints an integer $T$, the number of test cases.\n\nFor each test case, Minh initially stands at the root of the tree.\n\nTo move through the cave, you may print one of the following queries:\n\n\\begin{itemize}\n\\item $\\texttt{? L}$ --- attempt to move from the current chamber to its left child;\n\\item $\\texttt{? R}$ --- attempt to move from the current chamber to its right child;\n\\item $\\texttt{? B}$ --- attempt to move from the current chamber to its parent.\n\\end{itemize}\n\nAfter each query, the interactor prints an integer:\n\n\\begin{itemize}\n\\item $1$ if the requested move is possible. In this case, Minh moves to the corresponding chamber;\n\\item $0$ if the requested move is impossible. In this case, Minh remains in the current chamber.\n\\end{itemize}\n\nIn particular, the query $\\texttt{? B}$ returns $0$ when Minh is currently at the root.\n\nYou may perform at most $8000$ queries for each test case.\n\nWhen you have determined the total number of chambers, print\n\n$$\\texttt{! N}$$\n\nwhere $N$ is the total number of chambers in the current test case.\n\nPrinting the final answer does not count as a query.\n\nIf the answer is correct, the interaction proceeds to the next test case. Otherwise, your submission receives a Wrong Answer verdict.\n\nAfter printing every query, do not forget to flush the output. You must also flush the output after printing the final answer.",
+  "memoryLimit": 268435456,
+  "tutorial": ""
+}

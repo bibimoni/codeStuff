@@ -1,0 +1,10 @@
+I: download failed (500), retry next cycle
+K: download failed (500), retry next cycle
+M: download failed (500), retry next cycle
+I: download failed (500), retry next cycle
+K: download failed (500), retry next cycle
+M: not-zip, retry
+I DONE: rev 32 pkg 1489180 tests=34
+K DONE: rev 13 pkg 1489181 tests=40
+M DONE: rev 4 pkg 1489182 tests=34
+SYNC COMPLETE, remaining: []

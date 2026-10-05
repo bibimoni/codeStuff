@@ -1,0 +1,19 @@
+gen sample > $
+gen small > $
+gen rand 200 50 20 > $
+gen rand 100 200 5 > $
+gen rand 40 1000 1000000000 > $
+gen rand 20 1000 3 > $
+gen noncross 30 2000 > $
+gen noncross 20 5000 > $
+gen mix-tiny 10000 20 1000000000 > $
+gen single inc 200000 > $
+gen single dec 200000 > $
+gen single const 200000 > $
+gen single randbig 200000 > $
+gen latecross1 200000 > $
+gen latecross2 200000 > $
+gen latecross3 200000 > $
+gen latecross1 3000 40 > $
+gen latecross2 3000 40 > $
+gen latecross3 3000 40 > $

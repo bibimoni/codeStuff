@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="13" short-name="self-crossing-turtle" url="https://polygon.codeforces.com/p9D71i3/thienminha5k31/self-crossing-turtle">
+    <names>
+        <name language="english" value="Gardener's Turtle"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <tutorials latex-pdf-mode="obsolete">
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/english/tutorial.tex" type="application/x-tex"/>
+        <tutorial charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/tutorial.html" type="text/html"/>
+        <tutorial language="english" path="statements/.pdf/english/tutorial.pdf" type="application/pdf"/>
+    </tutorials>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>2000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>19</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test cmd="gen sample" method="generated" sample="true"/>
+                <test cmd="gen small" method="generated"/>
+                <test cmd="gen rand 200 50 20" method="generated"/>
+                <test cmd="gen rand 100 200 5" method="generated"/>
+                <test cmd="gen rand 40 1000 1000000000" method="generated"/>
+                <test cmd="gen rand 20 1000 3" method="generated"/>
+                <test cmd="gen noncross 30 2000" method="generated"/>
+                <test cmd="gen noncross 20 5000" method="generated"/>
+                <test cmd="gen mix-tiny 10000 20 1000000000" method="generated"/>
+                <test cmd="gen single inc 200000" method="generated"/>
+                <test cmd="gen single dec 200000" method="generated"/>
+                <test cmd="gen single const 200000" method="generated"/>
+                <test cmd="gen single randbig 200000" method="generated"/>
+                <test cmd="gen latecross1 200000" method="generated"/>
+                <test cmd="gen latecross2 200000" method="generated"/>
+                <test cmd="gen latecross3 200000" method="generated"/>
+                <test cmd="gen latecross1 3000 40" method="generated"/>
+                <test cmd="gen latecross2 3000 40" method="generated"/>
+                <test cmd="gen latecross3 3000 40" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+            <file path="files/tutorial.tex"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/checker.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.g++17"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker type="testlib">
+            <source path="files/checker.cpp" type="cpp.g++17"/>
+            <copy path="check.cpp" type="cpp.g++17"/>
+            <testset>
+                <test-count>3</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests>
+                    <test verdict="ok"/>
+                    <test verdict="wrong-answer"/>
+                    <test verdict="ok"/>
+                </tests>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.g++17"/>
+                <testset>
+                    <test-count>7</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests>
+                        <test verdict="valid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="invalid"/>
+                        <test verdict="valid"/>
+                    </tests>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="main">
+                <source path="solutions/sol_main.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="accepted">
+                <source path="solutions/sol_ok.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="time-limit-exceeded">
+                <source path="solutions/sol_tl.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_wa.cpp" type="cpp.g++17"/>
+            </solution>
+            <solution tag="wrong-answer">
+                <source path="solutions/sol_wa2.cpp" type="cpp.g++17"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+    <tags>
+        <tag value="geometry"/>
+        <tag value="implementation"/>
+        <tag value="math"/>
+    </tags>
+</problem>

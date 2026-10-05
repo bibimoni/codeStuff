@@ -1,0 +1,2739 @@
+[big-pickle] opencode attempt 1, 300 min left
+[0m
+> build · big-pickle
+[0m
+I'll start by reading the strategy file and skimming all problem sheets.
+[0m$ [0mwc -l /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/*.txt
+50 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/A.txt
+      65 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/B.txt
+      84 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/C.txt
+      38 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/D.txt
+      83 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/E.txt
+      68 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/F.txt
+      43 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/G.txt
+     111 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/H.txt
+     119 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/I.txt
+      63 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/J.txt
+      69 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/K.txt
+      71 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/L.txt
+     864 total
+[0m
+[0m$ [0mls -la /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/ 2>/dev/null; echo "---"; ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/
+total 8
+drwxr-xr-x   3 distiled  staff   96 Sep 27 04:13 .
+drwxr-xr-x  10 distiled  staff  320 Sep 27 04:12 ..
+-rw-r--r--   1 distiled  staff  151 Sep 27 04:13 _runner.log
+---
+A.txt
+B.txt
+C.txt
+D.txt
+E.txt
+F.txt
+G.txt
+H.txt
+I.txt
+J.txt
+K.txt
+L.txt
+[0m
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/A.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/B.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/C.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/D.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/E.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/F.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/G.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/H.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/I.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/J.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/K.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/L.txt
+[0m
+[0m← [0mWrite STRATEGY.md
+Wrote file successfully.
+[0m
+[0m← [0mWrite f.cpp
+Wrote file successfully.
+[0m
+[0m← [0mWrite f.cpp
+Wrote file successfully.
+[0m
+[0m← [0mWrite a.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && head -60 contest/judge.py
+#!/usr/bin/env python3
+"""Local contest judge (macOS-native runner).
+
+Usage:
+  python3 contest/judge.py submit <LETTER> <source.cpp> --team <name>
+  python3 contest/judge.py limits                     # show per-problem TL/ML
+
+Compiles with g++ -O2 -std=gnu++17, runs every test, verifies with the
+problem's own testlib checker (compiled once per problem, cached).
+Interactive problems (inter flag in map.txt): interactor <-> solution over
+two FIFOs, interactor exit code is the verdict.
+
+Limits: CPU time via RLIMIT_CPU = TL (fair under parallel load), wall-time
+backstop = 4*TL+5s kill, memory via RSS polling -> ML if peak > 1.05*ML.
+
+Every submission appends one JSON line to contest/results/<team>.jsonl:
+{"ts","letter","verdict","first_fail","passed","total","time_ms","file"}
+verdict in OK | WA | TL | ML | RE | CE | JE (judge error).
+"""
+import json, os, resource, signal, subprocess, sys, tempfile, time
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONTEST = os.path.join(ROOT, "contest")
+J = os.path.join(CONTEST, "_judge")
+RESULTS = os.path.join(CONTEST, "results")
+
+def load_map():
+    out = {}
+    for line in open(os.path.join(CONTEST, "map.txt")):
+        p = line.split()
+        out[p[0]] = dict(pid=p[1], slug=p[2],
+                         tl=int(p[3].split("=")[1]) / 1000.0,
+                         ml=int(p[4].split("=")[1]),
+                         inter=p[5].split("=")[1] == "1",
+                         tdir=p[7].split("=", 1)[1])
+    return out
+
+def tname(i):
+    return f"{i:02d}"
+
+def compile_cpp(src, bin_path, timeout=60):
+    r = subprocess.run(["g++-14", "-O2", "-std=gnu++17", "-o", bin_path, src],
+                       capture_output=True, text=True, timeout=timeout)
+    return r.returncode == 0, (r.stderr or "")[-1200:]
+
+def get_checker(letter):
+    """Compile (once) and return the checker binary path."""
+    cache = os.path.join(J, letter, ".check_bin")
+    src = None
+    for cand in ("check.cpp", "checker.cpp"):
+        p = os.path.join(J, letter, "files", cand)
+        if os.path.exists(p):
+            src = p
+            break
+    if src is None:
+        raise RuntimeError(f"no checker source under {letter}/files")
+    if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(src):
+        return cache
+    ok, err = compile_cpp(src, cache)
+    if not ok:
+[0m
+[0m← [0mWrite f.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit F contest/teams/big-pickle/f.cpp --team big-pickle 2>&1 | tail -20
+OK (102/102, max 584ms) | peak 8.4MB
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit A contest/teams/big-pickle/a.cpp --team big-pickle 2>&1 | tail -5; python3 contest/judge.py limits 2>&1 | tail -20
+OK (103/103, max 570ms) | peak 8.4MB
+A: suffix-array           TL= 1.00s ML= 256MB
+B: grid-reboot            TL= 3.00s ML= 512MB
+C: the-hidden-cave        TL= 2.00s ML= 256MB INTERACTIVE
+D: mulgame                TL= 1.00s ML= 256MB
+E: scheduling             TL= 2.00s ML= 256MB
+F: snow-white             TL= 0.25s ML=   8MB
+G: self-crossing-turtle   TL= 2.00s ML= 256MB
+H: rlu-cache-easy         TL= 2.00s ML= 256MB
+I: coolant-loops          TL= 2.00s ML= 256MB
+J: dp-math-hard           TL= 2.00s ML= 256MB
+K: zero-segment           TL= 2.00s ML= 256MB
+L: coral-loop             TL= 2.00s ML= 256MB
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > d_pat.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int memo[100000];
+int win(long long x, long long n){
+  if (x >= n) return 0; // previous player won; state is "lost" for current
+  if (x < 100000 && memo[x] != -1) return memo[x];
+  int r = 0;
+  for (int k = 2; k <= 9; k++) { if (!win(x*k, n)) { r = 1; break; } }
+  if (x < 100000) memo[x] = r;
+  return r;
+}
+int main(){
+  for (int n = 1; n <= 3000; n++) {
+    memset(memo, -1, sizeof(memo));
+    int w = win(1, n);
+    // find boundaries
+    if (n == 1 || w != prev) printf("n=%d %s\n", n, w ? "FIRST" : "SECOND"), prev = w;
+  }
+}
+EOF
+g++-14 -O2 -o d_pat d_pat.cpp 2>&1 | head -5; ./d_pat
+d_pat.cpp: In function 'int main()':
+d_pat.cpp:17:21: error: invalid operands of types 'int' and '<unresolved overloaded function type>' to binary 'operator!='
+   17 |     if (n == 1 || w != prev) printf("n=%d %s\n", n, w ? "FIRST" : "SECOND"), prev = w;
+      |                   ~~^~~~~~~
+d_pat.cpp:17:85: error: overloaded function with no contextual type information
+zsh:22: no such file or directory: ./d_pat
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > d_pat.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int memo[100000];
+int win(long long x, long long n){
+  if (x >= n) return 0;
+  if (x < 100000 && memo[x] != -1) return memo[x];
+  int r = 0;
+  for (int k = 2; k <= 9; k++) { if (!win(x*k, n)) { r = 1; break; } }
+  if (x < 100000) memo[x] = r;
+  return r;
+}
+int main(){
+  int prev = -1;
+  for (int n = 1; n <= 4000; n++) {
+    memset(memo, -1, sizeof(memo));
+    int w = win(1, n);
+    if (n == 1 || w != prev) { printf("n=%d %s\n", n, w ? "FIRST" : "SECOND"); prev = w; }
+  }
+}
+EOF
+g++-14 -O2 -o d_pat d_pat.cpp && ./d_pat
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+n=1 SECOND
+n=2 FIRST
+n=10 SECOND
+n=19 FIRST
+n=163 SECOND
+n=325 FIRST
+n=2917 SECOND
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > d_pat2.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+map<long long,int> memo;
+int win(long long x, long long n){
+  if (x >= n) return 0;
+  auto it = memo.find(x); if (it != memo.end()) return it->second;
+  int r = 0;
+  for (int k = 2; k <= 9; k++) if (!win(x*k, n)) { r = 1; break; }
+  memo[x] = r; return r;
+}
+int formula(long long n){ // true = first wins (n>=2 semantics), start WIN at [1,9]
+  long long hi = 9; int st = 1;
+  while (hi < n) { hi = hi * (st ? 2 : 9); st = !st; }
+  return st;
+}
+int main(){
+  long long tests[] = {2,9,10,18,19,162,163,324,325,2916,2917,5832,5833,52488,52489,104976,104977,944784,1000000000,999999999};
+  for (long long n : tests) {
+    memo.clear();
+    int w = win(1, n);
+    printf("n=%lld brute=%d formula=%d %s\n", n, w, formula(n), (w==formula(n)?"OK":"MISMATCH"));
+  }
+}
+EOF
+g++-14 -O2 -o d_pat2 d_pat2.cpp && ./d_pat2
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+n=2 brute=1 formula=1 OK
+n=9 brute=1 formula=1 OK
+n=10 brute=0 formula=0 OK
+n=18 brute=0 formula=0 OK
+n=19 brute=1 formula=1 OK
+n=162 brute=1 formula=1 OK
+n=163 brute=0 formula=0 OK
+n=324 brute=0 formula=0 OK
+n=325 brute=1 formula=1 OK
+n=2916 brute=1 formula=1 OK
+n=2917 brute=0 formula=0 OK
+n=5832 brute=0 formula=0 OK
+n=5833 brute=1 formula=1 OK
+n=52488 brute=1 formula=1 OK
+n=52489 brute=0 formula=0 OK
+n=104976 brute=0 formula=0 OK
+n=104977 brute=1 formula=1 OK
+n=944784 brute=1 formula=1 OK
+n=1000000000 brute=1 formula=1 OK
+n=999999999 brute=1 formula=1 OK
+[0m
+[0m← [0mWrite h.cpp
+Wrote file successfully.
+[0m
+[0m← [0mWrite d.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit D contest/teams/big-pickle/d.cpp --team big-pickle 2>&1 | tail -3; python3 contest/judge.py submit H contest/teams/big-pickle/h.cpp --team big-pickle 2>&1 | tail -3
+OK (101/101, max 575ms) | peak 8.4MB
+RE on test 1 (0/24, max 0ms) | peak 8.4MB
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > h1.txt <<'EOF'
+3
+3 12
+2 2
+2 5
+1 4 10
+2 1
+2 4
+1 2 7
+2 2
+1 9 1
+2 3
+2 9
+1 4 8
+2 2
+1 4
+2 1
+1 5 3
+2 1
+2 5
+2 5
+2 1
+1 3 6
+2 2
+2 1
+2 3
+EOF
+g++-14 -O2 -std=gnu++17 -o h1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp 2>&1 | grep -v deployment; ./h1 < h1.txt; echo "exit=$?"
+exit=139
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && printf '1\n3 12\n2 2\n2 5\n1 4 10\n2 1\n2 4\n1 2 7\n2 2\n1 9 1\n2 3\n2 9\n1 4 8\n2 2\n' > h2.txt && ./h1 < h2.txt; echo "exit=$?"; printf '1\n1 1\n2 1\n' > h3.txt && ./h1 < h3.txt; echo "exit=$?"
+0 2
+-1
+-1
+10 1
+7 1
+-1
+1 1
+7 3
+exit=0
+0 1
+exit=0
+[0m
+[0m← [0mEdit h.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp
+@@ -9,10 +9,10 @@
+ int main() {
+     int T; if (scanf("%d", &T) != 1) return 0;
+     string out;
+     while (T--) {
+-        int n, q; scanf("%d %d", &n, &q);
+-        Fenwick bit(q + 2);
++        int n, q; if (scanf("%d %d", &n, &q) != 2) break;
++        Fenwick bit(n + q + 2);
+         set<int> live;
+         unordered_map<int, pair<int, int>> mp; // key -> (value, timestamp)
+         mp.reserve(4 * n + 16);
+         for (int i = 1; i <= n; i++) { mp[i] = {0, i}; live.insert(i); bit.add(i, 1); }
+
+[0m
+[0m← [0mEdit h.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp
+@@ -17,11 +17,11 @@
+ mp.reserve(4 * n + 16);
+ for (int i = 1; i <= n; i++) { mp[i] = {0, i}; live.insert(i); bit.add(i, 1); }
+ int timer = n;
+ for (int qi = 0; qi < q; qi++) {
+-    int type, a; scanf("%d %d", &type, &a);
++    int type, a; if (scanf("%d %d", &type, &a) != 2) break;
+     if (type == 1) {
+-        int b; scanf("%d", &b);
++        int b; if (scanf("%d", &b) != 1) break;
+         auto it = mp.find(a);
+         if (it != mp.end()) {
+             int old = it->second.second;
+             live.erase(old); bit.add(old, -1);
+
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit H contest/teams/big-pickle/h.cpp --team big-pickle 2>&1 | tail -3
+RE on test 1 (0/24, max 0ms) | peak 8.4MB
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && sed -n '60,220p' contest/judge.py
+if not ok:
+        raise RuntimeError(f"checker compile failed for {letter}: {err[:400]}")
+    return cache
+
+def get_interactor(letter):
+    cache = os.path.join(J, letter, ".inter_bin")
+    src = os.path.join(J, letter, "files", "interactor.cpp")
+    if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(src):
+        return cache
+    ok, err = compile_cpp(src, cache)
+    if not ok:
+        raise RuntimeError(f"interactor compile failed for {letter}: {err[:400]}")
+    return cache
+
+def run_limited(argv, stdin_path, stdout_path, tl, ml_mb):
+    """fork+wait4 runner: per-child rusage (exact CPU time + peak RSS, immune
+    to pollution by the judge's other children). Mid-run RSS kill via ps.
+    Returns (verdict, peak_rss_mb, elapsed_ms)."""
+    tl_cpu = int(tl) + 2  # RLIMIT backstop; verdict uses ru_utime+ru_stime
+    wall_deadline = 4 * tl + 5.0
+    bin_abs = os.path.abspath(argv[0])
+    pid = os.fork()
+    if pid == 0:  # child: no python I/O from here
+        try:
+            resource.setrlimit(resource.RLIMIT_CPU, (tl_cpu, tl_cpu + 1))
+            resource.setrlimit(resource.RLIMIT_NOFILE, (256, 256))
+            fi = os.open(stdin_path, os.O_RDONLY)
+            os.dup2(fi, 0)
+            fo = os.open(stdout_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o666)
+            os.dup2(fo, 1)
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, 2)
+            os.execv(bin_abs, [bin_abs])
+        finally:
+            os._exit(127)
+    t0 = time.monotonic()
+    poll_peak = 0.0
+    status = ru = None
+    next_ps = t0 + 0.08
+    while True:
+        wpid, status, ru = os.wait4(pid, os.WNOHANG)
+        if wpid:
+            break
+        now = time.monotonic()
+        if now >= next_ps:
+            next_ps = now + 0.025
+            try:
+                pr = subprocess.run(["ps", "-o", "rss=", "-p", str(pid)],
+                                    capture_output=True, text=True, timeout=2)
+                if pr.stdout.strip():
+                    poll_peak = max(poll_peak, int(pr.stdout.strip()) / 1024.0)
+            except Exception:
+                pass
+            if poll_peak > ml_mb:
+                os.kill(pid, 9)
+                os.wait4(pid, 0)
+                return "ML", poll_peak, (now - t0) * 1000
+        if now - t0 > wall_deadline:
+            os.kill(pid, 9)
+            os.wait4(pid, 0)
+            return "TL", poll_peak, (now - t0) * 1000
+        time.sleep(0.005)
+    el = (time.monotonic() - t0) * 1000
+    cpu = ru.ru_utime + ru.ru_stime
+    peak = max(poll_peak, ru.ru_maxrss / 1048576.0)
+    if peak > ml_mb:
+        return "ML", peak, el
+    if os.WIFSIGNALED(status) and os.WTERMSIG(status) == signal.SIGXCPU:
+        return "TL", peak, el
+    if cpu > tl * 1.02:
+        return "TL", peak, el
+    if os.WIFSIGNALED(status) or os.WEXITSTATUS(status) != 0:
+        return "RE", peak, el
+    return "RUN_OK", peak, el
+
+def check_output(letter, tdir, test, outp, inter):
+    """Run testlib checker. verdict OK/WA/JE."""
+    if inter:
+        return "OK", ""  # interactor already decided
+    chk = get_checker(letter)
+    r = subprocess.run([chk, os.path.join(tdir, test),
+                        outp,
+                        os.path.join(tdir, test + ".a")],
+                       capture_output=True, text=True, timeout=60)
+    if r.returncode == 0:
+        return "OK", ""
+    if r.returncode == 1:
+        return "WA", (r.stderr or "")[:150]
+    if r.returncode == 2:
+        return "WA", (r.stderr or "")[:150]  # presentation error counts as WA here
+    return "JE", f"checker rc={r.returncode} {(r.stderr or '')[:150]}"
+
+def run_interactive_final(letter, sol_bin, tdir, test, tl, ml_mb):
+    """testlib convention: interactor stdin/stdout <-> solution stdout/stdin;
+    argv[1]=test input, argv[2]=transcript file (written by interactor).
+    Verdict = interactor exit code (0 OK, 1 WA, 2 PE->WA, else judge error/RE)."""
+    inter = get_interactor(letter)
+    tin = os.path.join(tdir, test)
+    tl_cpu = int(tl) + 2
+    with tempfile.TemporaryDirectory(prefix="inter") as work:
+        transcript = os.path.join(work, "transcript.txt")
+        to_sol_r, to_sol_w = os.pipe()       # interactor.stdout -> sol.stdin
+        to_int_r, to_int_w = os.pipe()       # sol.stdout -> interactor.stdin
+
+        def pre():
+            resource.setrlimit(resource.RLIMIT_CPU, (tl_cpu, tl_cpu + 1))
+
+        t0 = time.monotonic()
+        inter_p = subprocess.Popen([inter, tin, transcript],
+                                   stdin=to_int_r, stdout=to_sol_w,
+                                   stderr=subprocess.PIPE)
+        os.close(to_int_r); os.close(to_sol_w)
+        sol_p = subprocess.Popen([sol_bin], stdin=to_sol_r, stdout=to_int_w,
+                                 stderr=subprocess.DEVNULL, preexec_fn=pre)
+        os.close(to_sol_r); os.close(to_int_w)
+        peak = 0.0
+        wall_deadline = 4 * tl + 6.0
+        while inter_p.poll() is None and sol_p.poll() is None:
+            try:
+                pr = subprocess.run(["ps", "-o", "rss=", "-p", str(sol_p.pid)],
+                                    capture_output=True, text=True, timeout=2)
+                if pr.stdout.strip():
+                    peak = max(peak, int(pr.stdout.strip()) / 1024.0)
+            except Exception:
+                pass
+            if peak > ml_mb * 1.05:
+                sol_p.kill(); inter_p.kill()
+                return "ML", "", (time.monotonic() - t0) * 1000
+            if time.monotonic() - t0 > wall_deadline:
+                sol_p.kill(); inter_p.kill()
+                return "TL", "", (time.monotonic() - t0) * 1000
+            time.sleep(0.01)
+        try:
+            _, ie = inter_p.communicate(timeout=30)
+        except Exception:
+            inter_p.kill(); _, ie = inter_p.communicate()
+        el = (time.monotonic() - t0) * 1000
+        irc = inter_p.returncode if inter_p.returncode is not None else 3
+        ie = (ie or b"").decode(errors="replace").strip()
+        if irc == 0:
+            return "OK", "", el
+        if irc in (1, 2):
+            return "WA", ie[:150], el
+        if sol_p.poll() not in (None, 0):
+            return "RE", f"sol rc={sol_p.returncode}; {ie[:100]}", el
+        return "JE", f"interactor rc={irc} {ie[:150]}", el
+
+def judge(letter, src, team):
+    m = load_map()[letter]
+    eff_ml = m["ml"] * 1.05
+    try:
+        eff_ml = max(eff_ml, json.load(open(os.path.join(CONTEST, "calib.json"))).get(letter, 0))
+    except Exception:
+        pass
+    tdir = m["tdir"]
+    tests = sorted((f for f in os.listdir(tdir)
+                    if not f.endswith(".a") and not f.endswith(".out")),
+                   key=lambda s: int(s))
+    with tempfile.TemporaryDirectory(prefix="judge") as td:
+        bin_path = os.path.join(td, "sol")
+        ok, err = compile_cpp(src, bin_path)
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o h1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp 2>&1|grep -v deployment; ./h1 < h1.txt; echo "exit=$?"
+exit=139
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O0 -g -std=gnu++17 -fsanitize=address -o h1d /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp 2>&1|grep -v deployment; ./h1d < h1.txt 2>&1 | head -30
+ld: library 'asan' not found
+collect2: error: ld returned 1 exit status
+zsh:1: no such file or directory: ./h1d
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O0 -g -std=gnu++17 -o h1d /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp 2>&1|grep -v deployment; lldb -b -o run -o bt ./h1d < h1.txt 2>&1 | tail -25
+(no output)
+
+<shell_metadata>
+shell tool terminated command after exceeding timeout 120000 ms. If this command is expected to take longer and is not waiting for interactive input, retry with a larger timeout value in milliseconds.
+</shell_metadata>
+[0m
+[0m→ [0mRead h.cpp
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && sed 's|int type, a; if (scanf("%d %d", &type, &a) != 2) break;|int type, a; if (scanf("%d %d", \&type, \&a) != 2) break; fprintf(stderr,"q %d %d n=%d\\n",type,a,n);|; s|printf|printf|g' /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp > hdbg.cpp && g++-14 -O0 -g -std=gnu++17 -o hdbg hdbg.cpp 2>&1|grep -v deployment; ./hdbg < h1.txt > /dev/null; echo "exit=$?"
+q 2 2 n=3
+q 2 5 n=3
+q 1 4 n=3
+q 2 1 n=3
+q 2 4 n=3
+q 1 2 n=3
+q 2 2 n=3
+q 1 9 n=3
+q 2 3 n=3
+q 2 9 n=3
+q 1 4 n=3
+q 2 2 n=3
+q 2 1 n=1
+q 1 5 n=1
+exit=139
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && sed 's|int lru = \*live.begin();|fprintf(stderr,"live.size=%d\\n",(int)live.size()); int lru = *live.begin();|; s|auto jt = mp.find(lru); mp.erase(jt);|auto jt = mp.find(lru); fprintf(stderr,"jt=%d mp.size=%d\\n", jt==mp.end()?-1:jt->first,(int)mp.size()); mp.erase(jt);|' /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp > hdbg.cpp && g++-14 -O0 -g -std=gnu++17 -o hdbg hdbg.cpp 2>&1|grep -v deployment; ./hdbg < h1.txt > /dev/null; echo "exit=$?"
+live.size=3
+jt=1 mp.size=3
+live.size=3
+jt=3 mp.size=3
+live.size=1
+jt=-1 mp.size=1
+exit=139
+[0m
+[0m← [0mWrite h.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o h1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp 2>&1|grep -v deployment; ./h1 < h1.txt; echo "exit=$?"
+0 2
+-1
+-1
+10 1
+7 1
+-1
+1 1
+7 3
+0 1
+-1
+3 1
+0 2
+-1
+0 2
+6 2
+exit=0
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit H contest/teams/big-pickle/h.cpp --team big-pickle 2>&1 | tail -3
+OK (24/24, max 629ms) | peak 30.7MB
+[0m
+[0m← [0mWrite g.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o gtest /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/g.cpp 2>&1|grep -v deployment; cat > gcheck.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){
+  mt19937_64 rng(12345);
+  for (int it=0; it<3000; it++){
+    int n = 1 + rng()%12;
+    int mx = 1 + rng()%5;
+    printf("1\n%d\n", n);
+    for (int i=0;i<n;i++) printf("%d ", 1 + rng()%mx);
+    printf("\n");
+  }
+}
+EOF
+g++-14 -O2 -o gcheck gcheck.cpp 2>&1|grep -v deployment; ./gcheck > gc.txt; ./gtest 0 < gc.txt > g0.txt; ./gtest 1 < gc.txt > g1.txt; diff g0.txt g1.txt && echo "IDENTICAL on 3000 random small cases" || echo "DIFFERS"
+IDENTICAL on 3000 random small cases
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gcheck2.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){
+  mt19937_64 rng(999);
+  for (int it=0; it<800; it++){
+    int n = 3 + rng()%60;
+    int mode = it % 4;
+    long long base = 1 + rng()%20;
+    printf("1\n%d\n", n);
+    for (int i=0;i<n;i++){
+      long long v;
+      if (mode==0) v = base + (long long)(rng()%3);
+      else if (mode==1) v = base + i + (long long)(rng()%2);
+      else if (mode==2) v = base * (1 + (long long)(rng()%2)) + (long long)(rng()%2);
+      else v = 1 + (long long)(rng()% (base+1));
+      printf("%lld ", v);
+    }
+    printf("\n");
+  }
+}
+EOF
+g++-14 -O2 -o gcheck2 gcheck2.cpp 2>&1|grep -v deployment; ./gcheck2 > gc2.txt; ./gtest 0 < gc2.txt > g0b.txt; ./gtest 1 < gc2.txt > g1b.txt; diff g0b.txt g1b.txt && echo IDENTICAL || echo DIFFERS; grep -c No g1b.txt
+IDENTICAL
+0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gcheck3.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){
+  mt19937_64 rng(7);
+  for (int it=0; it<600; it++){
+    int n = 4 + rng()%80;
+    long long start = 1 + rng()%50;
+    int mode = it % 3;
+    printf("1\n%d\n", n);
+    for (int i=0;i<n;i++){
+      long long k = start + (i/2) + (mode==1 ? (long long)(rng()%2) : 0) - (mode==2 && rng()%5==0 ? 1 : 0);
+      if (k<1) k=1;
+      printf("%lld ", k);
+    }
+    printf("\n");
+  }
+  // pure expanding spiral
+  for (int n=4;n<=200;n+=3){ printf("1\n%d\n",n); for(int i=0;i<n;i++) printf("%d ", 1000+i/2); printf("\n"); }
+}
+EOF
+g++-14 -O2 -o gcheck3 gcheck3.cpp 2>&1|grep -v deployment; ./gcheck3 > gc3.txt; ./gtest 0 < gc3.txt > g0c.txt; ./gtest 1 < gc3.txt > g1c.txt; diff g0c.txt g1c.txt && echo IDENTICAL; echo "No count: $(grep -c No g1c.txt) / $(wc -l < g1c.txt)"
+IDENTICAL
+No count: 1 /        1
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gcheck.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){
+  mt19937_64 rng(12345);
+  int T = 4000; printf("%d\n", T);
+  for (int it=0; it<T; it++){
+    int n, mode = atoi(argv[1]);
+    long long base;
+    if (mode==0){ n = 1 + rng()%12; base = 1 + rng()%5; }
+    else if (mode==1){ n = 3 + rng()%60; base = 1 + rng()%20; }
+    else { n = 4 + rng()%200; base = 1 + rng()%2000; }
+    printf("%d\n", n);
+    for (int i=0;i<n;i++){
+      long long v = base + (i/2) + (long long)(rng()%3) - (long long)(rng()%2) + (long long)(rng()%2);
+      if (v<1) v=1;
+      printf("%lld ", v);
+    }
+    printf("\n");
+  }
+}
+EOF
+g++-14 -O2 -o gcheck gcheck.cpp 2>&1|grep -v deployment; for m in 0 1 2; do ./gcheck $m > gc$m.txt; ./gtest 0 < gc$m.txt > a$m.txt; ./gtest 1 < gc$m.txt > b$m.txt; if diff -q a$m.txt b$m.txt >/dev/null; then echo "mode $m IDENTICAL  (No: $(grep -c No a$m.txt)/$m)"; else echo "mode $m DIFFERS"; diff a$m.txt b$m.txt | head; fi; done
+mode 0 DIFFERS
+18a19
+> No
+21d21
+< Yes
+93,94d92
+< Yes
+< Yes
+95a94,95
+> No
+> No
+mode 1 DIFFERS
+111a112
+> No
+178a180
+> No
+230,231d231
+< Yes
+< Yes
+233d232
+< Yes
+266a266
+mode 2 DIFFERS
+1048d1047
+< Yes
+1192a1192
+> No
+1238d1237
+< Yes
+1361a1361
+> No
+2169c2169
+< Yes
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF'
+import subprocess
+a=open('a0.txt').read().split('\n'); b=open('b0.txt').read().split('\n')
+# regenerate inputs one by one
+lines=open('gc0.txt').read().split('\n')
+t=int(lines[0]); idx=1; cases=[]
+for i in range(t):
+    n=int(lines[idx]); d=list(map(int,lines[idx+1].split())); idx+=2
+    cases.append((n,d))
+shown=0
+for i,(x,y) in enumerate(zip(a,b)):
+    if x!=y and shown<2:
+        n,d=cases[i]
+        print("case",i+1,"n=",n,"d=",d,"brute=",x,"fast=",y)
+        # simulate: print which pair
+        segs=[];px=py=0
+        dx=[0,-1,0,1];dy=[1,0,-1,0]
+        for k in range(n):
+            dirk=k%4
+            segs.append((px,py,px+dx[dirk]*d[k],py+dy[dirk]*d[k]))
+            px+=dx[dirk]*d[k];py+=dy[dirk]*d[k]
+        for a1 in range(n):
+            for b1 in range(a1+2,n):
+                A=segs[a1];B=segs[b1]
+                av=A[0]==A[2];bv=B[0]==B[2]
+                hit=False
+                if av and bv: hit = A[0]==B[0] and max(min(A[1],A[3]),min(B[1],B[3]))<=min(max(A[1],A[3]),max(B[1],B[3]))
+                elif not av and not bv: hit = A[1]==B[1] and max(min(A[0],A[2]),min(B[0],B[2]))<=min(max(A[0],A[2]),max(B[0],B[2]))
+                elif av: hit = min(A[1],A[3])<=B[1]<=max(A[1],A[3]) and min(B[0],B[2])<=A[0]<=max(B[0],B[2])
+                else: hit = min(B[1],B[3])<=A[1]<=max(B[1],B[3]) and min(A[0],A[2])<=B[0]<=max(A[0],B[2])
+                if hit: print("  first hit pair",a1+1,b1+1,"dist",b1-a1); break
+            else: continue
+            break
+        shown+=1
+EOF
+case 19 n= 5 d= [5, 6, 7, 6, 6] brute= Yes fast= No
+  first hit pair 1 5 dist 4
+case 93 n= 5 d= [3, 3, 4, 3, 3] brute= Yes fast= No
+  first hit pair 1 5 dist 4
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gmax.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+int main(int argc,char**argv){
+  int mode=atoi(argv[1]); mt19937_64 rng(argc>2?atoll(argv[2]):12345);
+  int T=3000; printf("%d\n",T);
+  for(int it=0;it<T;it++){
+    int n; ll base;
+    if(mode==0){n=1+rng()%14; base=1+rng()%6;}
+    else if(mode==1){n=3+rng()%60; base=1+rng()%20;}
+    else if(mode==2){n=4+rng()%200; base=1+rng()%3000;}
+    else {n=4+rng()%100; base=1+rng()%50;}
+    printf("%d\n",n);
+    for(int i=0;i<n;i++){
+      ll v;
+      if(mode==3) v=base+i/2+ (ll)(rng()%2);       // expanding spiral (mostly No)
+      else v=base+(i/2)+(ll)(rng()%3)-(ll)(rng()%2)+(ll)(rng()%2);
+      if(v<1)v=1; printf("%lld ",v);
+    }
+    printf("\n");
+  }
+}
+EOF
+g++-14 -O2 -o gmax gmax.cpp 2>&1|grep -v deployment
+cat > gmin.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+int main(){int t;scanf("%d",&t);
+ while(t--){int n;scanf("%d",&n);vector<ll>d(n);for(auto&x:d)scanf("%lld",&x);
+  vector<array<ll,4>> s(n); ll x=0,y=0; int dx[4]={0,-1,0,1},dy[4]={1,0,-1,0};
+  for(int i=0;i<n;i++){int k=i%4;s[i]={x,y,x+dx[k]*d[i],y+dy[k]*d[i]};x+=dx[k]*d[i];y+=dy[k]*d[i];}
+  int best=1000000;
+  for(int i=0;i<n;i++)for(int j=i+2;j<n;j++){auto&A=s[i];auto&B=s[j];
+   bool av=A[0]==A[2],bv=B[0]==B[2];bool hit=false;
+   if(av&&bv)hit=A[0]==B[0]&&max(min(A[1],A[3]),min(B[1],B[3]))<=min(max(A[1],A[3]),max(B[1],B[3]));
+   else if(!av&&!bv)hit=A[1]==B[1]&&max(min(A[0],A[2]),min(B[0],B[2]))<=min(max(A[0],A[2]),max(B[0],B[2]));
+   else if(av)hit=min(A[1],A[3])<=B[1]&&B[1]<=max(A[1],A[3])&&min(B[0],B[2])<=A[0]&&A[0]<=max(B[0],B[2]);
+   else hit=min(B[1],B[3])<=A[1]&&A[1]<=max(B[1],B[3])&&min(A[0],A[2])<=B[0]&&B[0]<=max(A[0],A[2]);
+   if(hit){best=min(best,j-i);}}
+  printf("%d\n",best==1000000?-1:best);}
+ return 0;}
+EOF
+g++-14 -O2 -o gmin gmin.cpp 2>&1|grep -v deployment
+for m in 0 1 2 3; do ./gmax $m $((m*7+1)) > gg$m.txt; ./gmin < gg$m.txt > ggmin$m.txt; echo "mode $m: max mindist = $(sort -n ggmin$m.txt | tail -1), No-count=$(grep -c '^-1' ggmin$m.txt)"; done
+mode 0: max mindist = 5, No-count=956
+mode 1: max mindist = 4, No-count=116
+mode 2: max mindist = 4, No-count=20
+mode 3: max mindist = 3, No-count=58
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gbox.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){int t;scanf("%d",&t);
+ while(t--){int n;scanf("%d",&n);vector<long long>d(n);for(auto&x:d)scanf("%lld",&x);
+  long long x=0,y=0,xmin=0,xmax=0,ymin=0,ymax=0;int dx[4]={0,-1,0,1},dy[4]={1,0,-1,0};
+  bool bad=false;
+  for(int i=0;i<n&&!bad;i++){int k=i%4;long long nx=x+dx[k]*d[i],ny=y+dy[k]*d[i];
+   if(k==0){if(ny<=ymax){bad=true;break;}ymax=ny;}
+   else if(k==1){if(nx>=xmin){bad=true;break;}xmin=nx;}
+   else if(k==2){if(ny>=ymin){bad=true;break;}ymin=ny;}
+   else {if(nx<=xmax){bad=true;break;}xmax=nx;}
+   x=nx;y=ny;}
+  puts(bad?"Yes":"No");}
+ return 0;}
+EOF
+g++-14 -O2 -o gbox gbox.cpp 2>&1|grep -v deployment
+for m in 0 1 2 3; do ./gbox < gg$m.txt > gb$m.txt; ./gmin < gg$m.txt >/dev/null; paste -d' ' gb$m.txt <(awk '{print ($1==-1)?"No":"Yes"}' ggmin$m.txt) | awk '{if($1!=$2) d++} END{print "mode '"$m"': mismatches="d+0}'; done
+mode 0: mismatches=255
+mode 1: mismatches=51
+mode 2: mismatches=11
+mode 3: mismatches=23
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && for m in 0 1 2 3; do paste -d' ' gb$m.txt <(awk '{print ($1==-1)?"No":"Yes"}' ggmin$m.txt) | awk -v m=$m '{if($1!=$2){if($1=="Yes")fp++;else fn++}} END{print "mode "m": box=Yes but truth=No (false pos): "fp+0"   box=No but truth=Yes (false neg): "fn+0}'; done
+mode 0: box=Yes but truth=No (false pos): 255   box=No but truth=Yes (false neg): 0
+mode 1: box=Yes but truth=No (false pos): 51   box=No but truth=Yes (false neg): 0
+mode 2: box=Yes but truth=No (false pos): 11   box=No but truth=Yes (false neg): 0
+mode 3: box=Yes but truth=No (false pos): 23   box=No but truth=Yes (false neg): 0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gf.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+int main(int argc,char**argv){int K=atoi(argv[1]);
+ int t;scanf("%d",&t);
+ while(t--){int n;scanf("%d",&n);vector<ll>d(n);for(auto&x:d)scanf("%lld",&x);
+  vector<array<ll,4>> s(n); ll x=0,y=0; int dx[4]={0,-1,0,1},dy[4]={1,0,-1,0};
+  for(int i=0;i<n;i++){int k=i%4;s[i]={x,y,x+dx[k]*d[i],y+dy[k]*d[i]};x+=dx[k]*d[i];y+=dy[k]*d[i];}
+  bool bad=false;
+  for(int i=0;i<n&&!bad;i++)for(int j=i+2;j<n&&j-i<=K;j++){auto&A=s[i];auto&B=s[j];
+   bool av=A[0]==A[2],bv=B[0]==B[2];bool hit=false;
+   if(av&&bv)hit=A[0]==B[0]&&max(min(A[1],A[3]),min(B[1],B[3]))<=min(max(A[1],A[3]),max(B[1],B[3]));
+   else if(!av&&!bv)hit=A[1]==B[1]&&max(min(A[0],A[2]),min(B[0],B[2]))<=min(max(A[0],A[2]),max(B[0],B[2]));
+   else if(av)hit=min(A[1],A[3])<=B[1]&&B[1]<=max(A[1],A[3])&&min(B[0],B[2])<=A[0]&&A[0]<=max(B[0],B[2]);
+   else hit=min(B[1],B[3])<=A[1]&&A[1]<=max(B[1],B[3])&&min(A[0],A[2])<=B[0]&&B[0]<=max(A[0],A[2]);
+   if(hit){bad=true;break;}}
+  puts(bad?"Yes":"No");}
+ return 0;}
+EOF
+g++-14 -O2 -o gf gf.cpp 2>&1|grep -v deployment
+for K in 4 5 6 7 8 12; do g++-14 -O2 -o gf$K gf.cpp 2>/dev/null; echo -n "K=$K: "; for m in 0 1 2 3; do ./gf$K < gg$m.txt > f$m.txt; d=$(paste -d' ' f$m.txt <(awk '{print ($1==-1)?"No":"Yes"}' ggmin$m.txt) | awk '{if($1!=$2)c++} END{print c+0}'); echo -n "m$m=$d "; done; echo; done
+K=4: m0=3000 m1=3000 m2=3000 m3=3000 
+K=5: m0=3000 m1=3000 m2=3000 m3=3000 
+K=6: m0=3000 m1=3000 m2=3000 m3=3000 
+K=7: m0=3000 m1=3000 m2=3000 m3=3000 
+K=8: m0=3000 m1=3000 m2=3000 m3=3000 
+K=12: m0=3000 m1=3000 m2=3000 m3=3000
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && head -3 ggmin0.txt; echo ---; head -3 f0.txt; echo ---; paste -d' ' f0.txt <(awk '{print ($1==-1)?"No":"Yes"}' ggmin0.txt) | head -3
+-1
+-1
+3
+---
+---
+ No
+ No
+ Yes
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && ls -la gf* 2>&1 | head; g++-14 -O2 -std=gnu++17 -o gf4 gf.cpp 2>&1 | grep -v deployment; ./gf4 < gg0.txt | head -3
+-rwxr-xr-x  1 distiled  staff  34160 Sep 27 04:23 gf
+-rw-r--r--  1 distiled  staff   1035 Sep 27 04:23 gf.cpp
+-rwxr-xr-x  1 distiled  staff  34168 Sep 27 04:23 gf12
+-rwxr-xr-x  1 distiled  staff  34160 Sep 27 04:23 gf4
+-rwxr-xr-x  1 distiled  staff  34160 Sep 27 04:23 gf5
+-rwxr-xr-x  1 distiled  staff  34160 Sep 27 04:23 gf6
+-rwxr-xr-x  1 distiled  staff  34160 Sep 27 04:23 gf7
+-rwxr-xr-x  1 distiled  staff  34160 Sep 27 04:23 gf8
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && for K in 3 4 5 6 8 12; do echo -n "K=$K: "; for m in 0 1 2 3; do ./gf$K $K < gg$m.txt > f$m.txt; d=$(paste -d' ' f$m.txt <(awk '{print ($1==-1)?"No":"Yes"}' ggmin$m.txt) | awk '{if($1!=$2)c++} END{print c+0}'); echo -n "m$m=$d "; done; echo; done
+K=3: zsh:1: no such file or directory: ./gf3
+m0=3000 zsh:1: no such file or directory: ./gf3
+m1=3000 zsh:1: no such file or directory: ./gf3
+m2=3000 zsh:1: no such file or directory: ./gf3
+m3=3000 
+K=4: m0=16 m1=0 m2=0 m3=0 
+K=5: m0=0 m1=0 m2=0 m3=0 
+K=6: m0=0 m1=0 m2=0 m3=0 
+K=8: m0=0 m1=0 m2=0 m3=0 
+K=12: m0=0 m1=0 m2=0 m3=0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > gsearch.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+int main(int argc,char**argv){
+  mt19937_64 rng(atoi(argv[1]));
+  int maxd=0; ll bestn=0; vector<ll> bestd;
+  int ITER=200000;
+  for(int it=0; it<ITER; it++){
+    int n = 2 + rng()%30;
+    int mx = 1 + rng()%4;
+    vector<ll> d(n); for(auto&x:d) x=1+rng()%mx;
+    vector<array<ll,4>> s(n); ll x=0,y=0; int dx[4]={0,-1,0,1},dy[4]={1,0,-1,0};
+    for(int i=0;i<n;i++){int k=i%4;s[i]={x,y,x+dx[k]*d[i],y+dy[k]*d[i]};x+=dx[k]*d[i];y+=dy[k]*d[i];}
+    int mind=1000000;
+    for(int i=0;i<n;i++)for(int j=i+2;j<n;j++){auto&A=s[i];auto&B=s[j];
+     bool av=A[0]==A[2],bv=B[0]==B[2];bool hit=false;
+     if(av&&bv)hit=A[0]==B[0]&&max(min(A[1],A[3]),min(B[1],B[3]))<=min(max(A[1],A[3]),max(B[1],B[3]));
+     else if(!av&&!bv)hit=A[1]==B[1]&&max(min(A[0],A[2]),min(B[0],B[2]))<=min(max(A[0],A[2]),max(B[0],B[2]));
+     else if(av)hit=min(A[1],A[3])<=B[1]&&B[1]<=max(A[1],A[3])&&min(B[0],B[2])<=A[0]&&A[0]<=max(B[0],B[2]);
+     else hit=min(B[1],B[3])<=A[1]&&A[1]<=max(B[1],B[3])&&min(A[0],A[2])<=B[0]&&B[0]<=max(A[0],A[2]);
+     if(hit)mind=min(mind,j-i);}
+    if(mind<1000000 && mind>maxd){maxd=mind;bestn=n;bestd=d;}
+  }
+  printf("max first-intersection distance = %d\ncase n=%lld d=",maxd,bestn);
+  for(auto v:bestd)printf("%lld ",v); printf("\n");
+}
+EOF
+g++-14 -O2 -std=gnu++17 -o gsearch gsearch.cpp 2>&1|grep -v deployment; for s in 1 2 3 4; do ./gsearch $s; done
+max first-intersection distance = 5
+case n=6 d=1 1 2 2 1 1 
+max first-intersection distance = 5
+case n=7 d=2 2 4 3 2 1 1 
+max first-intersection distance = 5
+case n=6 d=1 1 2 2 1 1 
+max first-intersection distance = 5
+case n=6 d=2 1 4 4 2 3
+[0m
+[0m← [0mWrite g.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit G contest/teams/big-pickle/g.cpp --team big-pickle 2>&1 | tail -3
+RE on test 2 (1/19, max 692ms) | peak 8.4MB
+[0m
+[0m← [0mEdit g.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/g.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/g.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/g.cpp
+@@ -17,9 +17,9 @@
+ while (t--) {
+     int n; scanf("%d", &n);
+     vector<ll> d(n + 1);
+     for (int i = 1; i <= n; i++) scanf("%lld", &d[i]);
+-    vector<ll> X(n + 1), Y(n + 1);
++    vector<ll> X(n + 2), Y(n + 2);
+     ll x = 0, y = 0;
+     int dx[4] = {0, -1, 0, 1}, dy[4] = {1, 0, -1, 0};
+     for (int i = 1; i <= n; i++) {
+         int k = (i - 1) % 4;
+
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit G contest/teams/big-pickle/g.cpp --team big-pickle 2>&1 | tail -3
+OK (19/19, max 571ms) | peak 8.4MB
+[0m
+[0m← [0mWrite i.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit I contest/teams/big-pickle/i.cpp --team big-pickle 2>&1 | tail -3
+WA on test 1 (0/34, max 0ms) | wrong answer answer 1 differs: expected 1, found 2
+[0m
+[0m← [0mEdit i.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
+@@ -41,9 +41,9 @@
+         E++; if (dsu.merge(i, i + m)) C--;
+     }
+ }
+ vector<long long> ans(q);
+-for (int i = q - 1; i >= 0; i--) {
++for (int i = q - 1; i >= 1; i--) {
+     int u = hit[i];
+     V++; C++;
+     int r = u / m, c = u % m;
+     if (c > 0 && !dead[u - 1] && g[u - 1] && (g[u] & 8) && (g[u - 1] & 2)) { E++; if (dsu.merge(u, u - 1)) C--; }
+
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit I contest/teams/big-pickle/i.cpp --team big-pickle 2>&1 | tail -3
+WA on test 1 (0/34, max 0ms) | wrong answer answer 1 differs: expected 1, found 0
+[0m
+[0m← [0mEdit i.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
+@@ -41,10 +41,10 @@
+         E++; if (dsu.merge(i, i + m)) C--;
+     }
+ }
+ vector<long long> ans(q);
+-for (int i = q - 1; i >= 1; i--) {
+-    int u = hit[i];
++for (int i = q - 2; i >= 0; i--) {
++    int u = hit[i + 1];
+     V++; C++;
+     int r = u / m, c = u % m;
+     if (c > 0 && !dead[u - 1] && g[u - 1] && (g[u] & 8) && (g[u - 1] & 2)) { E++; if (dsu.merge(u, u - 1)) C--; }
+     if (c + 1 < m && !dead[u + 1] && g[u + 1] && (g[u] & 2) && (g[u + 1] & 8)) { E++; if (dsu.merge(u, u + 1)) C--; }
+
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit I contest/teams/big-pickle/i.cpp --team big-pickle 2>&1 | tail -3
+WA on test 3 (2/34, max 704ms) | wrong answer answer 13 differs: expected 1, found 0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > ibf.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int rank_of(vector<int>&g,int n,int m,vector<char>&dead){
+  int V=0,E=0; vector<vector<int>> adj(n*m);
+  for(int i=0;i<n*m;i++){ if(!g[i]||dead[i])continue; V++;
+    int r=i/m,c=i%m;
+    if(c+1<m && !dead[i+1] && g[i+1] && (g[i]&2)&&(g[i+1]&8)){E++;adj[i].push_back(i+1);adj[i+1].push_back(i);}
+    if(r+1<n && !dead[i+m] && g[i+m] && (g[i]&4)&&(g[i+m]&1)){E++;adj[i].push_back(i+m);adj[i+m].push_back(i);}
+  }
+  vector<char>vis(n*m,0); int C=0;
+  for(int i=0;i<n*m;i++){ if(!g[i]||dead[i]||vis[i])continue; C++; vector<int> st{i}; vis[i]=1;
+    while(!st.empty()){int u=st.back();st.pop_back();for(int v:adj[u])if(!vis[v]){vis[v]=1;st.push_back(v);} } }
+  return E-V+C;
+}
+int main(){int t;scanf("%d",&t);
+ while(t--){int n,m;scanf("%d %d",&n,&m);int N=n*m;vector<int>g(N);
+  for(auto&x:g)scanf("%d",&x);
+  int q;scanf("%d",&q);vector<int>hit(q);vector<char>dead(N,0);
+  for(int i=0;i<q;i++){int r,c;scanf("%d %d",&r,&c);hit[i]=(r-1)*m+c-1;dead[hit[i]]=1;}
+  for(int i=0;i<q;i++){ printf("%d%c", rank_of(g,n,m,dead), i+1==q?'\n':' '); dead[hit[i]]=0; }
+  if(q==0)puts("");
+ }
+ return 0;}
+EOF
+g++-14 -O2 -std=gnu++17 -o ibf ibf.cpp 2>&1|grep -v deployment
+g++-14 -O2 -std=gnu++17 -o isol /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp 2>&1|grep -v deployment
+cat > igen.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){mt19937 rng(7);int T=3000;printf("%d\n",T);
+ for(int it=0;it<T;it++){int n=1+rng()%5,m=1+rng()%5;
+  // build a random valid config: openings chosen randomly, ensuring >=2 openings
+  vector<vector<int>> g(n,vector<int>(m,0));
+  for(auto&r:g)for(auto&c:r){int bits=0;for(int d=0;d<4;d++) if(rng()%2)bits|=1<<d; int pc=__builtin_popcount(bits); if(pc==1)bits|=1<<rng()%4; if(pc==0&&rng()%2)bits|=3;c=bits;}
+  printf("%d %d\n",n,m);for(auto&r:g)for(auto&c:r)printf("%d ",c);printf("\n");
+  // choose q distinct junctions
+  vector<pair<int,int>> js; for(int i=0;i<n;i++)for(int j=0;j<m;j++) if(g[i][j])js.push_back({i+1,j+1});
+  shuffle(js.begin(),js.end(),rng); int q=rng()%(js.size()+1);
+  printf("%d\n",q); for(int i=0;i<q;i++)printf("%d %d\n",js[i].first,js[i].second);
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o igen igen.cpp 2>&1|grep -v deployment; ./igen > it.txt; ./ibf < it.txt > ibf.out; ./isol < it.txt > isol.out; diff ibf.out isol.out | head -20 && echo "IDENTICAL"
+85c85
+< 0 0 0 0 0 0 1 1 1 1 1 1 1
+---
+> 1 1 0 0 0 0 0 0 0 0 0 0 0
+161c161
+< 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+---
+> 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+165c165
+< 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1
+---
+> 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+192c192
+< 0 0 0 0 0 0 0 0 0 1 1 1
+---
+> 1 0 0 0 0 0 0 0 0 0 0 0
+204c204
+< 1
+---
+> 0
+IDENTICAL
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF'
+a=open('ibf.out').read().split('\n'); b=open('isol.out').read().split('\n')
+lines=open('it.txt').read().split('\n')
+idx=0; T=int(lines[idx]); idx+=1
+shown=0
+for it in range(T):
+    n,m=map(int,lines[idx].split()); idx+=1
+    N=n*m
+    g=[]
+    for r in range(n):
+        g+= list(map(int,lines[idx].split())); idx+=1
+    q=int(lines[idx]); idx+=1
+    hits=[]
+    for i in range(q):
+        r,c=map(int,lines[idx].split()); idx+=1; hits.append((r-1)*m+c-1)
+    if a[it]!=b[it] and shown<3:
+        print("case",it,"n,m",n,m,"q",q); print("g",g); print("hits",hits)
+        print(" brute:",a[it]); print(" mine :",b[it]); shown+=1
+EOF
+Traceback (most recent call last):
+  File "<stdin>", line 11, in <module>
+ValueError: invalid literal for int() with base 10: '2 2'
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF'
+a=open('ibf.out').read().split('\n'); b=open('isol.out').read().split('\n')
+lines=open('it.txt').read().split('\n')
+idx=0; T=int(lines[idx]); idx+=1
+shown=0
+for it in range(T):
+    n,m=map(int,lines[idx].split()); idx+=1
+    g=list(map(int,lines[idx].split())); idx+=1
+    q=int(lines[idx]); idx+=1
+    hits=[]
+    for i in range(q):
+        r,c=map(int,lines[idx].split()); idx+=1; hits.append((r-1)*m+c-1)
+    if a[it]!=b[it] and shown<3:
+        print("case",it,"n,m",n,m,"q",q); print("g",g); print("hits",hits)
+        print(" brute:",a[it]); print(" mine :",b[it]); shown+=1
+EOF
+case 84 n,m 5 5 q 13
+g [5, 10, 12, 14, 14, 14, 12, 13, 14, 11, 1, 3, 13, 6, 14, 2, 5, 15, 3, 11, 10, 6, 9, 9, 10]
+hits [5, 8, 19, 18, 3, 14, 9, 15, 22, 24, 0, 10, 12]
+ brute: 0 0 0 0 0 0 1 1 1 1 1 1 1
+ mine : 1 1 0 0 0 0 0 0 0 0 0 0 0
+case 160 n,m 5 5 q 16
+g [9, 14, 3, 9, 3, 6, 5, 3, 9, 0, 4, 12, 14, 12, 3, 1, 5, 15, 13, 15, 12, 6, 9, 6, 10]
+hits [15, 18, 16, 7, 13, 4, 5, 24, 22, 8, 2, 14, 21, 17, 12, 23]
+ brute: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1
+ mine : 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+case 164 n,m 5 5 q 25
+g [9, 6, 15, 9, 13, 9, 3, 5, 2, 14, 11, 5, 6, 14, 13, 12, 7, 14, 7, 9, 10, 15, 2, 12, 14]
+hits [17, 2, 23, 4, 22, 15, 8, 12, 13, 10, 18, 19, 7, 14, 16, 20, 6, 24, 0, 9, 11, 21, 3, 5, 1]
+ brute: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1
+ mine : 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > igen2.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){mt19937 rng(atoi(argv[1]));int T=20000;printf("%d\n",T);
+ for(int it=0;it<T;it++){int n=1+rng()%3,m=1+rng()%3;
+  vector<vector<int>> g(n,vector<int>(m,0));
+  for(auto&r:g)for(auto&c:r){int bits=0;for(int d=0;d<4;d++) if(rng()%2)bits|=1<<d; int pc=__builtin_popcount(bits); if(pc==1)bits|=1<<rng()%4; if(pc==0&&rng()%2)bits|=3;c=bits;}
+  printf("%d %d\n",n,m);for(auto&r:g)for(auto&c:r)printf("%d ",c);printf("\n");
+  vector<pair<int,int>> js; for(int i=0;i<n;i++)for(int j=0;j<m;j++) if(g[i][j])js.push_back({i+1,j+1});
+  shuffle(js.begin(),js.end(),rng); int q=rng()%(js.size()+1);
+  printf("%d\n",q); for(int i=0;i<q;i++)printf("%d %d\n",js[i].first,js[i].second);
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o igen2 igen2.cpp 2>&1|grep -v deployment; ./igen2 11 > it2.txt; ./ibf < it2.txt > b1.out; ./isol < it2.txt > b2.out; diff b1.out b2.out | head -5; python3 - <<'EOF'
+a=open('b1.out').read().split('\n'); b=open('b2.out').read().split('\n')
+lines=open('it2.txt').read().split('\n')
+idx=0; T=int(lines[idx]); idx+=1
+shown=0
+for it in range(T):
+    n,m=map(int,lines[idx].split()); idx+=1
+    g=list(map(int,lines[idx].split())); idx+=1
+    q=int(lines[idx]); idx+=1
+    hits=[]
+    for i in range(q):
+        r,c=map(int,lines[idx].split()); idx+=1; hits.append((r-1)*m+c-1)
+    if a[it]!=b[it] and shown<2:
+        print("case",it,"n,m",n,m,"q",q); print("g",g); print("hits",hits)
+        print(" brute:",a[it]); print(" mine :",b[it]); shown+=1
+EOF
+igen2.cpp: In function 'int main()':
+igen2.cpp:3:29: error: 'argv' was not declared in this scope
+    3 | int main(){mt19937 rng(atoi(argv[1]));int T=20000;printf("%d\n",T);
+      |                             ^~~~
+zsh:15: no such file or directory: ./igen2
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+ValueError: invalid literal for int() with base 10: ''
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && sed -i '' 's/int main(){mt19937 rng(atoi(argv\[1\]));/int main(int argc,char**argv){mt19937 rng(atoi(argv[1]));/' igen2.cpp && g++-14 -O2 -o igen2 igen2.cpp 2>&1|grep -v deployment; ./igen2 11 > it2.txt; ./ibf < it2.txt > b1.out; ./isol < it2.txt > b2.out; diff b1.out b2.out | head -5; python3 - <<'EOF'
+a=open('b1.out').read().split('\n'); b=open('b2.out').read().split('\n')
+lines=open('it2.txt').read().split('\n')
+idx=0; T=int(lines[idx]); idx+=1
+shown=0
+for it in range(T):
+    n,m=map(int,lines[idx].split()); idx+=1
+    g=list(map(int,lines[idx].split())); idx+=1
+    q=int(lines[idx]); idx+=1
+    hits=[]
+    for i in range(q):
+        r,c=map(int,lines[idx].split()); idx+=1; hits.append((r-1)*m+c-1)
+    if a[it]!=b[it] and shown<2:
+        print("case",it,"n,m",n,m,"q",q); print("g",g); print("hits",hits)
+        print(" brute:",a[it]); print(" mine :",b[it]); shown+=1
+EOF
+172c172
+< 0 0 0 0 0 0 0 0 0
+---
+> 1 0 0 0 0 0 0 0 0
+337c337
+case 171 n,m 3 3 q 9
+g [11, 9, 9, 6, 15, 7, 7, 9, 10]
+hits [5, 3, 7, 1, 6, 0, 2, 8, 4]
+ brute: 0 0 0 0 0 0 0 0 0
+ mine : 1 0 0 0 0 0 0 0 0
+case 336 n,m 3 3 q 7
+g [7, 10, 5, 12, 7, 15, 14, 3, 9]
+hits [4, 3, 7, 8, 5, 6, 2]
+ brute: 0 0 0 0 0 1 1
+ mine : 0 0 0 0 0 0 0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF'
+s=open('ibf.cpp').read()
+s=s.replace("  for(int i=0;i<q;i++){ printf(\"%d%c\", rank_of(g,n,m,dead), i+1==q?'\\n':' '); dead[hit[i]]=0; }",
+            "  for(int i=0;i<q;i++){ dead[hit[i]]=1; printf(\"%d%c\", rank_of(g,n,m,dead), i+1==q?'\\n':' '); }")
+open('ibf.cpp','w').write(s)
+EOF
+grep -n "for(int i=0;i<q" ibf.cpp; g++-14 -O2 -std=gnu++17 -o ibf ibf.cpp 2>&1|grep -v deployment; ./ibf < it2.txt > b1.out; ./isol < it2.txt > b2.out; diff b1.out b2.out | head -5 && echo IDENT_SMALL; ./ibf < it.txt > b1.out; ./isol < it.txt > b2.out; diff b1.out b2.out | head -5 && echo IDENT_BIG
+19:  for(int i=0;i<q;i++){int r,c;scanf("%d %d",&r,&c);hit[i]=(r-1)*m+c-1;dead[hit[i]]=1;}
+20:  for(int i=0;i<q;i++){ dead[hit[i]]=1; printf("%d%c", rank_of(g,n,m,dead), i+1==q?'\n':' '); }
+172c172
+< 0 0 0 0 0 0 0 0 0
+---
+> 1 0 0 0 0 0 0 0 0
+545c545
+IDENT_SMALL
+85c85
+< 0 0 0 0 0 0 0 0 0 0 0 0 0
+---
+> 1 1 0 0 0 0 0 0 0 0 0 0 0
+161c161
+IDENT_BIG
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF'
+s=open('ibf.cpp').read()
+s=s.replace("hit[i]=(r-1)*m+c-1;dead[hit[i]]=1;}","hit[i]=(r-1)*m+c-1;}")
+open('ibf.cpp','w').write(s)
+EOF
+g++-14 -O2 -std=gnu++17 -o ibf ibf.cpp 2>&1|grep -v deployment; ./ibf < it2.txt > b1.out; ./isol < it2.txt > b2.out; diff b1.out b2.out|head -3 && echo IDENT_SMALL; ./ibf < it.txt > b1.out; ./isol < it.txt > b2.out; diff b1.out b2.out|head -3 && echo IDENT_BIG
+545c545
+< 1
+---
+IDENT_SMALL
+204c204
+< 1
+---
+IDENT_BIG
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && diff b1.out b2.out | head -20
+204c204
+< 1
+---
+> 0
+402c402
+< 1
+---
+> 0
+770c770
+< 1 1 1
+---
+> 1 1 0
+1063c1063
+< 1
+---
+> 0
+1201c1201
+< 1
+---
+> 0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF'
+a=open('b1.out').read().split('\n'); b=open('b2.out').read().split('\n')
+lines=open('it2.txt').read().split('\n')
+idx=0; T=int(lines[idx]); idx+=1
+shown=0
+for it in range(T):
+    n,m=map(int,lines[idx].split()); idx+=1
+    g=list(map(int,lines[idx].split())); idx+=1
+    q=int(lines[idx]); idx+=1
+    hits=[]
+    for i in range(q):
+        r,c=map(int,lines[idx].split()); idx+=1; hits.append((r-1)*m+c-1)
+    if a[it]!=b[it] and shown<3:
+        print("case",it,"n,m",n,m,"q",q); print("g",g); print("hits(0-idx)",hits)
+        for r in range(n): print("  ",g[r*m:(r+1)*m])
+        print(" brute:",a[it]); print(" mine :",b[it]); shown+=1
+EOF
+case 203 n,m 2 3 q 5
+g [12, 7, 6, 15, 13, 14]
+hits(0-idx) [2, 1, 5, 3, 4]
+   [12, 7, 6]
+   [15, 13, 14]
+ brute: 1
+ mine : 0
+case 401 n,m 2 3 q 1
+g [10, 10, 10, 12, 14, 3]
+hits(0-idx) [2]
+   [10, 10, 10]
+   [12, 14, 3]
+ brute: 1
+ mine : 0
+case 769 n,m 2 3 q 1
+g [5, 11, 13, 10, 11, 2]
+hits(0-idx) [5]
+   [5, 11, 13]
+   [10, 11, 2]
+ brute: 1 1 1
+ mine : 1 1 0
+Traceback (most recent call last):
+  File "<stdin>", line 12, in <module>
+IndexError: list index out of range
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && printf '1\n2 3\n10 10 10 12 14 3\n1\n1 3\n' > c401.txt && echo "brute:" && ./ibf < c401.txt && echo "mine:" && ./isol < c401.txt
+brute:
+0
+mine:
+0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && rm -rf cases && mkdir cases && cat > igen3.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){mt19937 rng(atoi(argv[1]));int T=20000;
+ for(int it=0;it<T;it++){int n=1+rng()%3,m=1+rng()%3;
+  vector<vector<int>> g(n,vector<int>(m,0));
+  for(auto&r:g)for(auto&c:r){int bits=0;for(int d=0;d<4;d++) if(rng()%2)bits|=1<<d; int pc=__builtin_popcount(bits); if(pc==1)bits|=1<<rng()%4; if(pc==0&&rng()%2)bits|=3;c=bits;}
+  vector<pair<int,int>> js; for(int i=0;i<n;i++)for(int j=0;j<m;j++) if(g[i][j])js.push_back({i+1,j+1});
+  shuffle(js.begin(),js.end(),rng); int q=rng()%(js.size()+1);
+  string s; char buf[256];
+  sprintf(buf,"1\n%d %d\n",n,m); s+=buf;
+  for(int i=0;i<n;i++){for(int j=0;j<m;j++){sprintf(buf,"%d ",g[i][j]);s+=buf;}s+="\n";}
+  sprintf(buf,"%d\n",q); s+=buf;
+  for(int i=0;i<q;i++){sprintf(buf,"%d %d\n",js[i].first,js[i].second);s+=buf;}
+  char fn[64]; sprintf(fn,"cases/%05d.txt",it);
+  FILE*f=fopen(fn,"w"); fputs(s.c_str(),f); fclose(f);
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o igen3 igen3.cpp 2>&1|grep -v deployment; ./igen3 11; fails=0; for f in cases/*.txt; do a=$(./ibf < $f); b=$(./isol < $f); if [ "$a" != "$b" ]; then echo "DIFF $f: brute='$a' mine='$b'"; cat $f; fails=$((fails+1)); [ $fails -ge 2 ] && break; fi; done; echo "done"
+DIFF cases/00544.txt: brute='1' mine='0'
+1
+3 3
+8 6 15 
+6 13 6 
+7 13 12 
+1
+3 3
+DIFF cases/02496.txt: brute='1' mine='0'
+1
+3 3
+9 15 14 
+9 11 9 
+5 14 3 
+1
+3 3
+done
+[0m
+[0m← [0mEdit i.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp
+@@ -41,8 +41,9 @@
+         E++; if (dsu.merge(i, i + m)) C--;
+     }
+ }
+ vector<long long> ans(q);
++if (q > 0) ans[q - 1] = E - V + C;
+ for (int i = q - 2; i >= 0; i--) {
+     int u = hit[i + 1];
+     V++; C++;
+     int r = u / m, c = u % m;
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o isol /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp 2>&1|grep -v deployment; fails=0; for f in cases/*.txt; do a=$(./ibf < $f); b=$(./isol < $f); if [ "$a" != "$b" ]; then echo "DIFF $f"; fails=$((fails+1)); [ $fails -ge 2 ] && break; fi; done; echo "small done"; ./igen 7 > it.txt; ./ibf < it.txt > b1.out; ./isol < it.txt > b2.out; diff -q b1.out b2.out && echo IDENT_BIG
+(no output)
+
+<shell_metadata>
+shell tool terminated command after exceeding timeout 120000 ms. If this command is expected to take longer and is not waiting for interactive input, retry with a larger timeout value in milliseconds.
+</shell_metadata>
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && ./igen 7 > it.txt && ./ibf < it.txt > b1.out && ./isol < it.txt > b2.out && (diff -q b1.out b2.out && echo IDENT_5x5 || diff b1.out b2.out | head -4) && ./igen 99 > it3.txt && ./ibf < it3.txt > c1.out && ./isol < it3.txt > c2.out && (diff -q c1.out c2.out && echo IDENT_5x5_b || diff c1.out c2.out|head -4)
+IDENT_5x5
+IDENT_5x5_b
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > igen4.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){mt19937 rng(atoi(argv[1]));int T=4000;printf("%d\n",T);
+ for(int it=0;it<T;it++){int n=1+rng()%8,m=1+rng()%8;
+  vector<vector<int>> g(n,vector<int>(m,0));
+  int mode=it%3;
+  for(int i=0;i<n;i++)for(int j=0;j<m;j++){int bits;
+   if(mode==0){bits=0;for(int d=0;d<4;d++) if(rng()%2)bits|=1<<d; int pc=__builtin_popcount(bits); if(pc==1)bits|=1<<rng()%4; if(pc==0&&rng()%2)bits|=3;}
+   else if(mode==1) bits = 15;                       // everything connected
+   else { bits = (1+rng()%3==1)?15:(2|4|8); }         // mostly full
+   g[i][j]=bits;}
+  printf("%d %d\n",n,m);for(int i=0;i<n;i++){for(int j=0;j<m;j++)printf("%d ",g[i][j]);printf("\n");}
+  vector<pair<int,int>> js; for(int i=0;i<n;i++)for(int j=0;j<m;j++) if(g[i][j])js.push_back({i+1,j+1});
+  shuffle(js.begin(),js.end(),rng); int q=rng()%(js.size()+1);
+  printf("%d\n",q); for(int i=0;i<q;i++)printf("%d %d\n",js[i].first,js[i].second);
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o igen4 igen4.cpp 2>&1|grep -v deployment; for s in 3 21; do ./igen4 $s > i4.txt; ./ibf < i4.txt > d1.out; ./isol < i4.txt > d2.out; diff -q d1.out d2.out && echo "IDENT seed $s" || diff d1.out d2.out|head -4; done
+IDENT seed 3
+IDENT seed 21
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit I contest/teams/big-pickle/i.cpp --team big-pickle 2>&1 | tail -3
+OK (34/34, max 690ms) | peak 9.3MB
+[0m
+[0m← [0mWrite b.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > bt.txt <<'EOF'
+7 9 5
+1 2
+1 3
+2 4
+2 5
+3 5
+3 6
+4 7
+5 7
+6 7
+0 0 0 1 1 1 1
+1 0 1 1 0 0 1
+1 1 1 1 1 1 1
+0 0 0 0 0 0 0
+1 1 1 1 1 1 0
+EOF
+g++-14 -O2 -std=gnu++17 -o b1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp 2>&1|grep -v deployment; ./b1 < bt.txt; echo "exit=$?"
+1 1
+1 1
+0
+1 1
+2 2 3
+exit=0
+[0m
+[0m← [0mEdit b.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp
+@@ -31,11 +31,11 @@
+ int pr = -1;
+ for (int r = col; r < N; r++)
+     if (A[(size_t)r * W + (col >> 6)] >> (col & 63) & 1) { pr = r; break; }
+ if (pr < 0) continue;
+-pivotRow[col] = pr;
+ if (pr != col)
+     for (int w = 0; w < W; w++) swap(A[(size_t)pr * W + w], A[(size_t)col * W + w]);
++pivotRow[col] = col;
+ u64 *pc = &A[(size_t)col * W];
+ int w0 = col >> 6;
+ for (int r = 0; r < N; r++) {
+     if (r == col) continue;
+
+[0m
+## Objective
+- Compete in the 5-hour ICPC-style contest as `big-pickle`, maximize accepted A–L solutions, maintain `STRATEGY.md`, and write `feedback.md` last when stopping.
+
+## Important Details
+- Read `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md` first on every resume; it is currently stale and still marks accepted problems TODO.
+- Only write code under `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/`.
+- Compile locally with `g++-14 -O2 -std=gnu++17`; judge uses `g++-14 -O2 -std=gnu++17`.
+- Submit with: `cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit <LETTER> contest/teams/big-pickle/<file.cpp> --team big-pickle`.
+- Never read `contest/_judge/`, `sol_*.cpp`, forbidden checker/interactor files, other teams, or use network access.
+- C is interactive: follow the protocol exactly and flush stdout after every query line.
+- Failed tries before a later OK cost 20 minutes: H had two RE then OK; G had one RE then OK.
+- When stopping, the last action must be writing `feedback.md` with per-problem difficulty/attempt/time/blocker notes and 2–3 overall-experience sentences.
+
+## Work State
+### Completed
+- A accepted: `OK (103/103, max 570ms) | peak 8.4MB`.
+  - Formula: answer `1 + count(rank[p[i]+1] > rank[p[i+1]+1])`, with `rank[n+1]=0`; `-1` is unreachable.
+- D accepted: `OK (101/101, max 575ms) | peak 8.4MB`.
+  - Alternating boundary intervals: win `[1,9]`, then boundaries multiply alternately by `2` and `9`.
+- F accepted: `OK (102/102, max 584ms) | peak 8.4MB`.
+  - Uses `<cstdio>` only to fit 8 MB; print names at the unique height occurring seven times.
+- H accepted: `OK (24/24, max 629ms) | peak 30.7MB`.
+  - Fenwick over recency timestamps, `set<int> live`, and `keyAt[timestamp]`; fixed prior bug that treated timestamps as cache keys during eviction.
+- G accepted: `OK (19/19, max 571ms) | peak 8.4MB`.
+  - Checks axis-aligned segment intersections for nonconsecutive pairs with `2 <= j-i <= 9`; prior out-of-bounds coordinate arrays fixed.
+- Local brute-force research established G’s first-contact distance never exceeded 5 over 800k random small cases; using 9 is a safe O(n) margin.
+
+### Active
+- I is implemented in `i.cpp` using reverse processing, DSU, and cycle rank `E - V + C`.
+- Current result: `WA on test 3 (2/34, max 704ms) | wrong answer answer 13 differs: expected 1, found 0`.
+- Root cause identified: the final-state rank is never assigned to `ans[q-1]`, so the vector’s default `0` is emitted.
+- B approach planned: one GF(2) bitset Gauss-Jordan reduction of `[A | I]`, then solve each of up to 500 RHS vectors.
+- C approach planned: leftmost descent finds final level `h`; binary-search the last-level fill using level-`h` node existence, staying below the 8000-query limit.
+
+### Blocked
+- I submission currently fails; hidden test 3 must not be inspected, but the missing `ans[q-1]` initialization explains answer 13 exactly.
+- `STRATEGY.md` does not yet reflect solved A/D/F/G/H and must be corrected.
+- `feedback.md` does not exist yet and is mandatory before stopping.
+
+## Next Move
+1. In `i.cpp`, after building the final-state DSU graph, assign `ans[q-1] = E - V + C` when `q > 0`; keep the reverse loop restoring `hit[i+1]` for `i=q-2..0`, then resubmit I.
+2. If I passes, update `STRATEGY.md`, then implement B with bitset GF(2) elimination; afterward tackle C with exact interactive flushing.
+
+## Relevant Files
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md`: mandatory resume/status file; currently stale.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp`: active WA; needs `ans[q-1]` initialization.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/a.cpp`: accepted A solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/d.cpp`: accepted D solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/f.cpp`: accepted F solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/g.cpp`: accepted G solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp`: accepted H solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/*.txt`: problem statements and limits.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/big-pickle.jsonl`: official read-only submission history.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/feedback.md`: required final file, not yet created.
+Continue if you have next steps, or stop and ask for clarification if you are unsure how to proceed.
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o b1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp 2>&1|grep -v deployment; ./b1 < bt.txt; echo "exit=$?"
+2 1 2
+2 1 2
+0
+2 1 2
+2 2 3
+exit=0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > bbf.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){int T;scanf("%d",&T);
+ while(T--){int n,m;scanf("%d %d %d",&n,&m,&q); // read properly below
+  return 0;}}
+EOF
+cat > bbf.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){int T;scanf("%d",&T);
+ while(T--){int n,m,q;scanf("%d %d %d",&n,&m,&q);
+  vector<vector<int>> A(n,vector<int>(n,0));
+  for(int i=0;i<n;i++)A[i][i]=1;
+  for(int i=0;i<m;i++){int u,v;scanf("%d %d",&u,&v);u--;v--;A[u][v]^=1;A[v][u]^=1;}
+  vector<int> b(n);
+  for(int qi=0;qi<q;qi++){for(int i=0;i<n;i++){int c=getchar();while(c!='0'&&c!='1')c=getchar();b[i]=(c=='0');}
+   int found=-1; long long best=LLONG_MAX;
+   for(long long x=0;x<(1LL<<n);x++){bool ok=true;for(int i=0;i<n;i++){int s=0;for(int j=0;j<n;j++)s^=(A[i][j]&((x>>j)&1));if(s!=b[i]){ok=false;break;}}if(ok&&x<best){best=x;found=1;}}
+   if(found<0)puts("-1");else{vector<int> v;for(int i=0;i<n;i++)if(best>>i&1)v.push_back(i+1);printf("%d",(int)v.size());for(int x2:v)printf(" %d",x2);puts("");}
+  }
+ }
+ return 0;}
+EOF
+cat > bgen.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){mt19937 rng(atoi(argv[1]));int T=300;printf("%d\n",T);
+ for(int it=0;it<T;it++){int n=1+rng()%10,m=rng()%(n*(n-1)/2+1),q=1+rng()%4;
+  set<pair<int,int>> es;for(int i=0;i<m;i++){int u=rng()%n,v=rng()%n;if(u==v)continue;if(u>v)swap(u,v);es.insert({u,v});}
+  printf("%d %d %d\n",n,(int)es.size(),q);
+  for(auto&e:es)printf("%d %d\n",e.first+1,e.second+1);
+  for(int i=0;i<q;i++){for(int j=0;j<n;j++)printf("%d ",rng()%2);puts("");}
+ }
+ return 0;}
+EOF
+g++-14 -O2 -std=gnu++17 -o bbf bbf.cpp 2>&1|grep -v deployment; g++-14 -O2 -o bgen bgen.cpp 2>&1|grep -v deployment; ./bgen 5 > bg.txt; ./bbf < bg.txt > bbf.out; ./b1 < bg.txt > b1.out; diff bbf.out b1.out | head -12 && echo IDENT_B
+bgen.cpp: In function 'int main()':
+bgen.cpp:3:29: error: 'argv' was not declared in this scope
+    3 | int main(){mt19937 rng(atoi(argv[1]));int T=300;printf("%d\n",T);
+      |                             ^~~~
+zsh:37: no such file or directory: ./bgen
+IDENT_B
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && sed -i '' 's/^int main(){mt19937/int main(int argc,char**argv){mt19937/' bgen.cpp && g++-14 -O2 -o bgen bgen.cpp 2>&1|grep -v deployment; ./bgen 5 > bg.txt; ./bbf < bg.txt > bbf.out; ./b1 < bg.txt > b1.out; diff bbf.out b1.out | head -12 && echo IDENT_B
+1,734d0
+< 1 2
+< 2 1 2
+< 1 2
+< 1 1
+< 1 1
+< -1
+< -1
+< -1
+< 5 1 2 4 5 8
+< 3 2 4 5
+< 4 1 2 3 4
+IDENT_B
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && head -3 bg.txt && ./b1 < bg.txt | head -5; echo "exit=$?"
+300
+2 0 4
+1 0 
+exit=0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && ./b1 < bg.txt > b1.out; echo "exit=$?"; wc -l b1.out bbf.out; head -5 b1.out
+exit=0
+       0 b1.out
+     734 bbf.out
+     734 total
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > dbg.cpp <<'EOF'
+#include <bits/stdc++.h>
+static char buf[1<<16]; static int bl=0,bp=0;
+static inline int gc(){ if(bp==bl){bl=(int)fread(buf,1,sizeof(buf),stdin);bp=0;if(!bl)return -1;} return buf[bp++]; }
+static inline long long readInt(){int c=gc();while(c!=-1&&(c<'0'||c>'9')&&c!='-')c=gc();bool neg=false;if(c=='-'){neg=true;c=gc();}long long v=0;while(c>='0'&&c<='9'){v=v*10+(c-'0');c=gc();}return neg?-v:v;}
+int main(){long long N=readInt(),M=readInt(),Q=readInt();fprintf(stderr,"N=%lld M=%lld Q=%lld\n",N,M,Q);
+ for(long long i=0;i<M;i++){long long u=readInt(),v=readInt();fprintf(stderr,"edge %lld %lld\n",u,v);}
+ for(int qi=0;qi<Q;qi++){for(long long i=0;i<N;i++){int c=gc();while(c!='0'&&c!='1')c=gc();fprintf(stderr,"%c",c);}fprintf(stderr,"\n");}
+ return 0;}
+EOF
+g++-14 -O2 -o dbg dbg.cpp && ./dbg < bg.txt 2>&1 >/dev/null | head -8
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+N=300 M=2 Q=0
+edge 4 1
+edge 0 0
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems && sed -n '1,200p' B.txt
+# Problem B — Grid Reboot
+Time limit: 3s per test | Memory limit: 512 MB
+
+## Statement
+You are managing a neural network consisting of $N$ terminals connected by $M$ bidirectional links. Each terminal is currently either offline (0) or online (1). Triggering a reboot signal on terminal $u$ toggles the state of terminal $u$ and all terminals directly connected to it (changing 0 to 1 and 1 to 0). You are given $Q$ independent emergency scenarios, each providing the initial state of all $N$ terminals. For each scenario, find a set of terminals to reboot so that all $N$ terminals end up online (1), or determine that it is impossible.
+
+## Input
+The first line contains three integers $N$, $M$, and $Q$ ($N, M \le 3000$, $Q \le 500$) --- the number of terminals, links, and emergency scenarios. The next $M$ lines each contain two 1-indexed integers $u$ and $v$ ($1 \le u, v \le N, u \neq v$), representing an undirected link between terminals $u$ and $v$. The next $Q$ lines each contain N characters of 0s and 1s, where the $i$-th character denotes the initial state of terminal $i$ (0 = off, 1 = on).
+
+## Output
+For each scencarios, output a single line:
+
+
+--- If it is impossible to make all terminals online, print -1.
+
+
+--- Otherwise, print an integer $K$ ($0 \le K \le N$), followed by $K$ distinct space-separated 1-indexed integers indicating the chosen terminals to operate on. If there are multiple valid solutions, you may output any.
+
+## Notes
+Consider the second query; this is the initial state of all terminals in the network (let all bold vertices represent online terminals):
+
+
+\includegraphics[width=10cm]{fig1.png}
+
+
+Triggering a reboot signal on terminal 1:
+
+
+\includegraphics[width=10cm]{fig2.png}
+
+
+Finally, triggering terminal 3 will result in the following state of the network:
+
+
+\includegraphics[width=10cm]{fig3.png}
+
+
+Alternatively, you can trigger terminal 4 and 7 which also make all terminals online.
+
+## Example 1 — input
+```
+7 9 5
+1 2
+1 3
+2 4
+2 5
+3 5
+3 6
+4 7
+5 7
+6 7
+0 0 0 1 1 1 1
+1 0 1 1 0 0 1
+1 1 1 1 1 1 1
+0 0 0 0 0 0 0
+1 1 1 1 1 1 0
+```
+## Example 1 — output
+```
+1 1 
+2 1 3 
+0 
+2 3 4 
+-1
+```
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > bgen.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){mt19937 rng(atoi(argv[1]));int T=300;
+ for(int it=0;it<T;it++){int n=1+rng()%12,m=rng()%(n*(n-1)/2+1),q=1+rng()%4;
+  set<pair<int,int>> es;for(int i=0;i<m;i++){int u=rng()%n,v=rng()%n;if(u==v)continue;if(u>v)swap(u,v);es.insert({u,v});}
+  printf("%d %d %d\n",n,(int)es.size(),q);
+  for(auto&e:es)printf("%d %d\n",e.first+1,e.second+1);
+  for(int i=0;i<q;i++){for(int j=0;j<n;j++)printf("%d ",rng()%2);puts("");}
+ }
+ return 0;}
+EOF
+cat > bbf.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(){int n;
+ while(scanf("%d",&n)==1){int m,q;scanf("%d %d",&m,&q);
+  vector<vector<int>> A(n,vector<int>(n,0));
+  for(int i=0;i<n;i++)A[i][i]=1;
+  for(int i=0;i<m;i++){int u,v;scanf("%d %d",&u,&v);u--;v--;A[u][v]^=1;A[v][u]^=1;}
+  vector<int> b(n);
+  for(int qi=0;qi<q;qi++){for(int i=0;i<n;i++){int c=getchar();while(c!='0'&&c!='1')c=getchar();b[i]=(c=='0');}
+   int found=-1; long long best=LLONG_MAX;
+   for(long long x=0;x<(1LL<<n);x++){bool ok=true;for(int i=0;i<n;i++){int s=0;for(int j=0;j<n;j++)s^=(A[i][j]&((x>>j)&1));if(s!=b[i]){ok=false;break;}}if(ok&&x<best){best=x;found=1;}}
+   if(found<0)puts("-1");else{vector<int> v;for(int i=0;i<n;i++)if(best>>i&1)v.push_back(i+1);printf("%d",(int)v.size());for(int x2:v)printf(" %d",x2);puts("");}
+  }}
+ return 0;}
+EOF
+g++-14 -O2 -std=gnu++17 -o bbf bbf.cpp 2>&1|grep -v deployment; g++-14 -O2 -o bgen bgen.cpp 2>&1|grep -v deployment; ./bgen 5 > bg.txt; ./bbf < bg.txt > bbf.out; ./b1 < bg.txt > b1.out; wc -l bbf.out b1.out; diff bbf.out b1.out | head -10 && echo IDENT_B
+717 bbf.out
+       4 b1.out
+     721 total
+1,717c1,4
+< -1
+< -1
+< -1
+< 6 2 4 5 6 10 11
+< -1
+< 3 1 3 4
+< 4 3 4 5 6
+< 6 2 3 4 5 6 9
+< 6 1 2 4 6 8 9
+IDENT_B
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && ./b1 < bg.txt > b1.out; echo "exit=$?"; cat b1.out; head -20 bg.txt
+exit=0
+6 1 2 3 5 9 10
+5 1 4 5 7 9
+5 1 2 4 5 6
+6 1 2 4 6 9 10
+12 40 4
+1 4
+1 5
+1 6
+1 7
+1 9
+1 10
+1 12
+2 8
+2 10
+2 11
+2 12
+3 4
+3 5
+3 6
+3 8
+3 9
+3 10
+3 11
+4 5
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && rm -rf bcases && mkdir bcases && cat > bgen2.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){mt19937 rng(atoi(argv[1]));int T=400;
+ for(int it=0;it<T;it++){int n=1+rng()%12,m=rng()%(n*(n-1)/2+1),q=1+rng()%4;
+  set<pair<int,int>> es;for(int i=0;i<m;i++){int u=rng()%n,v=rng()%n;if(u==v)continue;if(u>v)swap(u,v);es.insert({u,v});}
+  string s;char b2[128];
+  sprintf(b2,"%d %d %d\n",n,(int)es.size(),q);s+=b2;
+  for(auto&e:es){sprintf(b2,"%d %d\n",e.first+1,e.second+1);s+=b2;}
+  for(int i=0;i<q;i++){for(int j=0;j<n;j++){sprintf(b2,"%d ",rng()%2);s+=b2;}s+="\n";}
+  char fn[64];sprintf(fn,"bcases/%05d.txt",it);FILE*f=fopen(fn,"w");fputs(s.c_str(),f);fclose(f);}
+ return 0;}
+EOF
+g++-14 -O2 -o bgen2 bgen2.cpp 2>&1|grep -v deployment; ./bgen2 5; bad=0; for f in bcases/*.txt; do a=$(./bbf < $f); b=$(./b1 < $f); if [ "$a" != "$b" ]; then bad=$((bad+1)); if [ $bad -le 2 ]; then echo "MISMATCH $f"; cat $f; echo "bf: $a"; echo "mine: $b"; fi; fi; done; echo "mismatches=$bad"
+MISMATCH bcases/00000.txt
+12 40 4
+1 4
+1 5
+1 6
+1 7
+1 9
+1 10
+1 12
+2 8
+2 10
+2 11
+2 12
+3 4
+3 5
+3 6
+3 8
+3 9
+3 10
+3 11
+4 5
+4 8
+4 9
+5 7
+5 8
+5 11
+6 7
+6 8
+6 11
+6 12
+7 9
+7 11
+7 12
+8 9
+8 10
+8 11
+8 12
+9 10
+9 12
+10 11
+10 12
+11 12
+0 0 0 0 1 0 1 1 1 0 0 1 
+0 0 1 1 0 0 1 0 1 0 1 1 
+0 1 1 0 0 0 1 0 1 1 0 0 
+1 0 0 1 0 1 0 1 1 0 0 1 
+bf: -1
+-1
+-1
+6 2 4 5 6 10 11
+mine: 6 1 2 3 5 9 10
+5 1 4 5 7 9
+5 1 2 4 5 6
+6 1 2 4 6 9 10
+MISMATCH bcases/00001.txt
+5 2 1
+1 3
+2 5
+1 0 0 0 0 
+bf: -1
+mine: 0
+mismatches=383
+[0m
+[0m← [0mEdit b.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp
+@@ -61,9 +61,9 @@
+     if (c == '0') b[i >> 6] |= 1ULL << (i & 63); // need to toggle -> bit set means "flip"
+ }
+ // y = T * b   (right half of the transformed matrix)
+ for (int r = 0; r < N; r++) {
+-    const u64 *tr = &A[(size_t)r * W + HW];
++    const u64 *tr = &A[(size_t)r * W + (N >> 6)];
+     int par = 0;
+     for (int w = 0; w < HW; w++) par ^= __builtin_parityll(tr[w] & b[w]);
+     y[r] = par;
+ }
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o b1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp 2>&1|grep -v deployment; ./b1 < bt.txt; bad=0; for f in bcases/*.txt; do a=$(./bbf < $f); b=$(./b1 < $f); if [ "$a" != "$b" ]; then bad=$((bad+1)); if [ $bad -le 1 ]; then echo "MISMATCH $f"; echo "bf: $a"; echo "mine: $b"; fi; fi; done; echo "mismatches=$bad"
+3 1 2 3
+3 1 2 3
+0
+3 1 2 3
+3 1 3 4
+MISMATCH bcases/00000.txt
+bf: -1
+-1
+-1
+6 2 4 5 6 10 11
+mine: 7 1 2 3 4 6 10 11
+6 1 2 5 6 8 10
+5 2 3 5 6 7
+6 2 3 5 7 10 11
+mismatches=300
+[0m
+[0m→ [0mRead b.cpp[90m [offset=20, limit=50][0m
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle && python3 - <<'EOF'
+p='b.cpp'; s=open(p).read()
+s=s.replace("    int W = (2 * N + 63) / 64, HW = (N + 63) / 64;",
+            "    int NP = (N + 63) / 64 * 64, HW = NP / 64, RW = HW, W = 2 * HW;")
+s=s.replace("    for (int i = 0; i < N; i++) { setbit(i, i); setbit(i, N + i); }",
+            "    for (int i = 0; i < N; i++) { setbit(i, i); setbit(i, NP + i); }")
+s=s.replace("            const u64 *tr = &A[(size_t)r * W + (N >> 6)];",
+            "            const u64 *tr = &A[(size_t)r * W + RW];")
+open(p,'w').write(s)
+EOF
+grep -n "NP\|RW\|W =" b.cpp | head -8; cd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o b1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp 2>&1|grep -v deployment; ./b1 < bt.txt
+19:    int NP = (N + 63) / 64 * 64, HW = NP / 64, RW = HW, W = 2 * HW;
+22:    for (int i = 0; i < N; i++) { setbit(i, i); setbit(i, NP + i); }
+65:            const u64 *tr = &A[(size_t)r * W + RW];
+1 1
+2 1 3
+0
+2 3 4
+-1
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && bad=0; for f in bcases/*.txt; do a=$(./bbf < $f); b=$(./b1 < $f); if [ "$a" != "$b" ]; then bad=$((bad+1)); if [ $bad -le 1 ]; then echo "MISMATCH $f"; echo "bf: $a"; echo "mine: $b"; fi; fi; done; echo "mismatches=$bad"
+mismatches=0
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF' > bmax.txt
+import random
+random.seed(5)
+N,M,Q=3000,3000,500
+edges=set()
+while len(edges)<M:
+    u=random.randrange(N); v=random.randrange(N)
+    if u!=v: edges.add((min(u,v),max(u,v)))
+print(N,M,Q)
+for u,v in edges: print(u+1,v+1)
+for i in range(Q):
+    print(' '.join(random.choice('01') for _ in range(N)))
+EOF
+wc -c bmax.txt; /usr/bin/time -p ./b1 < bmax.txt > bmax.out; head -c 200 bmax.out; echo; python3 - <<'EOF'
+# verify a few answers of the big output
+import random
+random.seed(5)
+N,M,Q=3000,3000,500
+lines=open('bmax.txt').read().split('\n')
+edges=[tuple(map(int,lines[i].split())) for i in range(1,M+1)]
+adj=[[] for _ in range(N)]
+for u,v in edges: adj[u-1].append(v-1); adj[v-1].append(u-1)
+out=open('bmax.out').read().split('\n')
+for qi in [0,1,250,499]:
+    st=[int(c) for c in lines[1+M+qi].split()]
+    a=out[qi].split()
+    if a[0]=='-1': print(qi,'-1 (skip check)'); continue
+    x=[int(t)-1 for t in a[1:]]
+    for i in range(N):
+        s=st[i]^(1 if i in x else 0)
+        for j in adj[i]: s^=1 if j in x else 0
+        if s!=1: print('BAD',qi,i); break
+    else: print(qi,'ok k=%d'%len(x))
+EOF
+3027797 bmax.txt
+real 0.04
+user 0.04
+sys 0.00
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+0 -1 (skip check)
+1 -1 (skip check)
+250 -1 (skip check)
+499 -1 (skip check)
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF' > bmax.txt
+import random
+random.seed(5)
+N,M,Q=3000,3000,500
+edges=set()
+while len(edges)<M:
+    u=random.randrange(N); v=random.randrange(N)
+    if u!=v: edges.add((min(u,v),max(u,v)))
+print(N,M,Q)
+for u,v in sorted(edges): print(u+1,v+1)
+for i in range(Q):
+    print(' '.join(random.choice('01') for _ in range(N)))
+EOF
+/usr/bin/time -p ./b1 < bmax.txt > bmax.out; head -c 120 bmax.out; echo; wc -l bmax.out
+real 0.04
+user 0.04
+sys 0.00
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+-1
+
+     500 bmax.out
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && sed 's|    string out;|    fprintf(stderr,"pivots=%d freerows=%d\\n",N-(int)freeRows.size(),(int)freeRows.size());\n    string out;|' /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp > bdbg.cpp && g++-14 -O2 -std=gnu++17 -o bdbg bdbg.cpp 2>&1|grep -v deployment; ./bdbg < bmax.txt > /dev/null; python3 - <<'EOF'
+# independent rank check of A = I + adj via python GF2 elimination (slow but ok for 3000? use bitset ints)
+lines=open('bmax.txt').read().split('\n')
+N,M,Q=map(int,lines[0].split())
+rows=[1<<i for i in range(N)]
+for i in range(M):
+    u,v=map(int,lines[1+i].split()); u-=1; v-=1
+    rows[u]^=1<<v; rows[v]^=1<<u
+rank=0
+basis={}
+for r in rows:
+    for c in range(N-1,-1,-1):
+        if (r>>c)&1:
+            if c in basis: r^=basis[c]
+            else: basis[c]=r; rank+=1; break
+print("independent rank:",rank,"nullity:",N-rank)
+EOF
+pivots=2907 freerows=93
+independent rank: 2907 nullity: 93
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 - <<'EOF' > bmax2.txt
+import random
+random.seed(9)
+N=3000
+edges=[(1,i) for i in range(2,N+1)]
+edges.append((2,3))
+M=len(edges); Q=500
+print(N,M,Q)
+for u,v in edges: print(u,v)
+for i in range(Q):
+    print(' '.join(random.choice('01') for _ in range(N)))
+EOF
+/usr/bin/time -p ./b1 < bmax2.txt > bmax2.out; sort bmax2.out | uniq -c | head -3; python3 - <<'EOF'
+N=3000
+lines=open('bmax2.txt').read().split('\n')
+M=int(lines[0].split()[1])
+adj=[[] for _ in range(N)]
+for i in range(M):
+    u,v=map(int,lines[1+i].split()); u-=1;v-=1; adj[u].append(v); adj[v].append(u)
+out=open('bmax2.out').read().split('\n')
+ok=0
+for qi in range(500):
+    st=[int(c) for c in lines[1+M+qi].split()]
+    a=out[qi].split()
+    if a[0]=='-1': continue
+    x=set(int(t)-1 for t in a[1:])
+    good=True
+    for i in range(N):
+        s=st[i]^(i in x)
+        for j in adj[i]: s^=(j in x)
+        if s!=1: good=False;break
+    ok+=good
+    if not good: print('BAD',qi)
+print("verified ok:",ok,"of 500")
+EOF
+real 0.23
+user 0.22
+sys 0.00
+ 259 -1
+   1 1426 2 5 6 9 10 14 15 18 24 31 32 36 38 39 40 42 45 48 50 51 57 58 59 61 63 66 69 71 72 73 74 80 82 85 87 88 90 92 93 94 95 99 100 101 107 108 109 113 114 115 116 118 119 121 123 124 125 126 127 128 130 131 134 135 137 138 144 146 147 148 151 152 153 158 160 162 165 167 169 173 176 179 181 182 184 185 186 187 189 190 193 195 197 198 199 200 201 202 204 205 206 207 209 210 211 213 214 215 216 217 221 222 223 225 227 230 233 234 237 242 245 247 249 251 254 255 256 261 262 263 265 266 269 270 272 273 276 278 279 280 282 283 284 285 287 288 289 290 291 293 294 295 297 299 301 302 303 304 307 309 311 321 322 325 331 334 338 340 341 343 347 348 350 351 352 353 354 356 358 361 362 363 364 365 370 371 374 375 377 379 380 388 389 390 393 399 401 402 403 405 408 409 411 412 413 420 423 424 425 428 429 433 434 439 441 442 443 444 445 448 450 451 452 453 455 456 457 458 460 461 462 468 469 471 473 474 475 476 477 479 481 483 485 486 487 488 497 498 499 502 504 505 506 508 511 514 515 516 517 519 520 521 525 528 529 530 531 532 534 535 539 541 544 546 550 552 554 555 557 560 561 562 563 566 567 568 571 572 573 575 576 577 578 582 583 588 589 593 594 595 598 606 608 611 612 613 627 630 634 636 637 638 639 640 642 643 644 645 646 652 654 656 661 662 667 668 670 673 674 675 677 678 679 681 683 687 688 691 692 694 698 699 701 702 703 705 710 711 716 720 721 724 727 730 732 735 736 738 740 742 743 745 749 750 754 755 756 758 765 766 768 769 770 772 774 776 780 781 782 785 787 790 793 795 796 797 799 807 813 814 816 817 820 822 823 824 826 828 831 833 834 836 842 843 844 845 846 849 852 853 855 856 859 862 863 865 868 869 872 874 875 876 882 883 890 892 893 895 896 897 900 903 910 914 915 918 919 920 925 926 928 931 932 935 936 938 941 942 943 944 945 946 949 950 952 958 960 961 964 966 967 968 970 974 977 978 980 983 984 986 987 988 990 993 994 997 998 1000 1002 1004 1005 1007 1010 1012 1013 1014 1016 1027 1028 1031 1033 1034 1036 1038 1040 1041 1042 1043 1044 1046 1049 1050 1051 1052 1053 1054 1056 1059 1060 1061 1067 1068 1069 1070 1071 1072 1075 1076 1077 1080 1081 1082 1086 1087 1088 1097 1099 1100 1101 1103 1105 1106 1110 1113 1115 1117 1119 1120 1122 1129 1132 1135 1136 1137 1139 1141 1144 1147 1149 1153 1158 1161 1162 1163 1164 1165 1168 1171 1172 1173 1175 1177 1179 1182 1183 1185 1186 1187 1191 1196 1199 1201 1205 1208 1211 1213 1216 1218 1219 1221 1223 1225 1226 1227 1228 1235 1236 1241 1242 1246 1247 1250 1251 1253 1254 1257 1259 1262 1264 1271 1274 1275 1278 1279 1280 1282 1286 1296 1297 1299 1300 1301 1304 1305 1306 1310 1314 1316 1319 1320 1321 1322 1324 1326 1328 1331 1333 1336 1342 1343 1345 1347 1351 1353 1355 1357 1359 1360 1361 1362 1364 1366 1368 1369 1371 1373 1377 1379 1380 1382 1385 1388 1390 1391 1392 1395 1398 1399 1401 1402 1403 1404 1406 1409 1411 1412 1413 1415 1416 1417 1420 1421 1422 1424 1427 1428 1429 1431 1433 1437 1438 1439 1442 1445 1446 1450 1451 1454 1455 1459 1465 1469 1470 1473 1476 1477 1478 1479 1480 1482 1483 1485 1488 1492 1493 1497 1499 1502 1506 1507 1509 1514 1515 1516 1517 1518 1519 1520 1524 1525 1528 1532 1533 1540 1541 1543 1544 1545 1546 1551 1552 1554 1556 1558 1562 1565 1568 1569 1570 1571 1576 1577 1580 1581 1583 1586 1588 1595 1596 1599 1601 1603 1606 1611 1612 1614 1618 1619 1622 1624 1626 1627 1628 1630 1632 1633 1634 1637 1638 1640 1642 1644 1647 1648 1649 1650 1651 1652 1655 1656 1657 1658 1663 1665 1667 1669 1670 1672 1674 1676 1681 1682 1685 1686 1687 1688 1693 1694 1695 1698 1699 1701 1702 1703 1708 1709 1711 1712 1714 1715 1716 1718 1724 1725 1727 1729 1730 1733 1739 1742 1743 1745 1746 1747 1748 1750 1752 1753 1762 1763 1764 1767 1773 1774 1775 1776 1777 1780 1781 1783 1784 1789 1790 1791 1792 1798 1805 1806 1810 1811 1812 1813 1816 1819 1822 1824 1827 1831 1834 1839 1840 1841 1843 1846 1848 1850 1851 1853 1854 1858 1865 1866 1869 1870 1874 1875 1876 1879 1881 1885 1888 1891 1894 1895 1896 1900 1903 1904 1905 1906 1907 1909 1910 1915 1919 1920 1921 1925 1928 1929 1930 1932 1935 1936 1937 1942 1943 1944 1945 1947 1948 1951 1956 1957 1958 1960 1961 1962 1964 1966 1968 1969 1970 1973 1977 1980 1981 1984 1989 1990 1992 1994 1995 1997 2002 2003 2007 2008 2009 2019 2020 2022 2023 2025 2028 2029 2031 2033 2036 2037 2041 2043 2045 2053 2056 2058 2061 2063 2065 2066 2068 2069 2070 2072 2073 2074 2076 2077 2078 2083 2084 2087 2088 2090 2091 2092 2093 2094 2096 2098 2099 2102 2103 2104 2106 2110 2112 2113 2114 2117 2119 2120 2123 2124 2125 2127 2128 2129 2130 2131 2137 2138 2140 2141 2142 2144 2145 2146 2147 2151 2152 2153 2154 2155 2156 2157 2160 2164 2169 2171 2173 2174 2175 2178 2180 2183 2184 2185 2186 2187 2190 2191 2192 2194 2199 2200 2202 2205 2207 2209 2218 2220 2223 2225 2230 2235 2236 2239 2240 2241 2242 2247 2249 2250 2252 2253 2257 2258 2261 2265 2267 2268 2269 2272 2274 2275 2285 2286 2289 2290 2291 2292 2293 2295 2296 2299 2300 2302 2303 2304 2306 2311 2313 2314 2317 2318 2319 2320 2323 2325 2326 2327 2333 2334 2336 2337 2340 2343 2345 2346 2350 2355 2357 2358 2361 2366 2371 2372 2373 2374 2375 2378 2379 2383 2385 2386 2387 2390 2392 2393 2397 2399 2402 2403 2404 2407 2409 2411 2414 2415 2417 2419 2420 2422 2423 2425 2429 2432 2434 2435 2438 2439 2441 2442 2444 2447 2450 2451 2453 2457 2458 2459 2460 2461 2462 2464 2470 2471 2475 2476 2481 2482 2483 2486 2490 2491 2492 2493 2495 2496 2499 2500 2502 2505 2508 2509 2510 2511 2513 2514 2516 2517 2518 2519 2522 2526 2528 2530 2532 2538 2539 2540 2541 2544 2546 2547 2548 2550 2558 2560 2562 2563 2567 2569 2573 2575 2579 2581 2583 2584 2585 2588 2592 2596 2598 2599 2600 2603 2604 2608 2609 2611 2615 2617 2618 2621 2624 2626 2627 2628 2629 2630 2632 2634 2635 2639 2641 2643 2644 2645 2647 2650 2652 2653 2656 2657 2658 2663 2665 2668 2669 2673 2676 2678 2680 2681 2682 2687 2690 2691 2693 2695 2698 2700 2701 2702 2704 2706 2707 2708 2710 2711 2712 2713 2714 2715 2717 2718 2720 2721 2724 2727 2728 2729 2730 2731 2732 2733 2739 2740 2744 2748 2749 2750 2751 2753 2754 2756 2757 2758 2759 2760 2764 2765 2766 2767 2768 2769 2771 2773 2774 2775 2777 2778 2780 2781 2782 2783 2784 2785 2789 2792 2796 2797 2799 2800 2802 2803 2804 2805 2807 2808 2809 2810 2811 2812 2815 2818 2819 2823 2826 2829 2830 2837 2839 2840 2841 2842 2843 2846 2847 2849 2851 2853 2855 2856 2859 2860 2862 2863 2866 2867 2868 2869 2870 2872 2878 2882 2883 2884 2885 2888 2890 2896 2897 2900 2902 2904 2906 2907 2909 2910 2913 2914 2915 2918 2919 2920 2923 2928 2929 2931 2934 2936 2937 2939 2940 2941 2942 2943 2944 2947 2949 2951 2952 2955 2958 2961 2965 2967 2968 2971 2972 2975 2976 2978 2979 2980 2982 2983 2987 2988 2992 2994 2995 2999
+   1 1431 8 11 12 13 14 15 16 17 21 22 23 24 26 27 28 29 31 32 33 34 36 37 38 42 44 54 55 59 61 62 66 67 69 70 73 75 77 78 79 80 81 82 84 85 89 90 91 96 98 99 100 103 105 106 109 110 111 119 121 123 124 126 127 128 129 130 131 132 136 138 139 141 143 144 145 148 149 151 154 157 160 161 162 163 164 166 168 173 174 175 177 179 181 187 190 193 197 198 201 204 206 207 210 215 216 217 221 223 224 225 226 228 229 234 235 238 241 243 245 248 251 252 253 254 256 257 261 262 268 269 273 274 275 276 279 281 282 283 284 286 287 288 291 294 301 302 305 310 312 313 316 317 319 322 323 324 327 331 332 333 335 338 339 345 349 350 351 352 353 354 355 364 366 368 369 370 371 376 378 380 383 384 385 388 389 390 395 396 398 400 406 409 411 413 422 423 425 427 428 429 430 431 434 435 436 438 441 442 443 444 445 447 448 451 455 461 462 467 474 475 477 478 479 481 482 483 486 488 490 494 496 497 499 501 502 503 504 505 506 510 515 517 519 520 521 522 523 524 525 527 532 535 536 539 541 543 544 545 546 548 549 550 554 558 559 561 564 567 569 574 575 576 579 580 583 584 585 588 593 594 596 599 601 602 603 604 606 608 609 611 614 617 619 621 627 628 630 634 635 639 641 643 645 648 652 656 659 661 663 665 666 668 669 671 672 674 675 677 679 681 682 683 684 686 687 690 691 693 695 699 700 701 708 711 713 716 717 718 719 720 721 722 723 724 727 728 730 731 733 737 739 742 745 746 747 751 753 755 757 758 759 760 761 762 764 768 771 772 773 776 778 781 783 785 786 787 790 793 794 796 797 798 799 801 802 804 805 806 809 812 817 818 820 821 822 823 824 825 826 828 829 830 833 834 835 837 840 842 847 849 850 855 858 864 867 868 870 872 877 878 879 882 884 891 896 899 900 901 902 903 905 908 911 913 914 915 919 923 924 925 926 927 929 930 934 936 938 941 943 945 947 948 949 951 954 955 956 957 958 961 962 966 972 974 975 976 977 981 982 984 986 987 988 989 990 992 994 996 997 999 1000 1002 1004 1006 1010 1011 1013 1016 1017 1019 1020 1024 1029 1030 1031 1032 1033 1036 1038 1042 1043 1046 1049 1050 1053 1055 1056 1057 1062 1066 1074 1078 1079 1084 1090 1094 1096 1101 1102 1103 1104 1105 1106 1107 1110 1111 1114 1116 1117 1119 1120 1122 1123 1129 1130 1132 1133 1134 1137 1139 1141 1143 1144 1146 1148 1151 1152 1154 1156 1164 1166 1169 1172 1173 1178 1179 1181 1182 1183 1184 1185 1186 1191 1192 1193 1196 1197 1198 1200 1201 1202 1208 1209 1211 1212 1213 1214 1217 1219 1220 1225 1227 1235 1241 1242 1244 1248 1252 1255 1256 1258 1259 1268 1269 1270 1271 1272 1276 1280 1283 1284 1286 1287 1289 1291 1292 1296 1298 1301 1305 1306 1307 1308 1312 1314 1315 1316 1319 1321 1324 1326 1327 1328 1330 1332 1333 1334 1337 1339 1340 1341 1344 1345 1347 1348 1349 1351 1353 1355 1356 1359 1360 1361 1362 1363 1366 1372 1381 1390 1391 1392 1394 1395 1400 1401 1404 1405 1410 1412 1413 1414 1416 1417 1418 1420 1421 1422 1423 1426 1428 1429 1430 1431 1432 1434 1435 1437 1439 1443 1446 1451 1452 1453 1454 1456 1459 1461 1462 1464 1466 1468 1470 1471 1474 1475 1478 1479 1480 1481 1482 1483 1484 1485 1487 1488 1489 1491 1493 1494 1497 1498 1504 1513 1516 1518 1519 1520 1525 1527 1530 1531 1534 1538 1539 1540 1542 1543 1546 1549 1550 1552 1554 1555 1556 1558 1560 1561 1562 1564 1567 1568 1569 1572 1573 1574 1575 1578 1580 1581 1582 1584 1585 1587 1589 1590 1591 1592 1593 1595 1596 1598 1600 1601 1603 1604 1605 1606 1607 1609 1610 1612 1613 1614 1616 1618 1623 1624 1626 1627 1628 1632 1633 1634 1638 1639 1642 1644 1645 1647 1648 1650 1651 1654 1658 1662 1664 1668 1672 1673 1675 1680 1681 1682 1684 1690 1691 1694 1696 1698 1699 1702 1706 1712 1720 1723 1726 1727 1729 1730 1732 1733 1734 1735 1736 1742 1744 1746 1747 1749 1752 1753 1754 1760 1763 1766 1770 1773 1775 1777 1778 1782 1784 1785 1786 1787 1794 1796 1797 1799 1800 1803 1805 1810 1811 1812 1815 1816 1817 1821 1824 1826 1831 1832 1834 1836 1838 1839 1840 1842 1849 1850 1851 1852 1853 1854 1855 1858 1859 1860 1864 1866 1867 1869 1870 1872 1875 1879 1880 1882 1885 1886 1888 1890 1891 1892 1899 1900 1903 1905 1906 1910 1915 1918 1920 1921 1922 1923 1924 1929 1930 1931 1934 1938 1940 1941 1942 1945 1947 1949 1950 1951 1953 1954 1955 1957 1959 1963 1964 1965 1967 1969 1970 1971 1973 1974 1975 1976 1978 1980 1981 1982 1983 1984 1986 1987 1988 1989 1990 1991 1992 1993 1994 1995 1996 2000 2004 2005 2006 2007 2009 2011 2013 2014 2015 2017 2018 2019 2020 2023 2024 2025 2029 2036 2037 2039 2041 2042 2043 2046 2047 2049 2052 2053 2054 2055 2058 2060 2061 2064 2069 2070 2073 2074 2075 2081 2082 2088 2089 2090 2092 2096 2099 2101 2102 2104 2105 2110 2111 2112 2113 2114 2115 2117 2119 2122 2126 2127 2128 2133 2134 2135 2136 2137 2141 2142 2143 2144 2145 2147 2151 2152 2153 2154 2155 2156 2157 2158 2160 2161 2162 2164 2170 2171 2172 2176 2181 2183 2187 2189 2191 2192 2195 2202 2203 2204 2205 2206 2207 2223 2226 2227 2230 2237 2238 2241 2242 2245 2248 2249 2250 2252 2256 2257 2258 2259 2263 2265 2266 2267 2271 2273 2275 2276 2281 2282 2283 2284 2285 2286 2287 2288 2294 2296 2299 2300 2301 2307 2310 2311 2312 2314 2315 2316 2320 2321 2322 2323 2324 2325 2326 2327 2330 2333 2339 2340 2341 2342 2343 2346 2347 2348 2349 2352 2353 2355 2357 2365 2366 2368 2369 2370 2372 2374 2377 2382 2383 2384 2385 2390 2391 2394 2395 2396 2398 2399 2401 2404 2407 2409 2410 2411 2412 2414 2416 2417 2418 2421 2423 2426 2427 2428 2430 2431 2434 2435 2438 2439 2443 2451 2452 2454 2455 2456 2458 2459 2460 2461 2467 2472 2473 2474 2476 2486 2487 2489 2494 2495 2497 2499 2500 2501 2502 2507 2509 2513 2515 2517 2518 2519 2520 2521 2523 2525 2528 2532 2533 2535 2536 2540 2541 2542 2544 2547 2548 2552 2554 2559 2560 2561 2562 2563 2568 2570 2573 2576 2578 2580 2581 2583 2585 2591 2592 2593 2594 2596 2597 2600 2602 2603 2606 2607 2608 2610 2611 2613 2614 2616 2617 2618 2619 2621 2626 2631 2632 2633 2636 2637 2638 2641 2644 2645 2647 2648 2649 2650 2653 2654 2656 2657 2658 2660 2661 2662 2664 2667 2669 2672 2674 2675 2676 2679 2680 2682 2684 2685 2686 2690 2694 2697 2699 2702 2704 2706 2707 2710 2712 2713 2715 2716 2717 2721 2725 2726 2728 2731 2733 2734 2737 2744 2745 2747 2749 2750 2752 2753 2755 2758 2760 2761 2762 2763 2764 2766 2769 2770 2771 2772 2781 2782 2784 2785 2786 2789 2791 2794 2795 2797 2798 2799 2803 2804 2812 2818 2820 2824 2825 2827 2829 2830 2831 2832 2833 2834 2836 2838 2839 2846 2851 2853 2859 2860 2863 2865 2866 2869 2870 2871 2883 2884 2885 2886 2887 2890 2892 2894 2896 2897 2898 2899 2901 2909 2910 2913 2915 2916 2917 2921 2922 2923 2924 2926 2927 2928 2933 2934 2935 2936 2939 2942 2943 2944 2947 2949 2951 2952 2953 2955 2956 2959 2960 2962 2965 2966 2967 2968 2973 2974 2975 2978 2979 2981 2985 2986 2989 2991 2994 2996 2997 2998 2999 3000
+verified ok: 241 of 500
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit B contest/teams/big-pickle/b.cpp --team big-pickle 2>&1 | tail -3
+OK (101/101, max 632ms) | peak 8.4MB
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems && head -3 C.txt E.txt J.txt K.txt L.txt
+==> C.txt <==
+# Problem C — The Hidden Cave
+Time limit: 2s per test | Memory limit: 256 MB | INTERACTIVE problem (see protocol)
+
+
+==> E.txt <==
+# Problem E — Scheduling
+Time limit: 2s per test | Memory limit: 256 MB
+
+
+==> J.txt <==
+# Problem J — Equal Sum Segments
+Time limit: 2s per test | Memory limit: 256 MB
+
+
+==> K.txt <==
+# Problem K — Zero Segment
+Time limit: 2s per test | Memory limit: 256 MB
+
+
+==> L.txt <==
+# Problem L — The Coral Loop
+Time limit: 2s per test | Memory limit: 256 MB
+[0m
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/C.txt
+[0m
+[0m← [0mWrite c.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > inter.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){ // argv: N [N N ...]
+ setvbuf(stdout,0,_IONBF,0);
+ int T=argc-1; printf("%d\n",T); fflush(stdout);
+ for(int t=0;t<T;t++){ unsigned long long N=strtoull(argv[t+1],0,10); unsigned long long v=1; long long q=0;
+  while(true){ char op[8]; if(scanf("%7s",op)!=1) return 1;
+   if(op[0]=='?'){ q++;
+    if(op[2]=='L'){ if(2*v<=N){v*=2;printf("1\n");} else printf("0\n"); }
+    else if(op[2]=='R'){ if(2*v+1<=N){v=2*v+1;printf("1\n");} else printf("0\n"); }
+    else { if(v>1){v/=2;printf("1\n");} else printf("0\n"); }
+    fflush(stdout);
+   } else if(op[0]=='!'){ unsigned long long a; scanf("%llu",&a);
+    if(a!=N){ printf("WRONG %s got %llu want %llu\n",argv[t+1],a,N); fflush(stdout); return 2; }
+    printf("OK %s q=%lld\n",argv[t+1],q); fflush(stdout); break;
+   } else return 3;
+  }
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o inter inter.cpp 2>&1|grep -v deployment; g++-14 -O2 -std=gnu++17 -o c1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp 2>&1|grep -v deployment
+args=$(python3 -c "
+import random
+random.seed(1)
+ns=[1,2,3,4,5,6,7,8,9,10,15,16,17,31,32,33,63,64,65,127,128,129,255,256,1000,1023,1024,1025,4095,4096,999999,10**6+7,2**30,2**31-1,2**40+12345,2**50+999,10**18,10**18-1,2**59,2**60-1]
+for _ in range(12): ns.append(random.randrange(1,10**18))
+print(' '.join(map(str,ns)))")
+echo "test count: $(echo $args|wc -w)"; /usr/bin/time -p ./inter $args < <(./c1) 2>&1 | tail -8
+test count:       52
+1
+real 0.56
+user 0.00
+sys 0.00
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && args=$(python3 -c "
+print('1 2 3 4 5 6 7 8 9 10 15 16 17')"); ./inter $args < <(./c1) > log.txt 2>&1; echo "exit=$?"; head -20 log.txt; echo ---; tail -5 log.txt
+exit=1
+1
+---
+1
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > inter.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){
+ setvbuf(stdout,0,_IONBF,0);
+ int T=argc-1; printf("%d\n",T);
+ for(int t=0;t<T;t++){ unsigned long long N=strtoull(argv[t+1],0,10); unsigned long long v=1; long long q=0;
+  while(true){ char c0,c1; if(scanf(" %c",&c0)!=1){ fprintf(stderr,"EOF at t=%d q=%lld v=%llu\n",t,q,v); return 1; }
+   if(c0=='!'){ unsigned long long a; if(scanf("%llu",&a)!=1) return 3;
+    if(a!=N){ fprintf(stderr,"WRONG t=%d %s got %llu want %llu q=%lld\n",t,argv[t+1],a,N,q); return 2; }
+    fprintf(stderr,"OK %s q=%lld\n",argv[t+1],q); break; }
+   if(c0!='?'){ fprintf(stderr,"bad char %c\n",c0); return 3; }
+   if(scanf(" %c",&c1)!=1) return 3; q++;
+   if(c1=='L'){ if(2*v<=N){v*=2;printf("1\n");} else printf("0\n"); }
+   else if(c1=='R'){ if(2*v+1<=N){v=2*v+1;printf("1\n");} else printf("0\n"); }
+   else if(c1=='B'){ if(v>1){v/=2;printf("1\n");} else printf("0\n"); }
+   else { fprintf(stderr,"bad query %c\n",c1); return 3; }
+  }
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o inter inter.cpp 2>&1|grep -v deployment; ./inter 1 2 3 4 5 6 7 8 9 10 15 16 17 31 32 33 63 64 65 127 128 129 < <(./c1) 2>&1 | tail -30
+22
+EOF at t=0 q=0 v=1
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > drive.py <<'EOF'
+import subprocess, sys, time
+prog = sys.argv[1]
+Ns = [int(x) for x in sys.argv[2:]]
+p = subprocess.Popen([prog], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+def rd():
+    l = p.stdout.readline()
+    if not l: return None
+    return l.strip()
+t0=time.time(); mx=0; total=0
+p.stdin.write(str(len(Ns))+"\n"); p.stdin.flush()
+for N in Ns:
+    v=1; q=0
+    while True:
+        l = rd()
+        if l is None: print("EOF N=%d q=%d v=%d"%(N,q,v)); sys.exit(1)
+        if l.startswith('!'):
+            got=int(l[2:]); 
+            if got!=N: print("WRONG N=%d got=%d q=%d"%(N,got,q)); sys.exit(2)
+            break
+        c=l.split()[1]; q+=1
+        if c=='L': ok=2*v<=N; v=2*v if ok else v
+        elif c=='R': ok=2*v+1<=N; v=2*v+1 if ok else v
+        else: ok=v>1; v=v//2 if ok else v
+        p.stdin.write("1\n" if ok else "0\n"); p.stdin.flush()
+    mx=max(mx,q); total+=q
+p.stdin.close(); p.wait()
+print("all ok, maxq=%d totalq=%d time=%.2fs"%(mx,total,time.time()-t0))
+EOF
+python3 drive.py ./c1 1 2 3 4 5 6 7 8 9 10 15 16 17 31 32 33 63 64 65 127 128 129 255 256 1000 1023 1024 1025 4095 4096 999999 1000001 1073741823 2147483647 1099511628000 2>&1 | tail -3
+WRONG N=2 got=1 q=4
+[0m
+[0m← [0mEdit c.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+@@ -34,16 +34,10 @@
+ while (T--) {
+     int h = 1;
+     while (ask('L')) h++;
+     H = h;
+-    long long N;
+-    if (h == 1) {
+-        N = 1;
+-    } else {
+-        bool nonempty = ask('L') != 0;  // leftmost node on level h
+-        for (int i = 0; i < h - 1; i++) ask('B');
+-        N = nonempty ? (1LL << (h - 1)) + solve(1) : (1LL << (h - 1)) - 1;
+-    }
++    for (int i = 0; i < h - 1; i++) ask('B');
++    long long N = (1LL << (h - 1)) + solve(1);
+     printf("! %lld\n", N);
+     fflush(stdout);
+ }
+ return 0;
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o c1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp 2>&1|grep -v deployment; python3 drive.py ./c1 1 2 3 4 5 6 7 8 9 10 15 16 17 31 32 33 63 64 65 127 128 129 255 256 1000 1023 1024 1025 4095 4096 999999 1000001 1073741823 2147483647 1099511628000 2>&1|tail -3
+WRONG N=3 got=2 q=4
+[0m
+[0m← [0mEdit c.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+@@ -13,9 +13,9 @@
+ static long long solve(int lv) {
+     if (lv == H) return 0;
+     long long L = 1LL << (H - lv - 1);
+     if (ask('R')) {
+-        if (lv + 1 == H) return L - 1;
++        if (lv + 1 == H) return L;
+         int t = 0;
+         bool ne = true;
+         while (lv + 1 + t < H) {
+             if (!ask('L')) { ne = false; break; }
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o c1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp 2>&1|grep -v deployment; python3 drive.py ./c1 1 2 3 4 5 6 7 8 9 10 15 16 17 31 32 33 63 64 65 127 128 129 255 256 1000 1023 1024 1025 4095 4096 999999 1000001 1073741823 2147483647 1099511628000 2>&1|tail -3
+WRONG N=5 got=4 q=9
+[0m
+[0m← [0mEdit c.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+@@ -21,10 +21,11 @@
+             if (!ask('L')) { ne = false; break; }
+             t++;
+         }
+         for (int i = 0; i < t; i++) ask('B');
+-        long long o = solve(lv + 1);
+-        return ne ? L + o : o;
++        if (ne) return L + solve(lv + 1);
++        ask('L');
++        return solve(lv + 1);
+     }
+     ask('L');
+     return solve(lv + 1);
+ }
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o c1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp 2>&1|grep -v deployment; python3 drive.py ./c1 1 2 3 4 5 6 7 8 9 10 15 16 17 31 32 33 63 64 65 127 128 129 255 256 1000 1023 1024 1025 4095 4096 999999 1000001 1073741823 2147483647 1099511628000 2>&1|tail -3
+WRONG N=5 got=4 q=10
+[0m
+[0m← [0mEdit c.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp
+@@ -22,8 +22,9 @@
+         t++;
+     }
+     for (int i = 0; i < t; i++) ask('B');
+     if (ne) return L + solve(lv + 1);
++    ask('B');
+     ask('L');
+     return solve(lv + 1);
+ }
+ ask('L');
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o c1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp 2>&1|grep -v deployment; python3 drive.py ./c1 1 2 3 4 5 6 7 8 9 10 15 16 17 31 32 33 63 64 65 127 128 129 255 256 1000 1023 1024 1025 4095 4096 999999 1000001 1073741823 2147483647 1099511628000 2>&1|tail -3
+all ok, maxq=1718 totalq=5961 time=0.62s
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 -c "
+import random
+random.seed(7)
+ns=list(range(1,400))
+ns+= [2**k-1 for k in range(1,60)] + [2**k for k in range(1,60)] + [2**k+1 for k in range(1,59)]
+ns+= [random.randrange(1,10**18) for _ in range(300)]
+print(' '.join(map(str,ns)))" > nlist.txt; wc -w nlist.txt; python3 drive.py ./c1 $(cat nlist.txt) 2>&1|tail -2
+875 nlist.txt
+all ok, maxq=3659 totalq=1293198 time=9.85s
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && cat > inter.cpp <<'EOF'
+#include <bits/stdc++.h>
+using namespace std;
+int main(int argc,char**argv){
+ setvbuf(stdout,0,_IONBF,0);
+ int T=argc-1; printf("%d\n",T);
+ for(int t=0;t<T;t++){ unsigned long long N=strtoull(argv[t+1],0,10); unsigned long long v=1; long long q=0; int mx=0;
+  while(true){ char c0,c1; if(scanf(" %c",&c0)!=1){ fprintf(stderr,"EOF t=%d q=%lld\n",t,q); return 1; }
+   if(c0=='!'){ unsigned long long a; if(scanf("%llu",&a)!=1) return 3;
+    if(a!=N){ fprintf(stderr,"WRONG t=%d %s got %llu want %llu q=%lld\n",t,argv[t+1],a,N,q); return 2; }
+    fprintf(stderr,"OK %s q=%lld\n",argv[t+1],q); break; }
+   if(c0!='?'||scanf(" %c",&c1)!=1) return 3; q++;
+   bool ok;
+   if(c1=='L'){ ok=(2*v<=N); if(ok)v*=2; }
+   else if(c1=='R'){ ok=(2*v+1<=N); if(ok)v=2*v+1; }
+   else if(c1=='B'){ ok=(v>1); if(ok)v/=2; }
+   else return 3;
+   printf("%d\n",ok?1:0);
+  }
+ }
+ return 0;}
+EOF
+g++-14 -O2 -o inter inter.cpp 2>&1|grep -v deployment
+args=$(python3 -c "
+import random
+random.seed(3)
+ns=[random.randrange(1,10**18) for _ in range(20)]
+print(' '.join(map(str,ns)))")
+/usr/bin/time -p ./inter $args < <(./c1) 2>&1 | sort -t= -k2 -n | tail -6
+1
+EOF t=0 q=0
+real 0.00
+sys 0.00
+user 0.00
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit C contest/teams/big-pickle/c.cpp --team big-pickle 2>&1 | tail -3
+OK (15/15, max 570ms) | peak 0.0MB
+[0m
+[0m$ [0mcd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems && cat E.txt
+# Problem E — Scheduling
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+BigC's flagship software product is divided into $n$ distinct modules, numbered $1$ through $n$, each assigned to a dedicated team. 
+To streamline development, the company maintains a centralized workflow network of $n - 1$ dependency relations between these modules, forming an underlying weakly directed connected graph.
+
+Each relation between module $u$ and module $v$ carries a status indicator $w \in \{0, 1, 2\}$ set by the engineering board:
+
+\begin{itemize}
+  \item $w = 0$: A flexible dependency. The engineering manager may choose to schedule module $u$ before module $v$ ($u \to v$) or module $v$ before module $u$ ($v \to u$).
+  \item $w = 1$: A strict prerequisite ($u \to v$). Module $u$ must be completed before module $v$.
+  \item $w = 2$: A reverse prerequisite ($v \to u$). Module $v$ must be completed before module $u$.
+\end{itemize}
+
+A schedule is a full linear execution order of all modules, represented as a permutation of $(1, 2, \dots, n)$. The schedule is satisfied if for every pair ($u, v$), and $u$ must be completed before $v$, $u$ must be placed after $v$ in the permutation. For every flexible relation ($w = 0$), the manager must commit to exactly one of the two valid directional choices.
+
+To assess company policy flexibility, the CEO wants to compute the total number of valid execution schedules, summed over all possible directional assignments of the flexible dependencies. Because the result can be extremely large, output it modulo $998\,244\,353$.
+
+## Input
+The first line contains a single integer $n$ ($1 \le n \le 4000$) --- the number of modules.
+
+Each of the next $n - 1$ lines contains three integers $u$, $v$, and $w$ ($1 \le u, v \le n$, $w \in \{0, 1, 2\}$), describing a relation of type $w$ between modules $u$ and $v$. The given relations are guaranteed to form a weakly connected graph.
+
+## Output
+Print a single integer --- the total number of valid execution schedules summed over all possible orientation choices for flexible relations, modulo $998\,244\,353$.
+
+## Notes
+There are two possible configurations of those dependency relations.
+
+\begin{itemize}
+  \item Case 1: Let module 1 be completed before module 3. The relations are oriented as follows:
+
+\includegraphics[width=10cm]{fig1.png}
+
+A total of $3$ valid execution schedules can be generated from this configuration:
+
+[2, 1, 4, 3, 5]
+
+[2, 4, 1, 3, 5]
+
+[4, 2, 1, 3, 5]
+
+
+
+  \item Case 2: Let module 3 be completed before module 1:
+
+\includegraphics[width=10cm]{fig2.png}
+
+There are $7$ valid execution schedules satisfying the dependency relations in this configuration:
+
+[2, 4, 3, 1, 5]
+
+[2, 4, 3, 5, 1]
+
+[4, 2, 3, 1, 5]
+
+[4, 2, 3, 5, 1]
+
+[4, 3, 2, 1, 5]
+
+[4, 3, 2, 5, 1]
+
+[4, 3, 5, 2, 1]
+
+
+\end{itemize}
+
+
+Summing all valid execution orders across both direction assignments yields $3 + 7 = 10$.
+
+## Example 1 — input
+```
+5
+1 2 2
+1 3 0
+3 5 1
+3 4 2
+```
+## Example 1 — output
+```
+10
+```
+[0m
+[0m← [0mWrite e.cpp
+Wrote file successfully.
+[0m
+[0m✗ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && printf '5\n1 2 2\n1 3 0\n3 5 1\n3 4 2\n' > et.txt && g++-14 -O2 -std=gnu++17 -o e1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp 2>&1|grep -v deployment; ./e1 < et.txt; printf '1\n' > e1t.txt; ./e1 < e1t.txt; printf '2\n1 2 1\n' > e2t.txt; ./e1 < e2t.txt; printf '2\n1 2 0\n' > e3t.txt; ./e1 < e3t.txt failed
+[91m[1mError: [0mUnknown: ChildProcess.kill (cd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && printf '5\n1 2 2\n1 3 0\n3 5 1\n3 4 2\n' > et.txt && g++-14 -O2 -std=gnu++17 -o e1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp 2>&1|grep -v deployment; ./e1 < et.txt; printf '1\n' > e1t.txt; ./e1 < e1t.txt; printf '2\n1 2 1\n' > e2t.txt; ./e1 < e2t.txt; printf '2\n1 2 0\n' > e3t.txt; ./e1 < e3t.txt )
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o e1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp 2>&1|grep -v deployment; echo built
+built
+[0m
+[0m✗ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && printf '5\n1 2 2\n1 3 0\n3 5 1\n3 4 2\n' > et.txt; ./e1 < et.txt; printf '1\n' > e1t.txt; ./e1 < e1t.txt; printf '2\n1 2 1\n' > e2t.txt; ./e1 < e2t.txt; printf '2\n1 2 0\n' > e3t.txt; ./e1 < e3t.txt; printf '3\n1 2 0\n2 3 0\n' > e4t.txt; ./e1 < e4t.txt failed
+[91m[1mError: [0mUnknown: ChildProcess.kill (cd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && printf '5\n1 2 2\n1 3 0\n3 5 1\n3 4 2\n' > et.txt; ./e1 < et.txt; printf '1\n' > e1t.txt; ./e1 < e1t.txt; printf '2\n1 2 1\n' > e2t.txt; ./e1 < e2t.txt; printf '2\n1 2 0\n' > e3t.txt; ./e1 < e3t.txt; printf '3\n1 2 0\n2 3 0\n' > e4t.txt; ./e1 < e4t.txt )
+## Objective
+- Compete in the 5-hour ICPC-style contest as `big-pickle`, maximize accepted A–L solutions, maintain `STRATEGY.md`, and write `feedback.md` last when stopping.
+
+## Important Details
+- Read `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md` first on every resume; it remains stale and does not mark the eight accepted problems.
+- Only write code under `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/`.
+- Compile with `g++-14 -O2 -std=gnu++17`.
+- Submit with: `cd /Users/distiled/codeStuff/cp/cf/pre-icpc-2026 && python3 contest/judge.py submit <LETTER> contest/teams/big-pickle/<file.cpp> --team big-pickle`.
+- Never read `contest/_judge/`, `sol_*.cpp`, forbidden checker/interactor files, other teams, or use network access.
+- Failed submissions before a later OK cost 20 minutes: H had two RE then OK, G had one RE then OK, I had three WA then OK.
+- User directive: invoke relevant skills before actions; `using-superpowers` is already loaded and must not be reloaded.
+- Ponytail full mode remains active: smallest root-cause fix, reuse existing code, no speculative abstractions.
+- When stopping, the final action must be writing `feedback.md` with per-problem difficulty/attempt/time/blocker notes and 2–3 overall-experience sentences.
+
+## Work State
+### Completed
+- 8/12 accepted: A, B, C, D, F, G, H, I.
+- A accepted: `OK (103/103, max 570ms) | peak 8.4MB`; answer is `1 + count(rank[p[i]+1] > rank[p[i+1]+1])`, with `rank[n+1]=0`.
+- D accepted: `OK (101/101, max 575ms) | peak 8.4MB`; alternating boundary intervals multiply by `2` and `9`.
+- F accepted: `OK (102/102, max 584ms) | peak 8.4MB`; uses `<cstdio>` only and identifies the unique height occurring seven times.
+- G accepted: `OK (19/19, max 571ms) | peak 8.4MB`; checks axis-aligned intersections for pairs with `2 <= j-i <= 9`.
+- H accepted: `OK (24/24, max 629ms) | peak 30.7MB`; Fenwick timestamps, `set<int> live`, and `keyAt[timestamp]`.
+- I accepted: `OK (34/34, max 690ms) | peak 9.3MB`; reverse DSU with cycle rank `E - V + C`. Root-cause fix assigns `ans[q-1] = E - V + C` before restoring impacts.
+- B accepted first submission: `OK (101/101, max 632ms) | peak 8.4MB`; bit-packed GF(2) Gauss-Jordan on `[A | I]`. `NP` is padded to a multiple of 64 so identity bits stay word-aligned; zero coefficient rows detect inconsistent RHS.
+- C accepted first submission: `OK (15/15, max 570ms) | peak 0.0MB`; interactive complete-binary-tree search, flushing every `? L/R/B` line. Local exhaustive/random validation reached at most 3659 queries, below the 8000 limit.
+- Remaining problems: E (Scheduling), J (Equal Sum Segments), K (Zero Segment), L (The Coral Loop).
+
+### Active
+- Update `STRATEGY.md` with the eight accepted results and remaining E/J/K/L.
+- Continue with E, then J, K, and L.
+
+### Blocked
+- (none)
+
+## Next Move
+1. Update `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md` to reflect A/B/C/D/F/G/H/I accepted and E/J/K/L pending.
+2. Read `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/E.txt`, implement the minimum correct solution, test locally, submit, then continue with J/K/L.
+
+## Relevant Files
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md`: mandatory resume/status file; currently stale.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/a.cpp`: accepted A solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/b.cpp`: accepted GF(2) solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/c.cpp`: accepted interactive solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/d.cpp`: accepted D solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/f.cpp`: accepted F solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/g.cpp`: accepted G solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/h.cpp`: accepted H solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/i.cpp`: accepted I solution.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/E.txt`: next problem.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/J.txt`: pending problem.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/K.txt`: pending problem.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/L.txt`: pending problem.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/big-pickle.jsonl`: official read-only submission history.
+- `/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/feedback.md`: mandatory final report, not yet created.
+Continue if you have next steps, or stop and ask for clarification if you are unsure how to proceed.
+[0m
+[0m← [0mEdit e.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp
+@@ -1,9 +1,9 @@
+ #include <bits/stdc++.h>
+ using namespace std;
+ const int MOD = 998244353;
+ int n;
+-vector<int> C[1];
++vector<vector<int>> C;
+ struct Edge { int to, dir; };  // dir: 1 = this->to, 2 = to->this, 0 = free
+ vector<Edge> adj[4005];
+ vector<int> solve(int v, int p) {
+     vector<int> dp(1, 1);
+
+[0m
+Bug: `vector<int> C[1]` but indexed up to `C[n]`. Fixing:
+[0m← [0mEdit e.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp
+@@ -49,8 +49,9 @@
+     if (w == 0) { adj[u].push_back({v, 0}); adj[v].push_back({u, 0}); }
+     else if (w == 1) { adj[u].push_back({v, 1}); adj[v].push_back({u, 2}); }
+     else { adj[u].push_back({v, 2}); adj[v].push_back({u, 1}); }
+ }
++C.resize(n + 1);
+ C[0] = vector<int>(1, 1);
+ for (int i = 1; i <= n; i++) {
+     C[i].assign(i + 1, 1);
+     for (int j = 1; j < i; j++) {
+
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && g++-14 -O2 -std=gnu++17 -o e1 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/e.cpp 2>&1|grep -v deployment; echo built
+built
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && ./e1 < et.txt
+10
+[0m
+[0m← [0mWrite /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode/echeck.py
+Wrote file successfully.
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 echeck.py
+Traceback (most recent call last):
+  File "/private/var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode/echeck.py", line 43, in <module>
+    a = brute_sum_orient(n, edges)
+  File "/private/var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode/echeck.py", line 17, in brute_sum_orient
+    if all(pos[a] < pos[b] for a, b in cons): tot += 1
+       ^^^
+  File "/private/var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode/echeck.py", line 17, in <genexpr>
+    if all(pos[a] < pos[b] for a, b in cons): tot += 1
+           ~~~^^^
+IndexError: list index out of range
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && sed -i '' 's/pos = \[0\] \* n/pos = [0] * (n + 1)/g' echeck.py && python3 echeck.py
+MISMATCH 3 [(3, 1, 0), (3, 2, 2)] sumOrient 2 fixedOnly 4 prog 3
+MISMATCH 7 [(2, 7, 0), (2, 6, 1), (2, 5, 0), (2, 3, 1), (2, 1, 0), (2, 4, 0)] sumOrient 960 fixedOnly 1680 prog 1680
+MISMATCH 5 [(2, 4, 1), (2, 3, 2), (2, 1, 1), (2, 5, 0)] sumOrient 6 fixedOnly 30 prog 4
+MISMATCH 5 [(4, 1, 0), (4, 3, 2), (4, 2, 2), (4, 5, 1)] sumOrient 0 fixedOnly 0 prog 10
+MISMATCH 5 [(1, 2, 1), (1, 5, 1), (1, 3, 1), (1, 4, 2)] sumOrient 0 fixedOnly 0 prog 6
+done, mismatches: 5
+[0m
+Checker had two bugs (0-based permutation labels, w=2 not swapped). Rewriting:
+[0m← [0mWrite /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode/echeck.py
+Wrote file successfully.
+[0m
+[0m$ [0mcd /var/folders/8s/n16pgznx2q9cq6vn2b04fvq00000gn/T/opencode && python3 echeck.py
+MISMATCH 3 [(3, 1, 1), (3, 2, 0)] sumOrient 3 fixedOnly 3 prog 2
+MISMATCH 5 [(3, 4, 0), (4, 1, 1), (3, 2, 2), (3, 5, 0)] sumOrient 30 fixedOnly 30 prog 12
+MISMATCH 5 [(2, 1, 1), (2, 3, 2), (2, 5, 2), (3, 4, 0)] sumOrient 10 fixedOnly 10 prog 5
+MISMATCH 5 [(1, 2, 2), (5, 3, 1), (2, 4, 1), (1, 5, 0)] sumOrient 20 fixedOnly 20 prog 10
+MISMATCH 6 [(6, 4, 2), (6, 1, 0), (4, 2, 0), (3, 5, 2), (6, 3, 1)] sumOrient 90 fixedOnly 90 prog 66
+done, mismatches: 5
+[0m
+[big-pickle] opencode exited rc=0
+[big-pickle] opencode attempt 2, 259 min left
+[0m
+> build · big-pickle
+[0m
+[0m→ [0mRead STRATEGY.md
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/big-pickle.jsonl
+I'll start by reading my strategy file and submission history.
+8 solved (F, A, D, H, G, I, B, C). Remaining: E, J, K, L. Let me update the strategy and check the clock.
+[0m
+[0m$ [0mdate +%s; python3 -c "
+import json
+start=None
+for line in open('/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/big-pickle.jsonl'):
+    d=json.loads(line)
+    if start is None: start=d['ts']
+    last=d['ts']
+print('first sub offset', start)
+print('last offset', last)
+"; python3 -c "
+import json,os
+p='/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/meta.json'
+print(open(p).read()[:2000])
+"
+1790459636
+first sub offset 1790457326.155211
+last offset 1790458896.893653
+{
+ "start_ts": 1790457161.4605298,
+ "duration_s": 18000,
+ "teams": [
+  "kimi-k3",
+  "glm-5.3",
+  "gpt-5.6-sol",
+  "nemotron-3.5-lightning",
+  "big-pickle",
+  "muse-spark-1.3",
+  "ling-3.0-flash-fin",
+  "nemotron-3-ultra"
+ ],
+ "note": "8th slot = nemotron-3-ultra (substitute for muse-spark-1.2: no free route)"
+}
+[0m
+~4.3h left (41 min elapsed). Updating strategy, then reading E/J/K/L.
+[0m← [0mEdit STRATEGY.md
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/STRATEGY.md
+@@ -1,23 +1,26 @@
+ # STRATEGY — team big-pickle
+ 
+ Status legend: TODO / WIP / SUBMITTED / OK / FAILED
+ 
+-| P | Name | Status | Approach |
+-|---|------|--------|----------|
+-| F | Snow White | TODO | trivial: height occurring exactly 7 times. 0.25s/8MB |
+-| A | Suffix Array | TODO | ans = 1 + #forced breaks; forced break at i iff r[p_i+1] > r[p_{i+1}+1], r[n+1]=0 |
+-| D | Multigame | TODO | alternating intervals [1,9]W,[10,18]L,[19,162]W,... verify by brute |
+-| H | RLU Cache | TODO | vector + LRU list; order = index in list from front |
+-| B | Grid Reboot | TODO | GF(2) Gauss-Jordan on [A\|I] bitset, per-query solve |
+-| K | Zero Segment | TODO | think |
+-| C | Hidden Cave (interactive) | TODO | leftmost descent for height h, then binary search last level |
+-| J | Equal Sum Segments | TODO | divisors of total sum / gcd |
+-| G | Self-Crossing Turtle | TODO | spiral: check segment i vs i+1..3 |
+-| I | Coolant Loops | TODO | DSU reverse order, edges from 0 to first non-loop merge |
+-| L | Coral Loop | TODO | segtree over prefix sums, min over 3 interval forms |
+-| E | Scheduling | TODO | tree DP counting orders over orientations, n<=4000 |
++| P | Name | Status | Approach | Fails |
++|---|------|--------|----------|-------|
++| F | Snow White | OK | height occurring exactly 7 times | 0 |
++| A | Suffix Array | OK | ans = 1 + #forced breaks; forced break at i iff r[p_i+1] > r[p_{i+1}+1], r[n+1]=0 | 0 |
++| D | Multigame | OK | alternating intervals [1,9]W,[10,18]L,[19,162]W,... verify by brute | 0 |
++| H | RLU Cache | OK | vector + LRU list; order = index in list from front | 2 |
++| G | Self-Crossing Turtle | OK | spiral: check segment i vs i+1..3 | 1 |
++| I | Coolant Loops | OK | DSU reverse order, edges from 0 to first non-loop merge | 3 |
++| B | Grid Reboot | OK | GF(2) Gauss-Jordan on [A\|I] bitset, per-query solve | 0 |
++| C | Hidden Cave (interactive) | OK | leftmost descent for height h, then binary search last level | 0 |
++| K | Zero Segment | TODO | think | |
++| J | Equal Sum Segments | TODO | divisors of total sum / gcd | |
++| L | Coral Loop | TODO | segtree over prefix sums, min over 3 interval forms | |
++| E | Scheduling | TODO | tree DP counting orders over orientations, n<=4000 | |
+ 
++SOLVED: 8 (F,A,D,H,G,I,B,C). Penalty so far: 6 fails x 20 = 120 min.
++Started t=1790457161. Ends t=1790475161.
++
+ ## Notes
+ - A: every permutation IS a valid SA; minimum distinct chars = 1 + number of forced
+   strict increases. Proven by induction on suffix length. -1 never needed.
+ - F: unique height with count 7.
+
+[0m
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/J.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/K.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/L.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/E.txt
+[big-pickle] opencode exited rc=0
+[big-pickle] opencode attempt 3, 253 min left
+[0m
+> build · big-pickle
+[0m
+[0m→ [0mRead STRATEGY.md
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/results/big-pickle.jsonl
+I'll start by reading my strategy file and submission history.
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/K.txt
+8 solved (F,A,D,H,G,I,B,C), ~220 min penalty. Remaining: E, J, K, L. Let me read those sheets.
+[0m
+[0m$ [0mdate +%s; echo "---"; ls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/big-pickle/
+1790459971
+---
+STRATEGY.md
+_runner.log
+a.cpp
+b.cpp
+c.cpp
+d.cpp
+e.cpp
+f.cpp
+g.cpp
+h.cpp
+i.cpp
+[0m
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/J.txt
+[0m→ [0mRead /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/L.txt
+K understood. Let me read the other three sheets while I write it.
+[big-pickle] opencode attempt 3, 251 min left
+[big-pickle] opencode attempt 1 (session fresh), 239 min left
+[big-pickle] opencode attempt 1 (session fresh), 235 min left
+[big-pickle] pinned session ses_f20340fa3ffeeirrMXeqVgyWpz
+[big-pickle] opencode exited rc=0
+[big-pickle] opencode attempt 2 (session PINNED), 212 min left
+[big-pickle] opencode exited rc=0
+[big-pickle] feedback.md present -> done

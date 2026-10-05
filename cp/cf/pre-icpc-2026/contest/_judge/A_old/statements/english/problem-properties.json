@@ -1,0 +1,42 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATQNCjQgMSAyIDMNCg==",
+    "example.02.mu": "TVXzATQNCjQgMyAyIDENCg==",
+    "example.03.mu": "TVXzATcNCjQgMyAxIDIgNiA3IDUNCg=="
+  },
+  "scoring": null,
+  "notes": "In the third sample, the string $\\text{\"bobapop\"}$ consists of $4$ distinct characters ($\\text{'a'}$, $\\text{'b'}$, $\\text{'o'}$, $\\text{'p'}$) and produces the given suffix array. \nNo valid string with fewer distinct characters exists.",
+  "legend": "You are given the suffix array of an unknown string $s$ of length $n$. \nYour task is to find the minimum number of distinct characters required to construct a string $s$ that produces this exact suffix array.\n\nA suffix array of a string $T = t_1 t_2 \\dots t_n$ is a permutation $p = (p_1, p_2, \\dots, p_n)$ of integers from $1$ to $n$ such that for all $1 \\le i < n$, the suffix of $T$ starting at position $p_i$ is lexicographically strictly smaller than the suffix starting at position $p_{i+1}$.\nFor example, the suffix array of the string $T = \\text{\"bobapop\"}$ is $(4, 3, 1, 2, 6, 7, 5)$, because:$$\\text{\"apop\"} < \\text{\"bapop\"} < \\text{\"bobapop\"} < \\text{\"obapop\"} < \\text{\"op\"} < \\text{\"p\"} < \\text{\"pop\"}$$.",
+  "authorLogin": "bakhibk",
+  "language": "english",
+  "timeLimit": 1000,
+  "output": "Print a single integer --- the minimum number of distinct characters in a string $s$ that has $p$ as its suffix array. If no such string exists, print $-1$.",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains a single integer $n$ ($1 \\le n \\le 50$) --- the length of the string $s$.\nThe second line contains $n$ space-separated integers $p_1, p_2, \\dots, p_n$ ($1 \\le p_i \\le n$), representing a permutation of integers from $1$ to $n$, which is the suffix array of string $s$.",
+  "authorName": "NHẬT LONG",
+  "sampleTests": [
+    {
+      "output": "2",
+      "input": "4\n4 1 2 3\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    },
+    {
+      "output": "1",
+      "input": "4\n4 3 2 1\n",
+      "inputFile": "example.02",
+      "outputFile": "example.02.a"
+    },
+    {
+      "output": "4",
+      "input": "7\n4 3 1 2 6 7 5\n",
+      "inputFile": "example.03",
+      "outputFile": "example.03.a"
+    }
+  ],
+  "name": "Archive of Lost Letters",
+  "interaction": null,
+  "memoryLimit": 268435456,
+  "tutorial": ""
+}

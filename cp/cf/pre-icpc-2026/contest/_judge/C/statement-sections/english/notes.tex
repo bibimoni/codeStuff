@@ -1,0 +1,9 @@
+In the example, the hidden number of nodes is $6$.
+
+The first query moves the walk to the right child of the root, which exists.
+
+The second query attempts to move to its right child. The interactor returns $0$, so node $7$ does not exist and the walk stays at node $3$.
+
+The third query moves to the left child of node $3$. The interactor returns $1$, so node $6$ exists.
+
+Since the tree is complete, node $6$ exists while node $7$ does not, therefore the total number of nodes is $6$.

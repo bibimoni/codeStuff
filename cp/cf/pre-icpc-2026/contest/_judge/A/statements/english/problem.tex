@@ -1,0 +1,35 @@
+\begin{problem}{Archive of Lost Letters}{standard input}{standard output}{1 second}{256 megabytes}
+
+Deep beneath the Royal Library lies the Archive of Lost Letters, whose scribes once catalogued every manuscript by a peculiar index: instead of preserving the text itself, they listed the starting positions of all its suffixes in lexicographic order. Centuries later the manuscripts have crumbled to dust, and only these indices survive.
+
+A suffix array of a string $T = t_1 t_2 \dots t_n$ is a permutation $p = (p_1, p_2, \dots, p_n)$ of integers from $1$ to $n$ such that for all $1 \le i < n$, the suffix of $T$ starting at position $p_i$ is lexicographically strictly smaller than the suffix starting at position $p_{i+1}$.
+For example, the suffix array of the string $T = \text{"bobapop"}$ is $(4, 3, 1, 2, 6, 7, 5)$, because:$$\text{"apop"} < \text{"bapop"} < \text{"bobapop"} < \text{"obapop"} < \text{"op"} < \text{"p"} < \text{"pop"}$$.
+
+The restoration workshop can cast one type block per distinct letter, and metal is expensive, so the archivist will settle for any reconstructed text that uses as few distinct letters as possible. You are given the surviving suffix array of an unknown manuscript $s$ of length $n$: determine the minimum number of distinct characters required to construct a string $s$ that produces this exact suffix array, or report that the index is corrupted and no such string exists.
+
+
+\InputFile
+The first line contains a single integer $n$ ($1 \le n \le 50$) --- the length of the string $s$.
+
+The second line contains $n$ distinct integers $p_1, p_2, \dots, p_n$ ($1 \le p_i \le n$) --- the surviving index of the manuscript $s$. It is guaranteed that these integers form a permutation of length $n$.
+
+
+\OutputFile
+Print a single integer --- the minimum number of distinct characters in a string $s$ that has $p$ as its suffix array. If no such string exists, print $-1$.
+
+
+\Examples
+
+\begin{example}
+\exmpfile{example.01}{example.01.a}%
+\exmpfile{example.02}{example.02.a}%
+\exmpfile{example.03}{example.03.a}%
+\end{example}
+
+\Note
+In the third sample, the string $\text{"bobapop"}$ consists of $4$ distinct characters ($\text{'a'}$, $\text{'b'}$, $\text{'o'}$, $\text{'p'}$) and produces the given suffix array. 
+No valid string with fewer distinct characters exists.
+
+
+\end{problem}
+

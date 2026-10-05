@@ -1,0 +1,5 @@
+{"ts": 1790525807.114302, "letter": "F", "verdict": "OK", "first_fail": null, "passed": 102, "total": 102, "time_ms": 569, "file": "F.cpp"}
+{"ts": 1790525810.533988, "letter": "D", "verdict": "OK", "first_fail": null, "passed": 101, "total": 101, "time_ms": 618, "file": "D.cpp"}
+{"ts": 1790525878.237893, "letter": "K", "verdict": "OK", "first_fail": null, "passed": 40, "total": 40, "time_ms": 577, "file": "K.cpp"}
+{"ts": 1790525880.509554, "letter": "G", "verdict": "OK", "first_fail": null, "passed": 19, "total": 19, "time_ms": 860, "file": "G.cpp"}
+{"ts": 1790525882.450853, "letter": "A", "verdict": "OK", "first_fail": null, "passed": 103, "total": 103, "time_ms": 576, "file": "A.cpp"}

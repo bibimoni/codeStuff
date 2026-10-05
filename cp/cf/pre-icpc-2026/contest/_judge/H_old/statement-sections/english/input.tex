@@ -1,0 +1,12 @@
+The first line contains a single integer $t$ ($1 \le t \le 2 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $q$ ($1 \le n, q \le 2 \cdot 10^5$) --- the capacity of the cache and the number of queries.
+
+The next $q$ lines describe the queries in the order they must be processed. Each line has one of two forms:
+
+\begin{itemize}
+  \item \texttt{1 a b} ($1 \le a \le 10^9$, $1 \le b \le 10^9$) --- put key $a$ with value $b$ into the cache;
+  \item \texttt{2 a} ($1 \le a \le 10^9$) --- look up key $a$.
+\end{itemize}
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $2 \cdot 10^5$, and the sum of $q$ over all test cases does not exceed $2 \cdot 10^5$.

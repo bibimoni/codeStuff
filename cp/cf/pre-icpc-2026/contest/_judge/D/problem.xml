@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<problem revision="3" short-name="mulgame" url="https://polygon.codeforces.com/p4PPJSH/bakhibk/mulgame">
+    <names>
+        <name language="english" value="Duel of the Twin Sisters"/>
+    </names>
+    <statements latex-pdf-mode="obsolete">
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/english/problem.tex" type="application/x-tex"/>
+        <statement charset="UTF-8" language="english" mathjax="true" path="statements/.html/english/problem.html" type="text/html"/>
+        <statement language="english" path="statements/.pdf/english/problem.pdf" type="application/pdf"/>
+    </statements>
+    <judging cpu-name="Intel(R) Core(TM) i3-8100 CPU @ 3.60GHz" cpu-speed="3600" input-file="" output-file="" run-count="1">
+        <testset name="tests">
+            <time-limit>1000</time-limit>
+            <memory-limit>268435456</memory-limit>
+            <test-count>101</test-count>
+            <input-path-pattern>tests/%02d</input-path-pattern>
+            <answer-path-pattern>tests/%02d.a</answer-path-pattern>
+            <tests>
+                <test method="manual" sample="true"/>
+                <test cmd="gen 967525148" method="generated"/>
+                <test cmd="gen 716095116" method="generated"/>
+                <test cmd="gen 836668738" method="generated"/>
+                <test cmd="gen 9668844" method="generated"/>
+                <test cmd="gen 752588428" method="generated"/>
+                <test cmd="gen 310482261" method="generated"/>
+                <test cmd="gen 297583784" method="generated"/>
+                <test cmd="gen 272297030" method="generated"/>
+                <test cmd="gen 976254299" method="generated"/>
+                <test cmd="gen 491550137" method="generated"/>
+                <test cmd="gen 217384900" method="generated"/>
+                <test cmd="gen 322768642" method="generated"/>
+                <test cmd="gen 197127612" method="generated"/>
+                <test cmd="gen 16003152" method="generated"/>
+                <test cmd="gen 159577187" method="generated"/>
+                <test cmd="gen 322861348" method="generated"/>
+                <test cmd="gen 600274300" method="generated"/>
+                <test cmd="gen 528289817" method="generated"/>
+                <test cmd="gen 463043205" method="generated"/>
+                <test cmd="gen 414159450" method="generated"/>
+                <test cmd="gen 126969668" method="generated"/>
+                <test cmd="gen 603660857" method="generated"/>
+                <test cmd="gen 505932700" method="generated"/>
+                <test cmd="gen 591246388" method="generated"/>
+                <test cmd="gen 319216173" method="generated"/>
+                <test cmd="gen 865361534" method="generated"/>
+                <test cmd="gen 895007905" method="generated"/>
+                <test cmd="gen 134487170" method="generated"/>
+                <test cmd="gen 521754200" method="generated"/>
+                <test cmd="gen 222929051" method="generated"/>
+                <test cmd="gen 578299694" method="generated"/>
+                <test cmd="gen 48092729" method="generated"/>
+                <test cmd="gen 223164344" method="generated"/>
+                <test cmd="gen 457273606" method="generated"/>
+                <test cmd="gen 810624091" method="generated"/>
+                <test cmd="gen 752025193" method="generated"/>
+                <test cmd="gen 572475085" method="generated"/>
+                <test cmd="gen 523403854" method="generated"/>
+                <test cmd="gen 776834503" method="generated"/>
+                <test cmd="gen 105871256" method="generated"/>
+                <test cmd="gen 754836575" method="generated"/>
+                <test cmd="gen 278142408" method="generated"/>
+                <test cmd="gen 761192076" method="generated"/>
+                <test cmd="gen 307724219" method="generated"/>
+                <test cmd="gen 91758832" method="generated"/>
+                <test cmd="gen 569491215" method="generated"/>
+                <test cmd="gen 652684852" method="generated"/>
+                <test cmd="gen 227197661" method="generated"/>
+                <test cmd="gen 667963575" method="generated"/>
+                <test cmd="gen 875660817" method="generated"/>
+                <test cmd="gen 698172202" method="generated"/>
+                <test cmd="gen 364967356" method="generated"/>
+                <test cmd="gen 100724425" method="generated"/>
+                <test cmd="gen 393149317" method="generated"/>
+                <test cmd="gen 590595242" method="generated"/>
+                <test cmd="gen 324630191" method="generated"/>
+                <test cmd="gen 733366679" method="generated"/>
+                <test cmd="gen 64813936" method="generated"/>
+                <test cmd="gen 119598264" method="generated"/>
+                <test cmd="gen 164500367" method="generated"/>
+                <test cmd="gen 892815476" method="generated"/>
+                <test cmd="gen 296291168" method="generated"/>
+                <test cmd="gen 947093986" method="generated"/>
+                <test cmd="gen 24086229" method="generated"/>
+                <test cmd="gen 798854744" method="generated"/>
+                <test cmd="gen 565798578" method="generated"/>
+                <test cmd="gen 410205199" method="generated"/>
+                <test cmd="gen 966162129" method="generated"/>
+                <test cmd="gen 950001072" method="generated"/>
+                <test cmd="gen 690288024" method="generated"/>
+                <test cmd="gen 206093586" method="generated"/>
+                <test cmd="gen 605641063" method="generated"/>
+                <test cmd="gen 435142103" method="generated"/>
+                <test cmd="gen 6341900" method="generated"/>
+                <test cmd="gen 639160857" method="generated"/>
+                <test cmd="gen 423842558" method="generated"/>
+                <test cmd="gen 745713224" method="generated"/>
+                <test cmd="gen 325900438" method="generated"/>
+                <test cmd="gen 742209682" method="generated"/>
+                <test cmd="gen 663297813" method="generated"/>
+                <test cmd="gen 685709829" method="generated"/>
+                <test cmd="gen 957952100" method="generated"/>
+                <test cmd="gen 998407614" method="generated"/>
+                <test cmd="gen 468072867" method="generated"/>
+                <test cmd="gen 556783796" method="generated"/>
+                <test cmd="gen 460323079" method="generated"/>
+                <test cmd="gen 399437971" method="generated"/>
+                <test cmd="gen 298951845" method="generated"/>
+                <test cmd="gen 12226051" method="generated"/>
+                <test cmd="gen 970030380" method="generated"/>
+                <test cmd="gen 313840007" method="generated"/>
+                <test cmd="gen 769317394" method="generated"/>
+                <test cmd="gen 694193124" method="generated"/>
+                <test cmd="gen 975726508" method="generated"/>
+                <test cmd="gen 86465252" method="generated"/>
+                <test cmd="gen 943660645" method="generated"/>
+                <test cmd="gen 123018027" method="generated"/>
+                <test cmd="gen 856510415" method="generated"/>
+                <test cmd="gen 183096528" method="generated"/>
+                <test cmd="gen 52881026" method="generated"/>
+            </tests>
+        </testset>
+    </judging>
+    <files>
+        <resources>
+            <file path="files/olymp.sty"/>
+            <file path="files/problem.tex"/>
+            <file path="files/statements.ftl"/>
+            <file path="files/testlib.h" type="h.g++"/>
+        </resources>
+        <executables>
+            <executable>
+                <source path="files/gen.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+            <executable>
+                <source path="files/validator.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </executable>
+        </executables>
+    </files>
+    <assets>
+        <checker name="std::lcmp.cpp" type="testlib">
+            <source path="files/check.cpp" type="cpp.g++17"/>
+            <copy path="check.cpp"/>
+            <testset>
+                <test-count>0</test-count>
+                <input-path-pattern>files/tests/checker-tests/%02d</input-path-pattern>
+                <output-path-pattern>files/tests/checker-tests/%02d.o</output-path-pattern>
+                <answer-path-pattern>files/tests/checker-tests/%02d.a</answer-path-pattern>
+                <tests/>
+            </testset>
+        </checker>
+        <validators>
+            <validator>
+                <source path="files/validator.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+                <testset>
+                    <test-count>0</test-count>
+                    <input-path-pattern>files/tests/validator-tests/%02d</input-path-pattern>
+                    <tests/>
+                </testset>
+            </validator>
+        </validators>
+        <solutions>
+            <solution tag="accepted">
+                <source path="solutions/gemini.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+            <solution tag="main">
+                <source path="solutions/solution.cpp" type="cpp.gcc14-64-msys2-g++23"/>
+            </solution>
+        </solutions>
+    </assets>
+    <properties>
+        <property name="tests-wellformed" value="true"/>
+    </properties>
+    <stresses>
+        <stress-count>0</stress-count>
+        <stress-path-pattern>stresses/%03d</stress-path-pattern>
+        <list/>
+    </stresses>
+</problem>

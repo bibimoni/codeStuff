@@ -1,0 +1,29 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Gardener's Turtle</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Gardener's Turtle</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>Every morning the royal gardener releases Turty, a clockwork turtle, onto the great lawn to retrace the walking lines with its little paint roller. Turty starts at point $$$(0, 0)$$$ on the $$$X$$$-$$$Y$$$ plane and follows a punched-tape program: a sequence of $$$n$$$ positive integers $$$d_1, d_2, \ldots, d_n$$$.</P><P>The turtle moves $$$d_1$$$ meters north, then $$$d_2$$$ meters west, $$$d_3$$$ meters south, $$$d_4$$$ meters east, and so on. After every move, its direction rotates by $$$90^\circ$$$ counter-clockwise.</P><P>Fresh paint smears wherever the trail crosses or touches itself, and the gardener insists on flawless borders.</P><P>Determine whether the path drawn by the turtle intersects itself. Two path segments are considered intersecting even if they only touch at one point or overlap along a non-empty segment. The common endpoint of two consecutive moves is not considered a self-intersection.</P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$t$$$ ($$$1 \le t \le 10^4$$$) &mdash; the number of test cases.</P><P>The first line of each test case contains a single integer $$$n$$$ ($$$1 \le n \le 2 \cdot 10^5$$$) &mdash; the number of moves.</P><P>The second line of each test case contains $$$n$$$ integers $$$d_1, d_2, \ldots, d_n$$$ ($$$1 \le d_i \le 10^9$$$) &mdash; the distances from the punched tape.</P><P>It is guaranteed that the sum of $$$n$$$ over all test cases does not exceed $$$2 \cdot 10^5$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each test case, print $$$\texttt{Yes}$$$ if the turtle's path intersects itself, and $$$\texttt{No}$$$ otherwise. The answer is case-insensitive: for example, $$$\texttt{Yes}$$$, $$$\texttt{YES}$$$ and $$$\texttt{yEs}$$$ are all accepted.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Example</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="3
+4
+2 1 1 2
+4
+1 2 3 4
+5
+1 1 1 1 1
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 1 1 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">4</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 2 3 4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 1 1 1 1</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="Yes
+No
+Yes
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">Yes</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">No</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">Yes</DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>In the first test case, the fourth segment intersects the first segment at $$$(0,1)$$$.</P><P>In the second test case, no two non-consecutive segments intersect.</P><P>In the third test case, the fourth segment returns to $$$(0,0)$$$, which belongs to the first segment.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

@@ -1,0 +1,28 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATMNCjkNCjE4DQoyNw0K"
+  },
+  "scoring": null,
+  "notes": "",
+  "legend": "Twin sisters often play games involving numbers together. \nFirst, they agree on a positive integer $n$. \nThen, they start playing with the initial value $p = 1$. \nThe two players take turns, with the younger sister always going first. On their turn, the current player multiplies $p$ by any integer $k$ such that $2 \\le k \\le 9$.\nThe winner is the first person to make $p \\ge n$.\n\nDetermine which player will win if both play optimally.",
+  "authorLogin": "bakhibk",
+  "language": "english",
+  "timeLimit": 1000,
+  "output": "For each test case, print a single line containing:\n\n\\begin{itemize}\n    \\item La premiere joueuse gagne. --- if the first player (younger sister) wins.\n    \\item La deuxieme joueuse gagne. --- if the second player (older sister) wins.\n\\end{itemize}",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains an integer $T$ ($1 \\le T \\le 10^4$) --- the number of test cases.\\\n\nEach of the following $T$ lines contains a single integer $n$ ($1 \\le n \\le 10^9$).",
+  "authorName": "NHẬT LONG",
+  "sampleTests": [
+    {
+      "output": "La premiere joueuse gagne.\nLa deuxieme joueuse gagne.\nLa premiere joueuse gagne.\n",
+      "input": "3\n9\n18\n27\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    }
+  ],
+  "name": "Duel of the Twin Sisters",
+  "interaction": null,
+  "memoryLimit": 268435456,
+  "tutorial": ""
+}

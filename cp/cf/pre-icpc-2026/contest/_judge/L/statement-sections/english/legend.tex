@@ -1,0 +1,13 @@
+You are given an edge-weighted undirected graph with $n + 1$ vertices numbered $1$ to $n + 1$.
+
+For each integer $i$ satisfying $1 \le i \le n$, there is an edge of weight $a_i$ connecting vertex $i$ and vertex $(i \bmod n) + 1$. Also, for each integer $i$ satisfying $1 \le i \le n$, there is an edge of weight $b_i$ connecting vertex $i$ and vertex $n + 1$. There are no other edges.
+
+All edge weights may be negative. A route is valid if it visits each vertex at most once.
+
+You have to process $q$ events of three kinds:
+
+\begin{itemize}
+\item print the total weight of the cheapest valid route from vertex $s$ to vertex $t$ ($s < t$);
+\item set $a_x := w$;
+\item set $b_x := w$.
+\end{itemize}

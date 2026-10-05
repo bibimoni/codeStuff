@@ -1,0 +1,6 @@
+Deep beneath the Royal Library lies the Archive of Lost Letters, whose scribes once catalogued every manuscript by a peculiar index: instead of preserving the text itself, they listed the starting positions of all its suffixes in lexicographic order. Centuries later the manuscripts have crumbled to dust, and only these indices survive.
+
+A suffix array of a string $T = t_1 t_2 \dots t_n$ is a permutation $p = (p_1, p_2, \dots, p_n)$ of integers from $1$ to $n$ such that for all $1 \le i < n$, the suffix of $T$ starting at position $p_i$ is lexicographically strictly smaller than the suffix starting at position $p_{i+1}$.
+For example, the suffix array of the string $T = \text{"bobapop"}$ is $(4, 3, 1, 2, 6, 7, 5)$, because:$$\text{"apop"} < \text{"bapop"} < \text{"bobapop"} < \text{"obapop"} < \text{"op"} < \text{"p"} < \text{"pop"}$$.
+
+The restoration workshop can cast one type block per distinct letter, and metal is expensive, so the archivist will settle for any reconstructed text that uses as few distinct letters as possible. You are given the surviving suffix array of an unknown manuscript $s$ of length $n$: determine the minimum number of distinct characters required to construct a string $s$ that produces this exact suffix array, or report that the index is corrupted and no such string exists.

@@ -1,0 +1,10 @@
+In the temple's karesansui (dry landscape) garden, $n$ gravel mounds stand in a row; mound $i$ is piled $a_i$ scoops high. For the evening meditation the head monk wants a stretch of at least $k$ consecutive mounds raked perfectly flat.
+
+Two kinds of work are available, any number of times, in any order:
+
+\begin{itemize}
+  \item \textbf{Pay:} choose an index $i$ ($1 \le i \le n$) and a positive integer $c \le a_i$, pay the groundskeepers $c$ coins, and they carry off that many scoops: set $a_i := a_i - c$.
+  \item \textbf{Rake:} choose three indices $l$, $m$, $r$ such that $1 \le l < m < r \le n$, drag the great garden rake from mound $l$ to mound $r$, and mound $m$ settles at the height of its taller support: set $a_m := \max(a_l, a_r)$. Raking costs nothing.
+\end{itemize}
+
+Find the minimum total number of coins the temple has to pay so that some contiguous segment of length at least $k$ of the row consists only of zeros.

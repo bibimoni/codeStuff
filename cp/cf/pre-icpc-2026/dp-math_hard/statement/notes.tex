@@ -1,0 +1,10 @@
+The example contains six test cases.
+
+\begin{itemize}
+  \item $a = [1, 2, 1, 2]$, total sum $6$. Balanced divisions: the whole array (one segment of sum $6$), and $[1, 2]\;[1, 2]$ (two segments of sum $3$). Three segments of sum $2$ would require a prefix of sum $2$, which does not exist. Answer: $2$.
+  \item $a = [1, -1, 1, -1]$, total sum $0$, so every segment must sum to $0$. The only position $i < n$ with prefix sum $0$ is $i = 2$, and we may either cut there or not. Answer: $2$.
+  \item $a = [1, 1]$: $[1, 1]$ or $[1]\;[1]$. Answer: $2$.
+  \item $a = [5]$: only the single segment. Answer: $1$.
+  \item $a = [-1, -1]$: same as the third case with a negative total. Answer: $2$.
+  \item $a = [1, 2, 3, 0, 2, 4]$, total sum $12$. With $k = 2$ segments (sum $6$ each) the cut can be made after index $3$ or after index $4$, since both prefix sums equal $6$ --- that gives $2$ divisions. No $k \in \{3, 4, 6\}$ works (e.g. for $k = 3$ a prefix of sum $4$ is required but absent). Together with the single-segment division, the answer is $3$.
+\end{itemize}

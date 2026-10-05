@@ -1,0 +1,42 @@
+gen sample > $
+gen edgepack 0 11 > $
+gen edgepack 1 12 > $
+gen edgepack 2 13 > $
+gen biganswer > $
+gen trap 8 40 21 > $
+gen trap 12 40 22 > $
+gen trap 6 40 23 > $
+gen rand 50 50 -5 5 40 101 > $
+gen rand 60 80 -9 2 50 102 > $
+gen rand 100 100 -9 9 30 103 > $
+gen rand 150 120 0 9 20 104 > $
+gen rand 200 300 -9 9 60 105 > $
+gen rand 300 200 -1000000000 1000000000 40 106 > $
+gen rand 500 500 -9 9 10 107 > $
+gen rand 700 700 -9 9 50 108 > $
+gen rand 1000 1000 -9 9 40 109 > $
+gen rand 1200 800 -1000000000 -1 30 110 > $
+gen rand 1500 1500 -9 9 80 111 > $
+gen rand 2000 1500 -9 2 40 112 > $
+gen rand 2500 2500 -9 9 40 113 > $
+gen rand 3000 1000 -1000000000 1000000000 20 114 > $
+gen rand 3000 3000 -9 9 40 115 > $
+gen rand 4000 4000 -9 9 20 116 > $
+gen trap 1000 2000 31 > $
+gen trap 3000 3000 32 > $
+gen trap 5000 5000 33 > $
+gen rand 6000 6000 -9 9 50 117 > $
+gen rand 8000 8000 -1000000000 1000000000 40 118 > $
+gen rand 10000 10000 -9 9 30 119 > $
+gen maxrand 201 > $
+gen maxrand 202 > $
+gen maxquery 203 > $
+gen maxupd 204 > $
+gen maxneg 205 > $
+gen maxmix 206 > $
+gen maxmono 207 > $
+gen maxhub 208 > $
+gen trap 300000 300000 41 > $
+gen trap 300000 300000 42 > $
+gen sumpack 301 > $
+gen tmax 302 > $

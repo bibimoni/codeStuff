@@ -1,0 +1,10 @@
+You are given an array $a$ of $n$ positive integers, and an integer $k$.
+
+You may perform the following operations on the array any number of times, in any order:
+
+\begin{itemize}
+  \item \textbf{Pay:} choose an index $i$ ($1 \le i \le n$), pay $a_i$ coins, and set $a_i := 0$.
+  \item \textbf{Free:} choose three indices $l$, $m$, $r$ such that $1 \le l < m < r \le n$, and set $a_m := \max(a_l, a_r)$. This operation costs nothing.
+\end{itemize}
+
+Find the minimum total number of coins you have to pay so that some contiguous segment of length at least $k$ of the array consists only of zeros.

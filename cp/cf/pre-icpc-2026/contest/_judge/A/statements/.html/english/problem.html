@@ -1,0 +1,29 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>Archive of Lost Letters</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">Archive of Lost Letters</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>1 second</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>Deep beneath the Royal Library lies the Archive of Lost Letters, whose scribes once catalogued every manuscript by a peculiar index: instead of preserving the text itself, they listed the starting positions of all its suffixes in lexicographic order. Centuries later the manuscripts have crumbled to dust, and only these indices survive.</P><P>A suffix array of a string $$$T = t_1 t_2 \dots t_n$$$ is a permutation $$$p = (p_1, p_2, \dots, p_n)$$$ of integers from $$$1$$$ to $$$n$$$ such that for all $$$1 \le i  \lt  n$$$, the suffix of $$$T$$$ starting at position $$$p_i$$$ is lexicographically strictly smaller than the suffix starting at position $$$p_{i+1}$$$. For example, the suffix array of the string $$$T = \text{"bobapop"}$$$ is $$$(4, 3, 1, 2, 6, 7, 5)$$$, because:$$$$$$\text{"apop"}  \lt  \text{"bapop"}  \lt  \text{"bobapop"}  \lt  \text{"obapop"}  \lt  \text{"op"}  \lt  \text{"p"}  \lt  \text{"pop"}$$$$$$.</P><P>The restoration workshop can cast one type block per distinct letter, and metal is expensive, so the archivist will settle for any reconstructed text that uses as few distinct letters as possible. You are given the surviving suffix array of an unknown manuscript $$$s$$$ of length $$$n$$$: determine the minimum number of distinct characters required to construct a string $$$s$$$ that produces this exact suffix array, or report that the index is corrupted and no such string exists.</P></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$n$$$ ($$$1 \le n \le 50$$$) &mdash; the length of the string $$$s$$$.</P><P>The second line contains $$$n$$$ distinct integers $$$p_1, p_2, \dots, p_n$$$ ($$$1 \le p_i \le n$$$) &mdash; the surviving index of the manuscript $$$s$$$. It is guaranteed that these integers form a permutation of length $$$n$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>Print a single integer &mdash; the minimum number of distinct characters in a string $$$s$$$ that has $$$p$$$ as its suffix array. If no such string exists, print $$$-1$$$.</P></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Examples</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+4 1 2 3
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-even test-example-line-0">4 1 2 3</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content">
+2</PRE></DIV><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="4
+4 3 2 1
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">4</DIV><DIV class="test-example-line test-example-line-even test-example-line-0">4 3 2 1</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content">
+1</PRE></DIV><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="7
+4 3 1 2 6 7 5
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">7</DIV><DIV class="test-example-line test-example-line-even test-example-line-0">4 3 1 2 6 7 5</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content">
+4</PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>In the third sample, the string $$$\text{"bobapop"}$$$ consists of $$$4$$$ distinct characters ($$$\text{'a'}$$$, $$$\text{'b'}$$$, $$$\text{'o'}$$$, $$$\text{'p'}$$$) and produces the given suffix array. No valid string with fewer distinct characters exists.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

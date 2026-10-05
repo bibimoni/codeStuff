@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="520" viewBox="0 0 640 520">
+<line x1="140" y1="25" x2="140" y2="495" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="225" y1="25" x2="225" y2="495" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="310" y1="25" x2="310" y2="495" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="395" y1="25" x2="395" y2="495" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="480" y1="25" x2="480" y2="495" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="465" x2="615" y2="465" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="380" x2="615" y2="380" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="295" x2="615" y2="295" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="210" x2="615" y2="210" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="125" x2="615" y2="125" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="380" x2="595" y2="380" stroke="#555" stroke-width="3"/>
+<polygon points="595,380 580,371 580,389" fill="#555"/>
+<line x1="310" y1="495" x2="310" y2="42" stroke="#555" stroke-width="3"/>
+<polygon points="310,42 301,56 319,56" fill="#555"/>
+<text x="600" y="366" font-family="Helvetica" font-size="28" fill="#555">x</text>
+<text x="328" y="40" font-family="Helvetica" font-size="28" fill="#555">y</text>
+<line x1="310" y1="380" x2="310" y2="210" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="310,282 304,302 316,302" fill="#1F3864"/>
+<line x1="310" y1="210" x2="225" y2="210" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="254,210 274,216 274,204" fill="#1F3864"/>
+<line x1="225" y1="210" x2="225" y2="295" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="225,266 231,246 219,246" fill="#1F3864"/>
+<line x1="225" y1="295" x2="395" y2="295" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="323,295 303,289 303,301" fill="#1F3864"/>
+<text x="347" y="343" font-family="Helvetica" font-size="27" fill="#1F3864" text-anchor="middle">1</text>
+<text x="268" y="164" font-family="Helvetica" font-size="27" fill="#1F3864" text-anchor="middle">2</text>
+<text x="172" y="262" font-family="Helvetica" font-size="27" fill="#1F3864" text-anchor="middle">3</text>
+<text x="408" y="241" font-family="Helvetica" font-size="27" fill="#1F3864" text-anchor="middle">4</text>
+<circle cx="310" cy="295" r="10" fill="#D62828"/>
+<text x="246" y="343" font-family="Helvetica" font-size="26" fill="#D62828" text-anchor="middle">(0,1)</text>
+<text x="334" y="426" font-family="Helvetica" font-size="26" fill="#555" text-anchor="middle">(0,0)</text>
+</svg>

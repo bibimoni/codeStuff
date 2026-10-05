@@ -1,0 +1,59 @@
+<HTML><HEAD><META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META content="no-cache" http-equiv="pragma">
+    <META content="-1" http-equiv="expires">
+    <META content="text/html;charset=UTF-8" http-equiv="content-type">
+    <LINK href="problem-statement.css" rel="stylesheet" type="text/css">
+    <TITLE>RLU Cache</TITLE>
+    <SCRIPT type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$$$','$$$']], displayMath: [['$$$$$$','$$$$$$']]}
+        });
+        </SCRIPT>
+        <SCRIPT async="" src="https://polygon.codeforces.com/lib/MathJax/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript">
+    </SCRIPT>
+</HEAD><BODY>
+    <DIV class="problem-statement"><DIV class="header"><DIV class="title">RLU Cache</DIV><DIV class="time-limit"><DIV class="property-title">time limit per test</DIV>2 seconds</DIV><DIV class="memory-limit"><DIV class="property-title">memory limit per test</DIV>256 megabytes</DIV><DIV class="input-file input-standard"><DIV class="property-title">input</DIV>standard input</DIV><DIV class="output-file output-standard"><DIV class="property-title">output</DIV>standard output</DIV></DIV><DIV class="legend"><P>An <SPAN class="tex-font-style-bf">RLU cache</SPAN> stores key&ndash;value pairs with a fixed capacity of $$$n$$$ pairs. At any moment the pairs in the cache have a <SPAN class="tex-font-style-underline">recency order</SPAN>: the most recently used pair has order $$$1$$$, the next one has order $$$2$$$, and so on; the pair with the largest order is the <SPAN class="tex-font-style-underline">least recently used</SPAN> one.</P><P>Initially the cache is full: it contains exactly the keys $$$1, 2, \ldots, n$$$, each with value $$$0$$$, inserted in this order &mdash; so key $$$1$$$ is initially the least recently used key (order $$$n$$$) and key $$$n$$$ is the most recently used one (order $$$1$$$).</P><P>You have to process $$$q$$$ queries of two types:</P><P></P><UL> <LI> <SPAN class="tex-font-style-tt">1 a b</SPAN> &mdash; put key $$$a$$$ with value $$$b$$$ into the cache: <UL> <LI> if key $$$a$$$ is already in the cache, its value is replaced by $$$b$$$ and $$$a$$$ becomes the most recently used key; </LI><LI> otherwise the least recently used key is <SPAN class="tex-font-style-underline">discarded</SPAN> (invalidated) from the cache, and $$$a$$$ with value $$$b$$$ is inserted as the most recently used key. </LI></UL> </LI><LI> <SPAN class="tex-font-style-tt">2 a</SPAN> &mdash; look up key $$$a$$$: <UL> <LI> if key $$$a$$$ is in the cache, print its value and its current order $$$r$$$ ($$$r = 1$$$ means most recently used, $$$r = n$$$ means least recently used); afterwards $$$a$$$ becomes the most recently used key; </LI><LI> otherwise print $$$-1$$$ (the key was never inserted or has already been invalidated). </LI></UL> </LI></UL></DIV><P></P><P></P><DIV class="input-specification"><DIV class="section-title">Input</DIV><P></P><P>The first line contains a single integer $$$t$$$ ($$$1 \le t \le 2 \cdot 10^5$$$) &mdash; the number of test cases.</P><P>The first line of each test case contains two integers $$$n$$$ and $$$q$$$ ($$$1 \le n, q \le 2 \cdot 10^5$$$) &mdash; the capacity of the cache and the number of queries.</P><P>The next $$$q$$$ lines describe the queries in the order they must be processed. Each line has one of two forms:</P><P></P><UL> <LI> <SPAN class="tex-font-style-tt">1 a b</SPAN> ($$$1 \le a \le 10^9$$$, $$$1 \le b \le 10^9$$$) &mdash; put key $$$a$$$ with value $$$b$$$ into the cache; </LI><LI> <SPAN class="tex-font-style-tt">2 a</SPAN> ($$$1 \le a \le 10^9$$$) &mdash; look up key $$$a$$$. </LI></UL><P></P><P>It is guaranteed that the sum of $$$n$$$ over all test cases does not exceed $$$2 \cdot 10^5$$$, and the sum of $$$q$$$ over all test cases does not exceed $$$2 \cdot 10^5$$$.</P></DIV><P></P><P></P><DIV class="output-specification"><DIV class="section-title">Output</DIV><P></P><P>For each query of type $$$2$$$ (in the order the queries appear, across all test cases), print one line:</P><P></P><UL> <LI> if key $$$a$$$ is in the cache, print two integers $$$b$$$ and $$$r$$$ &mdash; its current value and its current order; </LI><LI> otherwise print the single integer $$$-1$$$. </LI></UL></DIV><P></P><P></P><DIV class="sample-tests"><DIV class="section-title">Example</DIV><P></P><P></P><DIV class="sample-test"><DIV class="input"><DIV class="title">Input</DIV><PRE class="content" data-content="3
+3 12
+2 2
+2 5
+1 4 10
+2 1
+2 4
+1 2 7
+2 2
+1 9 1
+2 3
+2 9
+1 4 8
+2 2
+1 4
+2 1
+1 5 3
+2 1
+2 5
+2 5
+2 1
+1 3 6
+2 2
+2 1
+2 3
+">
+<DIV class="test-example-line test-example-line-even test-example-line-0">3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">3 12</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 4 10</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 4</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 2 7</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 9 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 3</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 9</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 4 8</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">2 2</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 4</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">1 5 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">2 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2 5</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">1 3 6</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">2 3</DIV></PRE></DIV><DIV class="output"><DIV class="title">Output</DIV><PRE class="content" data-content="0 2
+-1
+-1
+10 1
+7 1
+-1
+1 1
+7 3
+0 1
+-1
+3 1
+0 2
+-1
+0 2
+6 2
+">
+<DIV class="test-example-line test-example-line-odd test-example-line-1">0 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">-1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">-1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">10 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">7 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">-1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">1 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-1">7 3</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">0 1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">-1</DIV><DIV class="test-example-line test-example-line-even test-example-line-2">3 1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">0 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">-1</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">0 2</DIV><DIV class="test-example-line test-example-line-odd test-example-line-3">6 2</DIV></PRE></DIV></DIV></DIV><P></P><P></P><DIV class="note"><DIV class="section-title">Note</DIV><P></P><P>In the first test case of the example $$$n = 3$$$. Initially the cache holds keys $$$1, 2, 3$$$ with value $$$0$$$; key $$$3$$$ is the most recently used and key $$$1$$$ is the least recently used one.</P><P></P><UL> <LI> <SPAN class="tex-font-style-tt">2 2</SPAN>: key $$$2$$$ is present with value $$$0$$$ at order $$$2$$$, so the answer is <SPAN class="tex-font-style-tt">0 2</SPAN>. Afterwards the recency order is $$$(2, 3, 1)$$$ from most to least recent. </LI><LI> <SPAN class="tex-font-style-tt">2 5</SPAN>: key $$$5$$$ is not in the cache, answer <SPAN class="tex-font-style-tt">-1</SPAN>. </LI><LI> <SPAN class="tex-font-style-tt">1 4 10</SPAN>: the cache is full, so the least recently used key $$$1$$$ is discarded and key $$$4$$$ with value $$$10$$$ is inserted; the order becomes $$$(4, 2, 3)$$$. </LI><LI> <SPAN class="tex-font-style-tt">2 1</SPAN>: key $$$1$$$ has been invalidated, answer <SPAN class="tex-font-style-tt">-1</SPAN>. </LI><LI> <SPAN class="tex-font-style-tt">2 4</SPAN>: key $$$4$$$ has value $$$10$$$ and order $$$1$$$, answer <SPAN class="tex-font-style-tt">10 1</SPAN>. </LI><LI> <SPAN class="tex-font-style-tt">1 2 7</SPAN>: key $$$2$$$ is already in the cache, so only its value changes to $$$7$$$ and it becomes most recently used; order is $$$(2, 4, 3)$$$. </LI><LI> <SPAN class="tex-font-style-tt">2 2</SPAN>: answer <SPAN class="tex-font-style-tt">7 1</SPAN>. </LI><LI> <SPAN class="tex-font-style-tt">1 9 1</SPAN>: the least recently used key $$$3$$$ is discarded and key $$$9$$$ with value $$$1$$$ is inserted; order is $$$(9, 2, 4)$$$. </LI><LI> <SPAN class="tex-font-style-tt">2 3</SPAN>: key $$$3$$$ was discarded, answer <SPAN class="tex-font-style-tt">-1</SPAN>. </LI><LI> <SPAN class="tex-font-style-tt">2 9</SPAN>: answer <SPAN class="tex-font-style-tt">1 1</SPAN>. </LI><LI> <SPAN class="tex-font-style-tt">1 4 8</SPAN>: key $$$4$$$ is still in the cache: its value becomes $$$8$$$ and it becomes most recently used; order is $$$(4, 9, 2)$$$. </LI><LI> <SPAN class="tex-font-style-tt">2 2</SPAN>: key $$$2$$$ has value $$$7$$$ at order $$$3$$$, answer <SPAN class="tex-font-style-tt">7 3</SPAN>. </LI></UL><P></P><P>In the second test case the cache has capacity $$$1$$$: inserting key $$$5$$$ invalidates key $$$1$$$. Note how the first <SPAN class="tex-font-style-tt">2 1</SPAN> query in the third test case refreshes key $$$1$$$, so the subsequent insertion of key $$$3$$$ invalidates key $$$2$$$ instead.</P></DIV></DIV><P></P><P>  </P>
+
+</BODY></HTML>

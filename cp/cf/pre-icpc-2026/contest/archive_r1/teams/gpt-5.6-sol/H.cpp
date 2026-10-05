@@ -1,0 +1,5 @@
+#include <bits/stdc++.h>
+using namespace std;
+struct BIT{int n;vector<int>f;BIT(int n):n(n),f(n+1){}void add(int i,int v){for(;i<=n;i+=i&-i)f[i]+=v;}int sum(int i){int s=0;for(;i;i-=i&-i)s+=f[i];return s;}int kth(int k){int p=0;for(int d=1<<__lg(n);d;d>>=1)if(p+d<=n&&f[p+d]<k)k-=f[p+=d];return p+1;}};
+struct Info{int pos;long long val;};
+int main(){ios::sync_with_stdio(false);cin.tie(nullptr);int T;cin>>T;while(T--){int n,q;cin>>n>>q;BIT bit(n+q+2);unordered_map<long long,Info>mp;mp.reserve((n+q)*2);vector<long long>at(n+q+3);for(int i=1;i<=n;i++){mp[i]={i,0};at[i]=i;bit.add(i,1);}int now=n;auto touch=[&](long long key){auto &z=mp[key];bit.add(z.pos,-1);z.pos=++now;at[now]=key;bit.add(now,1);};while(q--){int ty;long long a,b;cin>>ty>>a;if(ty==1){cin>>b;auto it=mp.find(a);if(it==mp.end()){int p=bit.kth(1);mp.erase(at[p]);bit.add(p,-1);mp[a]={++now,b};at[now]=a;bit.add(now,1);}else{it->second.val=b;touch(a);}}else{auto it=mp.find(a);if(it==mp.end())cout<<-1<<'\n';else{cout<<it->second.val<<' '<<n-bit.sum(it->second.pos)+1<<'\n';touch(a);}}}}}

@@ -1,0 +1,16 @@
+The first line contains a single integer $t$ ($1 \le t \le 3 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $q$ ($2 \le n \le 3 \cdot 10^5$, $1 \le q \le 3 \cdot 10^5$) --- the number of islands in the Coral Loop and the number of logged events.
+
+The second line contains $n$ integers $a_1, a_2, \ldots, a_n$ ($-10^9 \le a_i \le 10^9$) --- the causeway prices: causeway $i$ connects islands $i$ and $i \bmod n + 1$.
+
+The third line contains $n$ integers $b_1, b_2, \ldots, b_n$ ($-10^9 \le b_i \le 10^9$) --- the prices of flights between island $i$ and the Nook.
+
+Each of the next $q$ lines describes one event in one of the following formats:
+\begin{itemize}
+\item \texttt{1 s t} ($1 \le s < t \le n+1$, where location $n+1$ is the Nook) --- print the cheapest valid route from location $s$ to location $t$;
+\item \texttt{2 x w} ($1 \le x \le n$, $-10^9 \le w \le 10^9$) --- set $a_x := w$;
+\item \texttt{3 x w} ($1 \le x \le n$, $-10^9 \le w \le 10^9$) --- set $b_x := w$.
+\end{itemize}
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $3 \cdot 10^5$, and the sum of $q$ over all test cases does not exceed $3 \cdot 10^5$.

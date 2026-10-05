@@ -1,0 +1,34 @@
+The interactor first prints an integer $T$, the number of test cases.
+
+For each test case, the walk starts at the root of the tree.
+
+To move through the tree, you may print one of the following queries:
+
+\begin{itemize}
+\item $\texttt{? L}$ --- attempt to move from the current node to its left child;
+\item $\texttt{? R}$ --- attempt to move from the current node to its right child;
+\item $\texttt{? B}$ --- attempt to move from the current node to its parent.
+\end{itemize}
+
+After each query, the interactor prints an integer:
+
+\begin{itemize}
+\item $1$ if the requested move is possible. In this case, the walk moves to the corresponding node;
+\item $0$ if the requested move is impossible. In this case, the walk stays at the current node.
+\end{itemize}
+
+In particular, the query $\texttt{? B}$ returns $0$ when the walk is currently at the root.
+
+You may perform at most $8000$ queries for each test case.
+
+When you have determined the total number of nodes, print
+
+$$\texttt{! N}$$
+
+where $N$ is the total number of nodes in the current test case.
+
+Printing the final answer does not count as a query.
+
+If the answer is correct, the interaction proceeds to the next test case. Otherwise, your submission receives a Wrong Answer verdict.
+
+After printing every query, do not forget to flush the output. You must also flush the output after printing the final answer.

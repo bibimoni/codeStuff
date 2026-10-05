@@ -1,0 +1,31 @@
+[A] 585864 build start failed: problem.buildPackage failed:  HTTP 400: {"status":"FAILED","comment":"problemId: There is already non-failed full package for this revision with verification."}
+
+[B] 585524 build start failed: problem.buildPackage failed:  HTTP 400: {"status":"FAILED","comment":"problemId: There is already non-failed full package for this revision with verification."}
+
+[C] 584556 build started
+[D] 586686 build start failed: problem.buildPackage failed:  HTTP 400: {"status":"FAILED","comment":"problemId: There is already non-failed full package for this revision with verification."}
+
+[E] 586674 build start failed: problem.buildPackage failed:  HTTP 400: {"status":"FAILED","comment":"problemId: There is already non-failed full package for this revision with verification."}
+
+[F] 586329 build start failed: problem.buildPackage failed:  HTTP 400: {"status":"FAILED","comment":"problemId: There is already non-failed full package for this revision with verification."}
+
+[G] 586335 build started
+[H] 586694 build started
+[I] 586459 build started
+[J] 584874 build started
+[K] 581736 build started
+[L] 590582 build started
+[A] 585864 cloned: pkg 1484500 rev 2, tests=103
+[B] 585524 cloned: pkg 1484499 rev 8, tests=101
+[C] 584556 pending: problem.package failed:  HTTP 500: 
+
+[D] 586686 cloned: pkg 1484493 rev 2, tests=101
+[E] 586674 cloned: pkg 1484496 rev 2, tests=101
+[F] 586329 cloned: pkg 1484498 rev 5, tests=102
+[G] 586335 cloned: pkg 1488506 rev 10, tests=19
+[H] 586694 cloned: pkg 1488507 rev 2, tests=24
+[I] 586459 pending: problem.package failed:  HTTP 500: 
+
+[J] 584874 cloned: pkg 1488509 rev 2, tests=34
+[K] 581736 cloned: pkg 1488510 rev 7, tests=40
+[L] 590582 cloned: pkg 1488511 rev 2, tests=42

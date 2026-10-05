@@ -1,0 +1,9 @@
+In the example, the hidden number of chambers is $6$.
+
+The first query moves Minh to the right child of the root, which exists.
+
+The second query attempts to move to its right child. The interactor returns $0$, so chamber $7$ does not exist and Minh remains at chamber $3$.
+
+The third query moves to the left child of chamber $3$. The interactor returns $1$, so chamber $6$ exists.
+
+Since the tree is complete, chamber $6$ exists while chamber $7$ does not, therefore the total number of chambers is $6$.

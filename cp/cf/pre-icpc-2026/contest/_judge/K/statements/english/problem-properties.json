@@ -1,0 +1,29 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATQNCiFjMTs1IDMNCjEgNCAyIDMgNQ0KIWMyOzMgMw0KMTAgMjAgMzANCiFjMzsxIDENCjcNCiFjNDs0IDINCjUgMSAxIDUNCg==",
+    "example.01.a.mu": "TVXzASFjMTszDQohYzI7NDANCiFjMzs3DQohYzQ7Mg0K"
+  },
+  "scoring": null,
+  "notes": "In the first test case, pay $1$ coin at mound $1$ ($a_1 := 1 - 1 = 0$) and $2$ coins at mound $3$ ($a_3 := 2 - 2 = 0$), then rake with $(l, m, r) = (1, 2, 3)$: mound $2$ settles at $\\max(0, 0) = 0$ and the stretch $[1, 3]$ is flat, for a total of $3$ coins.\n\nIn the second test case, pay $10$ coins at mound $1$ and settle mound $3$ in two payments of $25$ and $5$ coins (so $a_3$ goes $30 \\to 5 \\to 0$); one rake with $(1, 2, 3)$ flattens mound $2$ for free --- $40$ coins in total.\n\nIn the third test case $k = 1$, so paying all $7$ coins for the only mound already suffices. In the fourth test case, paying mounds $2$ and $3$ ($1 + 1$ coins) flattens the stretch $[2, 3]$.\n",
+  "legend": "In the temple's karesansui (dry landscape) garden, $n$ gravel mounds stand in a row; mound $i$ is piled $a_i$ scoops high. For the evening meditation the head monk wants a stretch of at least $k$ consecutive mounds raked perfectly flat.\n\nTwo kinds of work are available, any number of times, in any order:\n\n\\begin{itemize}\n  \\item \\textbf{Pay:} choose an index $i$ ($1 \\le i \\le n$) and a positive integer $c \\le a_i$, pay the groundskeepers $c$ coins, and they carry off that many scoops: set $a_i := a_i - c$.\n  \\item \\textbf{Rake:} choose three indices $l$, $m$, $r$ such that $1 \\le l < m < r \\le n$, drag the great garden rake from mound $l$ to mound $r$, and mound $m$ settles at the height of its taller support: set $a_m := \\max(a_l, a_r)$. Raking costs nothing.\n\\end{itemize}\n\nFind the minimum total number of coins the temple has to pay so that some contiguous segment of length at least $k$ of the row consists only of zeros.\n",
+  "authorLogin": "distiled",
+  "language": "english",
+  "timeLimit": 2000,
+  "output": "For each test case, print a single integer --- the minimum total cost needed to obtain a contiguous zero segment of length at least $k$.\n",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains a single integer $t$ ($1 \\le t \\le 2 \\cdot 10^5$) --- the number of test cases.\n\nThe first line of each test case contains two integers $n$ and $k$ ($1 \\le k \\le n \\le 2 \\cdot 10^5$) --- the size of the array and the minimum length of the required zero segment.\n\nThe second line of each test case contains $n$ integers $a_1, a_2, \\ldots, a_n$ ($1 \\le a_i \\le 10^9$) --- the heights of the mounds.\n\nIt is guaranteed that the sum of $n$ over all test cases does not exceed $2 \\cdot 10^5$.\n",
+  "authorName": "Bao Dang",
+  "sampleTests": [
+    {
+      "output": "3\n40\n7\n2\n",
+      "input": "4\n5 3\n1 4 2 3 5\n3 3\n10 20 30\n1 1\n7\n4 2\n5 1 1 5\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    }
+  ],
+  "name": "K-Long Zero Segment",
+  "interaction": null,
+  "memoryLimit": 268435456,
+  "tutorial": "Only paying creates zeros: the free operation can produce a zero only as $\\max$ of two zeros. Thus, if the leftmost and rightmost positions you pay for are $i$ and $j$, every position between them can be zeroed for free, producing a zero segment of length $j - i + 1$. Paying for more than two positions never helps, since only the two extreme paid positions matter.\n\nTherefore, for $k \\ge 2$, the answer is the minimum of $a_i + a_j$ over all pairs with $j - i + 1 \\ge k$. For $k = 1$, the answer is simply the minimum element of the array.\n\nScan $j$ from left to right while maintaining the minimum of $a_i$ over $i \\le j - k + 1$; each step updates the answer with $\\text{prefixMin} + a_j$. This gives an $O(n)$ solution per test case, $64$-bit integers are required since the answer can reach $2 \\cdot 10^9$.\n"
+}

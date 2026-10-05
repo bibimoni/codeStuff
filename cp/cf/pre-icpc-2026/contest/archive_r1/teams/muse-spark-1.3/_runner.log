@@ -1,0 +1,2341 @@
+[muse-spark-1.3] opencode attempt 1, 300 min left
+[0m
+> build · muse-spark-1.3-contributor-free
+[0m
+Starting the contest — skimming all 12 problems to rank them.
+[0m→ [0mRead .
+[0m
+[0m$ [0mls /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/ && cat /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/judge.py | head -100
+A.txt
+B.txt
+C.txt
+D.txt
+E.txt
+F.txt
+G.txt
+H.txt
+I.txt
+J.txt
+K.txt
+L.txt
+#!/usr/bin/env python3
+"""Local contest judge (macOS-native runner).
+
+Usage:
+  python3 contest/judge.py submit <LETTER> <source.cpp> --team <name>
+  python3 contest/judge.py limits                     # show per-problem TL/ML
+
+Compiles with g++ -O2 -std=gnu++17, runs every test, verifies with the
+problem's own testlib checker (compiled once per problem, cached).
+Interactive problems (inter flag in map.txt): interactor <-> solution over
+two FIFOs, interactor exit code is the verdict.
+
+Limits: CPU time via RLIMIT_CPU = TL (fair under parallel load), wall-time
+backstop = 4*TL+5s kill, memory via RSS polling -> ML if peak > 1.05*ML.
+
+Every submission appends one JSON line to contest/results/<team>.jsonl:
+{"ts","letter","verdict","first_fail","passed","total","time_ms","file"}
+verdict in OK | WA | TL | ML | RE | CE | JE (judge error).
+"""
+import json, os, resource, signal, subprocess, sys, tempfile, time
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONTEST = os.path.join(ROOT, "contest")
+J = os.path.join(CONTEST, "_judge")
+RESULTS = os.path.join(CONTEST, "results")
+
+def load_map():
+    out = {}
+    for line in open(os.path.join(CONTEST, "map.txt")):
+        p = line.split()
+        out[p[0]] = dict(pid=p[1], slug=p[2],
+                         tl=int(p[3].split("=")[1]) / 1000.0,
+                         ml=int(p[4].split("=")[1]),
+                         inter=p[5].split("=")[1] == "1",
+                         tdir=p[7].split("=", 1)[1])
+    return out
+
+def tname(i):
+    return f"{i:02d}"
+
+def compile_cpp(src, bin_path, timeout=60):
+    r = subprocess.run(["g++-14", "-O2", "-std=gnu++17", "-o", bin_path, src],
+                       capture_output=True, text=True, timeout=timeout)
+    return r.returncode == 0, (r.stderr or "")[-1200:]
+
+def get_checker(letter):
+    """Compile (once) and return the checker binary path."""
+    cache = os.path.join(J, letter, ".check_bin")
+    src = None
+    for cand in ("check.cpp", "checker.cpp"):
+        p = os.path.join(J, letter, "files", cand)
+        if os.path.exists(p):
+            src = p
+            break
+    if src is None:
+        raise RuntimeError(f"no checker source under {letter}/files")
+    if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(src):
+        return cache
+    ok, err = compile_cpp(src, cache)
+    if not ok:
+        raise RuntimeError(f"checker compile failed for {letter}: {err[:400]}")
+    return cache
+
+def get_interactor(letter):
+    cache = os.path.join(J, letter, ".inter_bin")
+    src = os.path.join(J, letter, "files", "interactor.cpp")
+    if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(src):
+        return cache
+    ok, err = compile_cpp(src, cache)
+    if not ok:
+        raise RuntimeError(f"interactor compile failed for {letter}: {err[:400]}")
+    return cache
+
+def run_limited(argv, stdin_path, stdout_path, tl, ml_mb):
+    """fork+wait4 runner: per-child rusage (exact CPU time + peak RSS, immune
+    to pollution by the judge's other children). Mid-run RSS kill via ps.
+    Returns (verdict, peak_rss_mb, elapsed_ms)."""
+    tl_cpu = int(tl) + 2  # RLIMIT backstop; verdict uses ru_utime+ru_stime
+    wall_deadline = 4 * tl + 5.0
+    bin_abs = os.path.abspath(argv[0])
+    pid = os.fork()
+    if pid == 0:  # child: no python I/O from here
+        try:
+            resource.setrlimit(resource.RLIMIT_CPU, (tl_cpu, tl_cpu + 1))
+            resource.setrlimit(resource.RLIMIT_NOFILE, (256, 256))
+            fi = os.open(stdin_path, os.O_RDONLY)
+            os.dup2(fi, 0)
+            fo = os.open(stdout_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o666)
+            os.dup2(fo, 1)
+            devnull = os.open(os.devnull, os.O_WRONLY)
+            os.dup2(devnull, 2)
+            os.execv(bin_abs, [bin_abs])
+        finally:
+            os._exit(127)
+    t0 = time.monotonic()
+    poll_peak = 0.0
+    status = ru = None
+    next_ps = t0 + 0.08
+    while True:
+        wpid, status, ru = os.wait4(pid, os.WNOHANG)
+[0m
+[0m$ [0mfor f in A B C D E F G H I J K L; do echo "===== $f ====="; cat /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/problems/$f.txt; echo; done
+===== A =====
+# Problem A — Suffix Array
+Time limit: 1s per test | Memory limit: 256 MB
+
+## Statement
+You are given the suffix array of an unknown string $s$ of length $n$. 
+Your task is to find the minimum number of distinct characters required to construct a string $s$ that produces this exact suffix array.
+
+A suffix array of a string $T = t_1 t_2 \dots t_n$ is a permutation $p = (p_1, p_2, \dots, p_n)$ of integers from $1$ to $n$ such that for all $1 \le i < n$, the suffix of $T$ starting at position $p_i$ is lexicographically strictly smaller than the suffix starting at position $p_{i+1}$.
+For example, the suffix array of the string $T = \text{"bobapop"}$ is $(4, 3, 1, 2, 6, 7, 5)$, because:$$\text{"apop"} < \text{"bapop"} < \text{"bobapop"} < \text{"obapop"} < \text{"op"} < \text{"p"} < \text{"pop"}$$.
+
+## Input
+The first line contains a single integer $n$ ($1 \le n \le 50$) --- the length of the string $s$.
+The second line contains $n$ space-separated integers $p_1, p_2, \dots, p_n$ ($1 \le p_i \le n$), representing a permutation of integers from $1$ to $n$, which is the suffix array of string $s$.
+
+## Output
+Print a single integer --- the minimum number of distinct characters in a string $s$ that has $p$ as its suffix array. If no such string exists, print $-1$.
+
+## Notes
+In the third sample, the string $\text{"bobapop"}$ consists of $4$ distinct characters ($\text{'a'}$, $\text{'b'}$, $\text{'o'}$, $\text{'p'}$) and produces the given suffix array. 
+No valid string with fewer distinct characters exists.
+
+## Example 1 — input
+```
+4
+4 1 2 3
+```
+## Example 1 — output
+```
+2
+```
+
+## Example 2 — input
+```
+4
+4 3 2 1
+```
+## Example 2 — output
+```
+1
+```
+
+## Example 3 — input
+```
+7
+4 3 1 2 6 7 5
+```
+## Example 3 — output
+```
+4
+```
+
+===== B =====
+# Problem B — Grid Reboot
+Time limit: 3s per test | Memory limit: 512 MB
+
+## Statement
+You are managing a neural network consisting of $N$ terminals connected by $M$ bidirectional links. Each terminal is currently either offline (0) or online (1). Triggering a reboot signal on terminal $u$ toggles the state of terminal $u$ and all terminals directly connected to it (changing 0 to 1 and 1 to 0). You are given $Q$ independent emergency scenarios, each providing the initial state of all $N$ terminals. For each scenario, find a set of terminals to reboot so that all $N$ terminals end up online (1), or determine that it is impossible.
+
+## Input
+The first line contains three integers $N$, $M$, and $Q$ ($N, M \le 3000$, $Q \le 500$) --- the number of terminals, links, and emergency scenarios. The next $M$ lines each contain two 1-indexed integers $u$ and $v$ ($1 \le u, v \le N, u \neq v$), representing an undirected link between terminals $u$ and $v$. The next $Q$ lines each contain N characters of 0s and 1s, where the $i$-th character denotes the initial state of terminal $i$ (0 = off, 1 = on).
+
+## Output
+For each scencarios, output a single line:
+
+
+--- If it is impossible to make all terminals online, print -1.
+
+
+--- Otherwise, print an integer $K$ ($0 \le K \le N$), followed by $K$ distinct space-separated 1-indexed integers indicating the chosen terminals to operate on. If there are multiple valid solutions, you may output any.
+
+## Notes
+Consider the second query; this is the initial state of all terminals in the network (let all bold vertices represent online terminals):
+
+
+\includegraphics[width=10cm]{fig1.png}
+
+
+Triggering a reboot signal on terminal 1:
+
+
+\includegraphics[width=10cm]{fig2.png}
+
+
+Finally, triggering terminal 3 will result in the following state of the network:
+
+
+\includegraphics[width=10cm]{fig3.png}
+
+
+Alternatively, you can trigger terminal 4 and 7 which also make all terminals online.
+
+## Example 1 — input
+```
+7 9 5
+1 2
+1 3
+2 4
+2 5
+3 5
+3 6
+4 7
+5 7
+6 7
+0 0 0 1 1 1 1
+1 0 1 1 0 0 1
+1 1 1 1 1 1 1
+0 0 0 0 0 0 0
+1 1 1 1 1 1 0
+```
+## Example 1 — output
+```
+1 1 
+2 1 3 
+0 
+2 3 4 
+-1
+```
+
+===== C =====
+# Problem C — The Hidden Cave
+Time limit: 2s per test | Memory limit: 256 MB | INTERACTIVE problem (see protocol)
+
+## Statement
+Minh discovers a mysterious cave system consisting of many interconnected chambers.
+
+The cave system forms a complete binary tree. The entrance of the cave is the root of the tree, and Minh initially stands at the entrance.
+
+Each chamber may have a passage leading to its left child and a passage leading to its right child. Every chamber except the entrance also has a passage leading back to its parent.
+
+A complete binary tree is a binary tree in which every level, except possibly the last, is completely filled, and all nodes on the last level are as far to the left as possible.
+
+Minh does not know the structure of the cave or the total number of chambers.
+
+Your task is to determine the total number of chambers in the cave by moving through it using the allowed queries.
+
+For each test case, the number of chambers $N$ satisfies
+
+$$1 \le N \le 10^{18}.$$
+
+## Input
+The first line contains an integer $T$ ($1 \le T \le 20$), the number of test cases.
+
+For each test case, the number of chambers $N$ is hidden and is not given directly to your program. It can only be determined through interaction.
+
+## Output
+
+
+## Interaction protocol
+The interactor first prints an integer $T$, the number of test cases.
+
+For each test case, Minh initially stands at the root of the tree.
+
+To move through the cave, you may print one of the following queries:
+
+\begin{itemize}
+\item $\texttt{? L}$ --- attempt to move from the current chamber to its left child;
+\item $\texttt{? R}$ --- attempt to move from the current chamber to its right child;
+\item $\texttt{? B}$ --- attempt to move from the current chamber to its parent.
+\end{itemize}
+
+After each query, the interactor prints an integer:
+
+\begin{itemize}
+\item $1$ if the requested move is possible. In this case, Minh moves to the corresponding chamber;
+\item $0$ if the requested move is impossible. In this case, Minh remains in the current chamber.
+\end{itemize}
+
+In particular, the query $\texttt{? B}$ returns $0$ when Minh is currently at the root.
+
+You may perform at most $8000$ queries for each test case.
+
+When you have determined the total number of chambers, print
+
+$$\texttt{! N}$$
+
+where $N$ is the total number of chambers in the current test case.
+
+Printing the final answer does not count as a query.
+
+If the answer is correct, the interaction proceeds to the next test case. Otherwise, your submission receives a Wrong Answer verdict.
+
+After printing every query, do not forget to flush the output. You must also flush the output after printing the final answer.
+
+## Notes
+In the example, the hidden number of chambers is $6$.
+
+The first query moves Minh to the right child of the root, which exists.
+
+The second query attempts to move to its right child. The interactor returns $0$, so chamber $7$ does not exist and Minh remains at chamber $3$.
+
+The third query moves to the left child of chamber $3$. The interactor returns $1$, so chamber $6$ exists.
+
+Since the tree is complete, chamber $6$ exists while chamber $7$ does not, therefore the total number of chambers is $6$.
+
+## Example 1 — input
+```
+1
+6
+```
+## Example 1 — output
+```
+
+```
+
+===== D =====
+# Problem D — Multiplication Game
+Time limit: 1s per test | Memory limit: 256 MB
+
+## Statement
+Twin sisters often play games involving numbers together. 
+First, they agree on a positive integer $n$. 
+Then, they start playing with the initial value $p = 1$. 
+The two players take turns, with the younger sister always going first. On their turn, the current player multiplies $p$ by any integer $k$ such that $2 \le k \le 9$.
+The winner is the first person to make $p \ge n$.
+
+Determine which player will win if both play optimally.
+
+## Input
+The first line contains an integer $T$ ($1 \le T \le 10^4$) --- the number of test cases.\
+
+Each of the following $T$ lines contains a single integer $n$ ($1 \le n \le 10^9$).
+
+## Output
+For each test case, print a single line containing:
+
+\begin{itemize}
+    \item La premiere joueuse gagne. --- if the first player (younger sister) wins.
+    \item La deuxieme joueuse gagne. --- if the second player (older sister) wins.
+\end{itemize}
+
+## Example 1 — input
+```
+3
+9
+18
+27
+```
+## Example 1 — output
+```
+La premiere joueuse gagne.
+La deuxieme joueuse gagne.
+La premiere joueuse gagne.
+```
+
+===== E =====
+# Problem E — Scheduling
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+BigC's flagship software product is divided into $n$ distinct modules, numbered $1$ through $n$, each assigned to a dedicated team. 
+To streamline development, the company maintains a centralized workflow network of $n - 1$ dependency relations between these modules, forming an underlying weakly directed connected graph.
+
+Each relation between module $u$ and module $v$ carries a status indicator $w \in \{0, 1, 2\}$ set by the engineering board:
+
+\begin{itemize}
+  \item $w = 0$: A flexible dependency. The engineering manager may choose to schedule module $u$ before module $v$ ($u \to v$) or module $v$ before module $u$ ($v \to u$).
+  \item $w = 1$: A strict prerequisite ($u \to v$). Module $u$ must be completed before module $v$.
+  \item $w = 2$: A reverse prerequisite ($v \to u$). Module $v$ must be completed before module $u$.
+\end{itemize}
+
+A schedule is a full linear execution order of all modules, represented as a permutation of $(1, 2, \dots, n)$. The schedule is satisfied if for every pair ($u, v$), and $u$ must be completed before $v$, $u$ must be placed after $v$ in the permutation. For every flexible relation ($w = 0$), the manager must commit to exactly one of the two valid directional choices.
+
+To assess company policy flexibility, the CEO wants to compute the total number of valid execution schedules, summed over all possible directional assignments of the flexible dependencies. Because the result can be extremely large, output it modulo $998\,244\,353$.
+
+## Input
+The first line contains a single integer $n$ ($1 \le n \le 4000$) --- the number of modules.
+
+Each of the next $n - 1$ lines contains three integers $u$, $v$, and $w$ ($1 \le u, v \le n$, $w \in \{0, 1, 2\}$), describing a relation of type $w$ between modules $u$ and $v$. The given relations are guaranteed to form a weakly connected graph.
+
+## Output
+Print a single integer --- the total number of valid execution schedules summed over all possible orientation choices for flexible relations, modulo $998\,244\,353$.
+
+## Notes
+There are two possible configurations of those dependency relations.
+
+\begin{itemize}
+  \item Case 1: Let module 1 be completed before module 3. The relations are oriented as follows:
+
+\includegraphics[width=10cm]{fig1.png}
+
+A total of $3$ valid execution schedules can be generated from this configuration:
+
+[2, 1, 4, 3, 5]
+
+[2, 4, 1, 3, 5]
+
+[4, 2, 1, 3, 5]
+
+
+
+  \item Case 2: Let module 3 be completed before module 1:
+
+\includegraphics[width=10cm]{fig2.png}
+
+There are $7$ valid execution schedules satisfying the dependency relations in this configuration:
+
+[2, 4, 3, 1, 5]
+
+[2, 4, 3, 5, 1]
+
+[4, 2, 3, 1, 5]
+
+[4, 2, 3, 5, 1]
+
+[4, 3, 2, 1, 5]
+
+[4, 3, 2, 5, 1]
+
+[4, 3, 5, 2, 1]
+
+
+\end{itemize}
+
+
+Summing all valid execution orders across both direction assignments yields $3 + 7 = 10$.
+
+## Example 1 — input
+```
+5
+1 2 2
+1 3 0
+3 5 1
+3 4 2
+```
+## Example 1 — output
+```
+10
+```
+
+===== F =====
+# Problem F — Snow White
+Time limit: 0.25s per test | Memory limit: 8 MB
+
+## Statement
+One day, Snow White and the seven dwarfs were taking a walk in the park.
+
+At that time, there were $n$ men in the park. 
+All $n$ of these men told Snow White their names and heights. 
+Despite living with the seven dwarfs for a long time, Snow White had never asked for their names. 
+Snow White only remembered that all seven dwarfs had the exact same height, and no one else had the same height as these dwarfs.
+
+Since the number of men is very large, Snow White asks you to write a program that reads the names and heights of the $n$ men in the park and prints the names of the seven dwarfs.
+
+## Input
+The first line contains an integer $n$ ($7 \le n \le 100$) --- the number of men in the park.
+
+In the next $n$ lines, the $i$-th line contains a string $S[i]$ and an integer $H[i]$. 
+Here, $S[i]$ is the name of the $i$-th man, consisting of 1 to 10 English letters, and $H[i]$ ($1 \le H[i] \le 1000$) is his height.
+
+## Output
+Print seven strings representing the names of the seven dwarfs, ordered according to their appearance in the input. 
+The input guarantees that the seven dwarfs can be uniquely identified from the $n$ men according to the rules above.
+
+## Example 1 — input
+```
+9
+city 1
+of 1
+shining 1
+stars 1
+are 2
+me 2
+just 1
+for 1
+you 1
+```
+## Example 1 — output
+```
+city
+of
+shining
+stars
+just
+for
+you
+```
+
+## Example 2 — input
+```
+7
+sieu 882
+cap 882
+ba 882
+khi 882
+back 882
+khoa 882
+hcmut 882
+```
+## Example 2 — output
+```
+sieu
+cap
+ba
+khi
+back
+khoa
+hcmut
+```
+
+===== G =====
+# Problem G — Self-Crossing Turtle
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+A turtle starts at point $(0, 0)$ on the $X$-$Y$ plane. You are given a sequence of $n$ positive integers $d_1, d_2, \ldots, d_n$.
+
+The turtle moves $d_1$ meters north, then $d_2$ meters west, $d_3$ meters south, $d_4$ meters east, and so on. After every move, its direction rotates by $90^\circ$ counter-clockwise.
+
+Determine whether the path drawn by the turtle intersects itself. Two path segments are considered intersecting even if they only touch at one point or overlap along a non-empty segment. The common endpoint of two consecutive moves is not considered a self-intersection.
+
+## Input
+The first line contains an integer $t$ ($1 \le t \le 10^4$) --- the number of test cases.
+
+Each test case consists of two lines. The first line contains an integer $n$ ($1 \le n \le 2 \cdot 10^5$) --- the number of moves. The second line contains $n$ integers $d_1, d_2, \ldots, d_n$ ($1 \le d_i \le 10^9$) --- the corresponding distances.
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $2 \cdot 10^5$.
+
+## Output
+For each test case, print $\texttt{Yes}$ if the turtle's path intersects itself, and $\texttt{No}$ otherwise. The answer is case-insensitive: for example, $\texttt{Yes}$, $\texttt{YES}$ and $\texttt{yEs}$ are all accepted.
+
+## Notes
+In the first test case, the fourth segment intersects the first segment at $(0,1)$.
+
+In the second test case, no two non-consecutive segments intersect.
+
+In the third test case, the fourth segment returns to $(0,0)$, which belongs to the first segment.
+
+## Example 1 — input
+```
+3
+4
+2 1 1 2
+4
+1 2 3 4
+5
+1 1 1 1 1
+```
+## Example 1 — output
+```
+Yes
+No
+Yes
+```
+
+===== H =====
+# Problem H — RLU Cache
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+An \textbf{RLU cache} stores key--value pairs with a fixed capacity of $n$ pairs. At any moment the pairs in the cache have a \emph{recency order}: the most recently used pair has order $1$, the next one has order $2$, and so on; the pair with the largest order is the \emph{least recently used} one.
+
+Initially the cache is full: it contains exactly the keys $1, 2, \ldots, n$, each with value $0$, inserted in this order --- so key $1$ is initially the least recently used key (order $n$) and key $n$ is the most recently used one (order $1$).
+
+You have to process $q$ queries of two types:
+
+\begin{itemize}
+  \item \texttt{1 a b} --- put key $a$ with value $b$ into the cache:
+    \begin{itemize}
+      \item if key $a$ is already in the cache, its value is replaced by $b$ and $a$ becomes the most recently used key;
+      \item otherwise the least recently used key is \emph{discarded} (invalidated) from the cache, and $a$ with value $b$ is inserted as the most recently used key.
+    \end{itemize}
+  \item \texttt{2 a} --- look up key $a$:
+    \begin{itemize}
+      \item if key $a$ is in the cache, print its value and its current order $r$ ($r = 1$ means most recently used, $r = n$ means least recently used); afterwards $a$ becomes the most recently used key;
+      \item otherwise print $-1$ (the key was never inserted or has already been invalidated).
+    \end{itemize}
+\end{itemize}
+
+## Input
+The first line contains a single integer $t$ ($1 \le t \le 2 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $q$ ($1 \le n, q \le 2 \cdot 10^5$) --- the capacity of the cache and the number of queries.
+
+The next $q$ lines describe the queries in the order they must be processed. Each line has one of two forms:
+
+\begin{itemize}
+  \item \texttt{1 a b} ($1 \le a \le 10^9$, $1 \le b \le 10^9$) --- put key $a$ with value $b$ into the cache;
+  \item \texttt{2 a} ($1 \le a \le 10^9$) --- look up key $a$.
+\end{itemize}
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $2 \cdot 10^5$, and the sum of $q$ over all test cases does not exceed $2 \cdot 10^5$.
+
+## Output
+For each query of type $2$ (in the order the queries appear, across all test cases), print one line:
+
+\begin{itemize}
+  \item if key $a$ is in the cache, print two integers $b$ and $r$ --- its current value and its current order;
+  \item otherwise print the single integer $-1$.
+\end{itemize}
+
+## Notes
+In the first test case of the example $n = 3$. Initially the cache holds keys $1, 2, 3$ with value $0$; key $3$ is the most recently used and key $1$ is the least recently used one.
+
+\begin{itemize}
+  \item \texttt{2 2}: key $2$ is present with value $0$ at order $2$, so the answer is \texttt{0 2}. Afterwards the recency order is $(2, 3, 1)$ from most to least recent.
+  \item \texttt{2 5}: key $5$ is not in the cache, answer \texttt{-1}.
+  \item \texttt{1 4 10}: the cache is full, so the least recently used key $1$ is discarded and key $4$ with value $10$ is inserted; the order becomes $(4, 2, 3)$.
+  \item \texttt{2 1}: key $1$ has been invalidated, answer \texttt{-1}.
+  \item \texttt{2 4}: key $4$ has value $10$ and order $1$, answer \texttt{10 1}.
+  \item \texttt{1 2 7}: key $2$ is already in the cache, so only its value changes to $7$ and it becomes most recently used; order is $(2, 4, 3)$.
+  \item \texttt{2 2}: answer \texttt{7 1}.
+  \item \texttt{1 9 1}: the least recently used key $3$ is discarded and key $9$ with value $1$ is inserted; order is $(9, 2, 4)$.
+  \item \texttt{2 3}: key $3$ was discarded, answer \texttt{-1}.
+  \item \texttt{2 9}: answer \texttt{1 1}.
+  \item \texttt{1 4 8}: key $4$ is still in the cache: its value becomes $8$ and it becomes most recently used; order is $(4, 9, 2)$.
+  \item \texttt{2 2}: key $2$ has value $7$ at order $3$, answer \texttt{7 3}.
+\end{itemize}
+
+In the second test case the cache has capacity $1$: inserting key $5$ invalidates key $1$. Note how the first \texttt{2 1} query in the third test case refreshes key $1$, so the subsequent insertion of key $3$ invalidates key $2$ instead.
+
+## Example 1 — input
+```
+3
+3 12
+2 2
+2 5
+1 4 10
+2 1
+2 4
+1 2 7
+2 2
+1 9 1
+2 3
+2 9
+1 4 8
+2 2
+1 4
+2 1
+1 5 3
+2 1
+2 5
+2 5
+2 1
+1 3 6
+2 2
+2 1
+2 3
+```
+## Example 1 — output
+```
+0 2
+-1
+-1
+10 1
+7 1
+-1
+1 1
+7 3
+0 1
+-1
+3 1
+0 2
+-1
+0 2
+6 2
+```
+
+===== I =====
+# Problem I — Coolant Loops
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+The research outpost \textit{Polaris Deep} orbits a dying star, and its only protection from the heat is a coolant network laid out on a grid of $n \times m$ tiles. Each tile is either empty or holds a junction. A junction has openings in two, three, or four of the four cardinal directions --- up, right, down, left. A junction with exactly one opening is physically impossible: the pressure would burst it instantly.
+
+Two junctions in orthogonally adjacent tiles are \emph{connected} if and only if both have openings facing each other. A \emph{loop} is a route that starts at some junction, moves along connections, and returns to the starting junction without using any connection twice.
+
+The chief engineer measures the network's resilience by the number of \emph{independent loops}$^{\dagger}$ it contains.
+
+Each tile is described by a single integer $g_{i,j}$: $0$ for an empty tile, and otherwise the sum of $1$ for an opening facing up, $2$ for right, $4$ for down, and $8$ for left. For instance, a junction whose openings face up and right is written as $g_{i,j} = 1 + 2 = 3$:
+
+\begin{center}
+  \def \htmlPixelsInCm {45}
+  \includegraphics[width=3cm]{pipe-bits.png}
+\end{center}
+
+During a micrometeorite storm the junctions are destroyed one by one. Telemetry predicts the whole sequence of $q$ impacts in advance: every impact hits a tile containing a working junction, and no tile is hit twice.
+
+After each impact, report the number of independent loops remaining in the network.
+
+{\small $^{\dagger}$ Formally, the \emph{number of independent loops} of the network is the largest $t$ for which one can choose a sequence of loops $L_1, L_2, \ldots, L_t$ such that every loop $L_i$ passes through at least one connection that none of the earlier loops $L_1, L_2, \ldots, L_{i-1}$ pass through.}
+
+## Input
+The first line contains a single integer $t$ ($1 \le t \le 2 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $m$ ($1 \le n, m$, $n \cdot m \le 2 \cdot 10^5$) --- the dimensions of the grid.
+
+Each of the next $n$ lines contains $m$ integers $g_{i,j}$ ($0 \le g_{i,j} \le 15$) describing the tiles as explained in the statement, from the top row to the bottom row. It is guaranteed that no value has exactly one bit set. Openings facing outside the grid simply connect to nothing.
+
+The next line contains a single integer $q$ --- the number of impacts.
+
+Each of the next $q$ lines contains two integers $r$ and $c$ ($1 \le r \le n$, $1 \le c \le m$) --- the tile destroyed by the next impact. All impacted tiles are pairwise distinct, and each of them contains a junction.
+
+It is guaranteed that $q$ does not exceed the number of junctions, and that the sum of $n \cdot m$ over all test cases does not exceed $2 \cdot 10^5$.
+
+## Output
+For each test case, print a single line containing $q$ integers: the $i$-th integer must be the number of independent loops remaining after the first $i$ impacts.
+
+If $q = 0$, print an empty line.
+
+## Notes
+The picture below shows the networks of the first two test cases of the first example; tiles are labeled with their input values.
+
+\begin{center}
+  \def \htmlPixelsInCm {45}
+  \includegraphics[width=8cm]{loops1.png} \\
+  \small{First test case: every junction opens in all four directions; the two highlighted squares are one choice of independent loops --- they share the middle connection, yet two cuts are needed to break them both.}
+\end{center}
+
+\begin{center}
+  \def \htmlPixelsInCm {45}
+  \includegraphics[width=8cm]{loops2.png} \\
+  \small{Second test case: one single loop around the center; the center junction opens to the left and to the right, but nobody answers, so it is isolated.}
+\end{center}
+
+In the first test case every tile holds a $4$-opening junction, and two loops exist initially --- for example, the left and the right unit squares. The first impact destroys tile $(1,1)$, breaking the left square, so only one loop (the right square) remains. The second impact destroys tile $(1,2)$ and breaks that loop as well, and the third impact changes nothing. Hence the answers are $1, 0, 0$.
+
+In the second test case eight junctions form a single loop around the center. The center tile $10$ opens to the left and to the right, but none of its neighbours opens back, so it is connected to nothing. The first impact destroys this isolated junction and the loop survives --- the answer is $1$. The second impact destroys tile $(1,2)$, cutting the ring into a path, so the answer becomes $0$.
+
+In the third test case no two adjacent junctions ever face each other: tile $5$ does not open to the right and tile $6$ does not open to the left. There is not a single connection in the network, let alone a loop.
+
+The fourth test case of the first example has $q = 0$, so the expected output for it is an empty line.
+
+In the second example the network initially has two independent loops --- one around the left $3 \times 3$ block and one around the right $2 \times 3$ block --- plus one isolated junction. The first impact removes the isolated junction (answers start with $2$), the second and third impacts break the left and the right loop respectively, and the remaining impacts only shorten paths: $2, 1, 0, 0, 0, 0$.
+
+## Example 1 — input
+```
+4
+2 3
+15 15 15
+15 15 15
+3
+1 1
+1 2
+2 2
+3 3
+6 10 12
+5 10 5
+3 10 9
+2
+2 2
+1 2
+1 3
+5 6 5
+2
+1 2
+1 3
+1 1
+0
+0
+```
+## Example 1 — output
+```
+1 0 0
+1 0
+0 0
+```
+
+## Example 2 — input
+```
+1
+4 5
+6 10 12 6 12
+5 10 5 5 5
+3 10 9 3 9
+0 0 0 0 0
+6
+2 2
+1 2
+2 5
+1 5
+3 1
+2 4
+```
+## Example 2 — output
+```
+2 1 0 0 0 0
+```
+
+===== J =====
+# Problem J — Equal Sum Segments
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+You are given an array $a$ of $n$ integers (elements may be negative).
+
+A \emph{division} of the array is a partition of it into one or more contiguous segments such that every element belongs to exactly one segment. A division is called \emph{balanced} if all its segments have the same sum.
+
+Count the number of balanced divisions. Two divisions are considered different if their sets of cut positions are different (a cut can be made between positions $i$ and $i+1$ for any $1 \le i < n$).
+
+Note that the division into a single segment (the whole array, no cuts) is always balanced.
+
+Since the number of divisions can be huge, print it modulo $10^9 + 7$.
+
+## Input
+The first line contains a single integer $t$ ($1 \le t \le 10^5$) --- the number of test cases.
+
+The first line of each test case contains a single integer $n$ ($1 \le n \le 10^5$) --- the size of the array.
+
+The second line of each test case contains $n$ integers $a_1, a_2, \ldots, a_n$ ($-10^9 \le a_i \le 10^9$) --- the elements of the array.
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $10^5$.
+
+## Output
+For each test case, print a single integer --- the number of balanced divisions of the array, modulo $10^9 + 7$.
+
+## Notes
+The example contains six test cases.
+
+\begin{itemize}
+  \item $a = [1, 2, 1, 2]$, total sum $6$. Balanced divisions: the whole array (one segment of sum $6$), and $[1, 2]\;[1, 2]$ (two segments of sum $3$). Three segments of sum $2$ would require a prefix of sum $2$, which does not exist. Answer: $2$.
+  \item $a = [1, -1, 1, -1]$, total sum $0$, so every segment must sum to $0$. The only position $i < n$ with prefix sum $0$ is $i = 2$, and we may either cut there or not. Answer: $2$.
+  \item $a = [1, 1]$: $[1, 1]$ or $[1]\;[1]$. Answer: $2$.
+  \item $a = [5]$: only the single segment. Answer: $1$.
+  \item $a = [-1, -1]$: same as the third case with a negative total. Answer: $2$.
+  \item $a = [1, 2, 3, 0, 2, 4]$, total sum $12$. With $k = 2$ segments (sum $6$ each) the cut can be made after index $3$ or after index $4$, since both prefix sums equal $6$ --- that gives $2$ divisions. No $k \in \{3, 4, 6\}$ works (e.g. for $k = 3$ a prefix of sum $4$ is required but absent). Together with the single-segment division, the answer is $3$.
+\end{itemize}
+
+## Example 1 — input
+```
+6
+4
+1 2 1 2
+4
+1 -1 1 -1
+2
+1 1
+1
+5
+2
+-1 -1
+6
+1 2 3 0 2 4
+```
+## Example 1 — output
+```
+2
+2
+2
+1
+2
+3
+```
+
+===== K =====
+# Problem K — Zero Segment
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+You are given an array $a$ of $n$ positive integers, and an integer $k$.
+
+You may perform the following operations on the array any number of times, in any order:
+
+\begin{itemize}
+  \item \textbf{Pay:} choose an index $i$ ($1 \le i \le n$), pay $a_i$ coins, and set $a_i := 0$.
+  \item \textbf{Free:} choose three indices $l$, $m$, $r$ such that $1 \le l < m < r \le n$, and set $a_m := \max(a_l, a_r)$. This operation costs nothing.
+\end{itemize}
+
+Find the minimum total number of coins you have to pay so that some contiguous segment of length at least $k$ of the array consists only of zeros.
+
+## Input
+The first line contains a single integer $t$ ($1 \le t \le 2 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $k$ ($1 \le k \le n \le 2 \cdot 10^5$) --- the size of the array and the minimum length of the required zero segment.
+
+The second line of each test case contains $n$ integers $a_1, a_2, \ldots, a_n$ ($1 \le a_i \le 10^9$) --- the elements of the array.
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $2 \cdot 10^5$.
+
+## Output
+For each test case, print a single integer --- the minimum total cost needed to obtain a contiguous zero segment of length at least $k$.
+
+## Notes
+In the first test case of the first example, one way to spend exactly $3$ coins is as follows. Pay $1$ coin to set $a_1 := 0$. Apply the free operation with $(l, m, r) = (1, 2, 5)$: this sets $a_2 := \max(a_1, a_5) = \max(0, 5) = 5$ --- note that this does not help at all. Now pay $2$ coins to set $a_3 := 0$, and apply the free operation with $(l, m, r) = (1, 2, 3)$ to set $a_2 := \max(a_1, a_3) = 0$. The segment $[1, 3]$ is all zeros. Trying to zero a longer segment, say $[2, 4]$, turns out to cost more, and careful consideration of every possibility shows that cost $3$ cannot be beaten.
+
+In the second test case of the first example the answer is $40$: a suitable sequence of operations achieves it, and one can check that no cheaper sequence exists.
+
+In the third test case of the first example, $k = 1$, so after paying $7$ coins for the only element the array already contains a zero segment of length $1$.
+
+In the second example, for the first test case the cheapest single payment has cost $1$, which is sufficient. For the second test case, the optimal cost is $9$.
+
+## Example 1 — input
+```
+4
+5 3
+1 4 2 3 5
+3 3
+10 20 30
+1 1
+7
+4 2
+5 1 1 5
+```
+## Example 1 — output
+```
+3
+40
+7
+2
+```
+
+## Example 2 — input
+```
+2
+6 1
+9 3 8 1 10 2
+5 4
+8 2 7 1 9
+```
+## Example 2 — output
+```
+1
+9
+```
+
+===== L =====
+# Problem L — The Coral Loop
+Time limit: 2s per test | Memory limit: 256 MB
+
+## Statement
+The Coral Loop is a ring of $n$ tiny islands, numbered from $1$ to $n$ around the atoll. Causeway $i$ connects island $i$ with island $i+1$ (for $1 \le i \le n-1$), and causeway $n$ loops back from island $n$ to island $1$. Crossing causeway $i$ costs $a_i$ shells --- several causeways cross such gorgeous lagoons that the paddlers' cooperative pays \emph{you} a rebate to use them, so some $a_i$ are negative.
+
+In the middle of the atoll floats the Ferry Nook, a seaplane dock. A flight between the Nook and island $i$ costs $b_i$ shells, promos and rebates included, so some $b_i$ are negative as well. All causeways and flights operate in both directions at the same price.
+
+Lani runs the trip kiosk. By the Paddlers' Charter --- twice-paddled water is wasted daylight --- a valid route may visit each location (islands and the Nook) at most once. Over the season she logs $q$ events of three kinds:
+
+\begin{itemize}
+\item A traveler asks for the cheapest valid route from location $s$ to location $t$ ($s < t$);
+\item Causeway $x$ is repriced: $a_x$ becomes $w$;
+\item The flight between the Nook and island $x$ is repriced: $b_x$ becomes $w$.
+\end{itemize}
+
+After every traveler's question Lani must announce the best possible price. The season is long, so help her answer quickly.
+
+## Input
+The first line contains a single integer $t$ ($1 \le t \le 3 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $q$ ($2 \le n \le 3 \cdot 10^5$, $1 \le q \le 3 \cdot 10^5$) --- the number of islands in the Coral Loop and the number of logged events.
+
+The second line contains $n$ integers $a_1, a_2, \ldots, a_n$ ($-10^9 \le a_i \le 10^9$) --- the causeway prices: causeway $i$ connects islands $i$ and $i \bmod n + 1$.
+
+The third line contains $n$ integers $b_1, b_2, \ldots, b_n$ ($-10^9 \le b_i \le 10^9$) --- the prices of flights between island $i$ and the Nook.
+
+Each of the next $q$ lines describes one event in one of the following formats:
+\begin{itemize}
+\item \texttt{1 s t} ($1 \le s < t \le n+1$, where location $n+1$ is the Nook) --- print the cheapest valid route from location $s$ to location $t$;
+\item \texttt{2 x w} ($1 \le x \le n$, $-10^9 \le w \le 10^9$) --- set $a_x := w$;
+\item \texttt{3 x w} ($1 \le x \le n$, $-10^9 \le w \le 10^9$) --- set $b_x := w$.
+\end{itemize}
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $3 \cdot 10^5$, and the sum of $q$ over all test cases does not exceed $3 \cdot 10^5$.
+
+## Output
+For every event of type $1$, print a single integer on its own line --- the minimum possible price of a route from $s$ to $t$ that visits no location twice. Prices may be negative: rebates can make the cooperative pay the traveler.
+
+## Notes
+In the example the atoll has $n = 3$ islands with causeway prices $a = (4, -2, 5)$ and flight prices $b = (3, 7, 1)$.
+
+\begin{itemize}
+\item \texttt{1 1 3}: paddling $1 \to 2 \to 3$ costs $4 - 2 = 2$, causeway $3$ directly costs $5$, and flying through the Nook costs $3 + 1 = 4$. The answer is $2$.
+\item \texttt{2 2 6}: the rebate lagoon causeway is repriced, $a_2 := 6$.
+\item \texttt{1 1 3}: now paddling $1 \to 2 \to 3$ costs $10$, so the Nook route ($3 + 1 = 4$) wins.
+\item \texttt{3 1 -4}: flight to island $1$ goes on promo, $b_1 := -4$.
+\item \texttt{1 1 3}: flying $1 \to \text{Nook} \to 3$ costs $-4 + 1 = -3$ --- the cooperative pays the traveler $3$ shells.
+\item \texttt{1 1 4}: location $4$ is the Nook; the direct flight from island $1$ costs $-4$, and nothing beats a promo.
+\end{itemize}
+
+## Example 1 — input
+```
+1
+3 6
+4 -2 5
+3 7 1
+1 1 3
+2 2 6
+1 1 3
+3 1 -4
+1 1 3
+1 1 4
+```
+## Example 1 — output
+```
+2
+4
+-3
+-4
+```
+[0m
+Skimmed all 12. Ranking by difficulty: D/F/K trivial, G/H/I/J easy-medium, B/C medium, A/E/L hard. Starting with the trivial ones.
+[0m← [0mWrite STRATEGY.md
+Wrote file successfully.
+[0m
+[0m← [0mWrite D.cpp
+Wrote file successfully.
+[0m
+[0m← [0mWrite F.cpp
+Wrote file successfully.
+[0m
+[0m← [0mWrite K.cpp
+Wrote file successfully.
+[0m
+K needs a correctness check on my key insight (free ops can also *reduce* values before paying). Verifying via brute force before submitting K; D and F are safe.
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/D /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/D.cpp && echo "3
+9
+18
+27" | /tmp/D; g++-14 -O2 -std=gnu++17 -o /tmp/F /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/F.cpp && echo "9
+city 1
+of 1
+shining 1
+stars 1
+are 2
+me 2
+just 1
+for 1
+you 1" | /tmp/F; g++-14 -O2 -std=gnu++17 -o /tmp/K /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/K.cpp && echo "4
+5 3
+1 4 2 3 5
+3 3
+10 20 30
+1 1
+7
+4 2
+5 1 1 5" | /tmp/K
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+La premiere joueuse gagne.
+La deuxieme joueuse gagne.
+La premiere joueuse gagne.
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+city
+of
+shining
+stars
+just
+for
+you
+clang: warning: overriding deployment version from '16.0' to '26.0' [-Woverriding-deployment-version]
+3
+40
+7
+2
+[0m
+D/F match samples. Now brute-force verification of K's formula:
+[0m$ [0mwhich g++-14; g++-14 --version 2>&1 | head -3
+/opt/homebrew/bin/g++-14
+g++-14 (Homebrew GCC 14.3.0) 14.3.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+[0m
+[0m$ [0mcat > /tmp/kbrute.py <<'EOF'
+import heapq, itertools, random
+
+def formula(a, k):
+    n = len(a)
+    if k == 1: return min(a)
+    suf = [0]*n; suf[n-1]=a[n-1]
+    for i in range(n-2,-1,-1): suf[i]=min(a[i],suf[i+1])
+    ans = 10**18
+    for i in range(n-k+1): ans = min(ans, a[i]+suf[i+k-1])
+    return ans
+
+def opt(a, k):
+    n = len(a); M = max(a)
+    start = tuple(a)
+    dist = {start: 0}
+    pq = [(0, start)]
+    while pq:
+        c, s = heapq.heappop(pq)
+        if c != dist[s]: continue
+        # check goal
+        run = 0
+        for v in s:
+            run = run+1 if v==0 else 0
+            if run >= k: return c
+        # pay actions
+        for i in range(n):
+            if s[i]==0: continue
+            ns = list(s); ns[i]=0; ns=tuple(ns)
+            nc = c+s[i]
+            if nc < dist.get(ns,10**18): dist[ns]=nc; heapq.heappush(pq,(nc,ns))
+        # free actions
+        for l in range(n):
+            for m in range(l+1,n):
+                for r in range(m+1,n):
+                    v = s[l] if s[l]>=s[r] else s[r]
+                    if v==s[m]: continue
+                    ns = list(s); ns[m]=v; ns=tuple(ns)
+                    if c < dist.get(ns,10**18): dist[ns]=c; heapq.heappush(pq,(c,ns))
+    return 10**18
+
+random.seed(1)
+bad = 0
+tested = 0
+for trial in range(400):
+    n = random.randint(1,4)
+    a = [random.randint(1,3) for _ in range(n)]
+    for k in range(1,n+1):
+        f = formula(a,k); o = opt(a,k)
+        tested += 1
+        if f != o:
+            bad += 1
+            print("MISMATCH", a, k, "formula", f, "opt", o)
+print(f"done {tested} tested, {bad} mismatches")
+EOF
+python3 /tmp/kbrute.py
+done 997 tested, 0 mismatches
+[0m
+K formula holds on ~1000 brute-force instances. Submitting D and F (confident), plus extended K check:
+[0m$ [0mcat > /tmp/kbrute2.py <<'EOF'
+import heapq, random
+exec(open('/tmp/kbrute.py').read().split('random.seed')[0])
+random.seed(2)
+bad=tested=0
+for trial in range(150):
+    n = random.randint(4,5)
+    a = [random.randint(1,4) for _ in range(n)]
+    for k in range(1,n+1):
+        f=formula(a,k); o=opt(a,k); tested+=1
+        if f!=o: bad+=1; print("MISMATCH",a,k,"formula",f,"opt",o)
+print(f"done {tested} tested, {bad} mismatches")
+EOF
+python3 /tmp/kbrute2.py
+done 667 tested, 0 mismatches
+[0m
+[0m$ [0mpython3 contest/judge.py submit D contest/teams/muse-spark-1.3/D.cpp --team muse-spark-1.3 2>&1 | tail -5
+OK (101/101, max 705ms) | peak 8.4MB
+[0m
+D accepted. Submitting F and K:
+[0m$ [0mpython3 contest/judge.py submit F contest/teams/muse-spark-1.3/F.cpp --team muse-spark-1.3 2>&1 | tail -3 && python3 contest/judge.py submit K contest/teams/muse-spark-1.3/K.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (102/102, max 1239ms) | peak 8.4MB
+OK (40/40, max 635ms) | peak 8.4MB
+[0m
+3/12 solved. Updating strategy and moving to G:
+[0m✗ [0mEdit STRATEGY.md failed
+[91m[1mError: [0mCould not find oldString in the file. It must match exactly, including whitespace, indentation, and line endings.
+[0m
+[0m$ [0mcat > /tmp/turtle.py <<'EOF'
+import random
+
+def segs(d):
+    # returns list of segments ((x1,y1),(x2,y2)) ; moves N,W,S,E,...
+    x=y=0; out=[]
+    dirs=[(0,1),(-1,0),(0,-1),(1,0)]
+    for i,v in enumerate(d):
+        dx,dy=dirs[i%4]
+        nx,ny=x+dx*v,y+dy*v
+        out.append(((x,y),(nx,ny)))
+        x,y=nx,ny
+    return out
+
+def inter(s1,s2):
+    (ax,ay),(bx,by)=s1; (cx,cy),(dx,dy)=s2
+    # axis aligned; normalize
+    if ax==bx and cx==dx: # both vertical
+        if ax!=cx: return False
+        return max(min(ay,by),min(cy,dy))<=min(max(ay,by),max(cy,dy))
+    if ay==by and cy==dy: # both horizontal
+        if ay!=cy: return False
+        return max(min(ax,bx),min(cx,dx))<=min(max(ax,bx),max(cx,dx))
+    # one vert one horiz
+    if ax==bx: v,h=s1,s2
+    else: v,h=s2,s1
+    (vx,vy1),(vx2,vy2)=v; (hx1,hy),(hx2,hy2)=h
+    return min(hx1,hx2)<=vx<=max(hx1,hx2) and min(vy1,vy2)<=hy<=max(vy1,vy2)
+
+def brute(d):
+    s=segs(d)
+    for i in range(len(s)):
+        for j in range(i):
+            if j==i-1: continue
+            if inter(s[i],s[j]): return True
+    return False
+
+def fast(d):
+    x=d; n=len(x)
+    for i in range(3,n):
+        if x[i]>=x[i-2] and x[i-1]<=x[i-3]: return True
+        if i>=4:
+            if x[i-1]==x[i-3] and x[i]+x[i-4]>=x[i-2]: return True
+        if i>=5:
+            if x[i-2]>=x[i-4] and x[i]+x[i-4]>=x[i-2] and x[i-1]<=x[i-3] and x[i-1]+x[i-5]>=x[i-3] and x[i-3]>x[i-5] and x[i-2]>x[i-4]:
+                return True
+    return False
+
+random.seed(3)
+bad=0; N=30000
+for t in range(N):
+    n=random.randint(1,9)
+    d=[random.randint(1,4) for _ in range(n)]
+    if brute(d)!=fast(d):
+        bad+=1; print("MISMATCH",d,"brute",brute(d))
+        if bad>5: break
+print("done",N,"bad",bad)
+EOF
+python3 /tmp/turtle.py
+done 30000 bad 0
+[0m
+G conditions verified on 30k random cases. Writing solution:
+[0m← [0mWrite G.cpp
+Wrote file successfully.
+[0m
+[0m→ [0mRead STRATEGY.md
+[0m✗ [0mEdit STRATEGY.md failed
+[91m[1mError: [0mCould not find oldString in the file. It must match exactly, including whitespace, indentation, and line endings.
+[0m
+[0m← [0mEdit STRATEGY.md
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/STRATEGY.md
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/STRATEGY.md
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/STRATEGY.md
+@@ -10,8 +10,8 @@
+ - G (Self-Crossing Turtle): TODO — LeetCode335 3-condition check, verify vs brute locally.
+ - H (RLU Cache): TODO — BIT over timestamps + map time->key. Easy-medium.
+ - I (Coolant Loops): TODO — reverse DSU, ans = E-V+C. Easy-medium.
+ - J (Equal Sum Segments): TODO — prefix freq, S=0 pow2, else divisor candidates. Easy-medium.
+-- K (Zero Segment): SOLVED (local) — min pair a_l+a_r with r-l≥k-1 (or min single if k=1).
++- K (Zero Segment): OK (judge).
+ - L (Coral Loop, dynamic shortest simple path ring+hub): TODO — hard, defer.
+ 
+ ## Order: D,F,K -> G,H,I,J -> B,C -> A,E,L
+
+[0m
+[0m$ [0mecho "3
+4
+2 1 1 2
+4
+1 2 3 4
+5
+1 1 1 1 1" | /tmp/g 2>/dev/null; g++-14 -O2 -std=gnu++17 -o /tmp/g /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/G.cpp 2>/dev/null && echo "3
+4
+2 1 1 2
+4
+1 2 3 4
+5
+1 1 1 1 1" | /tmp/g
+Yes
+No
+Yes
+Yes
+No
+Yes
+[0m
+[0m$ [0msed -n '7p;9p' contest/teams/muse-spark-1.3/STRATEGY.md | cat -A | head -10
+cat: illegal option -- A
+usage: cat [-belnstuv] [file ...]
+[0m
+[0m$ [0mpython3 contest/judge.py submit G contest/teams/muse-spark-1.3/G.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (19/19, max 1044ms) | peak 8.4MB
+[0m
+G accepted (4/12). Fixing strategy file:
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('SOLVED (local)','SUBMIT-OK?').replace('Submitted? pending.','')
+open(p,'w').write(s)
+EOF
+cat contest/teams/muse-spark-1.3/STRATEGY.md
+# STRATEGY — muse-spark-1.3
+
+## Status
+- A (Suffix Array, n≤50): TODO — min alphabet for given SA. Hard.
+- B (Grid Reboot, GF2 linear system N≤3000 Q≤500): TODO — bitset Gaussian elimination. Medium.
+- C (Hidden Cave, INTERACTIVE, complete binary tree N≤1e18): TODO — height via left walk + binary search last level. Medium.
+- D (Multiplication Game): SUBMIT-OK? — thresholds ×9/×2. 
+- E (Scheduling, tree orientations × linear extensions): TODO — hard.
+- F (Snow White): SUBMIT-OK? — height with freq exactly 7. 
+- G (Self-Crossing Turtle): TODO — LeetCode335 3-condition check, verify vs brute locally.
+- H (RLU Cache): TODO — BIT over timestamps + map time->key. Easy-medium.
+- I (Coolant Loops): TODO — reverse DSU, ans = E-V+C. Easy-medium.
+- J (Equal Sum Segments): TODO — prefix freq, S=0 pow2, else divisor candidates. Easy-medium.
+- K (Zero Segment): OK (judge).
+- L (Coral Loop, dynamic shortest simple path ring+hub): TODO — hard, defer.
+
+## Order: D,F,K -> G,H,I,J -> B,C -> A,E,L
+[0m
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- D (Multiplication Game): SUBMIT-OK? — thresholds ×9/×2. \n','- D: OK (judge).\n')
+s=s.replace('- F (Snow White): SUBMIT-OK? — height with freq exactly 7. \n','- F: OK (judge).\n')
+s=s.replace('- G (Self-Crossing Turtle): TODO — LeetCode335 3-condition check, verify vs brute locally.','- G: OK (judge).')
+open(p,'w').write(s)
+EOF
+cat contest/teams/muse-spark-1.3/STRATEGY.md
+# STRATEGY — muse-spark-1.3
+
+## Status
+- A (Suffix Array, n≤50): TODO — min alphabet for given SA. Hard.
+- B (Grid Reboot, GF2 linear system N≤3000 Q≤500): TODO — bitset Gaussian elimination. Medium.
+- C (Hidden Cave, INTERACTIVE, complete binary tree N≤1e18): TODO — height via left walk + binary search last level. Medium.
+- D: OK (judge).
+- E (Scheduling, tree orientations × linear extensions): TODO — hard.
+- F: OK (judge).
+- G: OK (judge).
+- H (RLU Cache): TODO — BIT over timestamps + map time->key. Easy-medium.
+- I (Coolant Loops): TODO — reverse DSU, ans = E-V+C. Easy-medium.
+- J (Equal Sum Segments): TODO — prefix freq, S=0 pow2, else divisor candidates. Easy-medium.
+- K (Zero Segment): OK (judge).
+- L (Coral Loop, dynamic shortest simple path ring+hub): TODO — hard, defer.
+
+## Order: D,F,K -> G,H,I,J -> B,C -> A,E,L
+[0m
+Now H (RLU cache with rank queries):
+[0m← [0mWrite H.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/h /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/H.cpp 2>/dev/null && printf "3\n3 12\n2 2\n2 5\n1 4 10\n2 1\n2 4\n1 2 7\n2 2\n1 9 1\n2 3\n2 9\n1 4 8\n2 2\n1 4\n2 1\n1 5 3\n2 1\n2 5\n2 5\n2 1\n1 3 6\n2 2\n2 1\n2 3" | /tmp/h
+0 2
+-1
+-1
+10 1
+7 1
+-1
+1 1
+7 3
+0 1
+-1
+3 1
+0 2
+-1
+0 2
+6 2
+[0m
+Sample matches. Submitting H:
+[0m$ [0mpython3 contest/judge.py submit H contest/teams/muse-spark-1.3/H.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (24/24, max 631ms) | peak 24.0MB
+[0m
+H accepted (5/12). Now I (reverse-DSU loop counting):
+[0m← [0mWrite I.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/i /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp 2>/dev/null && printf "4\n2 3\n15 15 15\n15 15 15\n3\n1 1\n1 2\n2 2\n3 3\n6 10 12\n5 10 5\n3 10 9\n2\n2 2\n1 2\n1 3\n5 6 5\n2\n1 2\n1 3\n1 1\n0\n0" | /tmp/i && echo "---EX2---" && printf "1\n4 5\n6 10 12 6 12\n5 10 5 5 5\n3 10 9 3 9\n0 0 0 0 0\n6\n2 2\n1 2\n2 5\n1 5\n3 1\n2 4" | /tmp/i
+1 0 0
+0 0
+0 0
+
+---EX2---
+0 0 0 0 0 0
+[0m
+Off-by-one in the reverse loop — fixing:
+[0m← [0mEdit I.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
+@@ -62,9 +62,10 @@
+         }
+     }
+ }
+ vector<long long> res(q);
+-for (int i = q-1; i >= 0; i--) {
++if (q > 0) res[q-1] = E - V + C;
++for (int i = q-1; i >= 1; i--) {
+     int v = imp[i];
+     int r = v/m, c = v%m;
+     active[v]=1; V++; C++;
+     for (int d = 0; d < 4; d++) {
+
+[0m
+[0m← [0mEdit I.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
+@@ -77,9 +77,9 @@
+             E++;
+             if (dsu.unite(v,u)) C--;
+         }
+     }
+-    res[i] = E - V + C;
++    res[i-1] = E - V + C;
+ }
+ for (int i = 0; i < q; i++) {
+     if (i) cout << ' ';
+     cout << res[i];
+
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/i /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp 2>/dev/null && printf "4\n2 3\n15 15 15\n15 15 15\n3\n1 1\n1 2\n2 2\n3 3\n6 10 12\n5 10 5\n3 10 9\n2\n2 2\n1 2\n1 3\n5 6 5\n2\n1 2\n1 3\n1 1\n0\n0" | /tmp/i && echo "---EX2---" && printf "1\n4 5\n6 10 12 6 12\n5 10 5 5 5\n3 10 9 3 9\n0 0 0 0 0\n6\n2 2\n1 2\n2 5\n1 5\n3 1\n2 4" | /tmp/i
+0 0 0
+0 0
+0 0
+
+---EX2---
+0 0 0 0 0 0
+[0m
+My manual trace says code should work — debugging directly:
+[0m$ [0mprintf "1\n2 3\n15 15 15\n15 15 15\n3\n1 1\n1 2\n2 2" | /tmp/i; echo "---case2alone---"; printf "1\n3 3\n6 10 12\n5 10 5\n3 10 9\n2\n2 2\n1 2" | /tmp/i
+0 0 0
+---case2alone---
+0 0
+[0m
+Found it — init phase uses incremental `active[]` but `destroyed[]` is known upfront, so down/right neighbors get skipped:
+[0m← [0mEdit I.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp
+@@ -54,9 +54,9 @@
+ for (int d : {1,2}) {
+     int nr=r+dr[d], nc=c+dc[d];
+     if (nr<0||nr>=n||nc<0||nc>=m) continue;
+     int u=id(nr,nc);
+-    if (!active[u]) continue;
++    if (g[u]==0 || destroyed[u]) continue;
+     if ((g[v]&bit[d]) && (g[u]&bit[opp[d]])) {
+         E++;
+         if (dsu.unite(v,u)) C--;
+     }
+
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/i /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/I.cpp 2>/dev/null && printf "4\n2 3\n15 15 15\n15 15 15\n3\n1 1\n1 2\n2 2\n3 3\n6 10 12\n5 10 5\n3 10 9\n2\n2 2\n1 2\n1 3\n5 6 5\n2\n1 2\n1 3\n1 1\n0\n0" | /tmp/i && echo "---EX2---" && printf "1\n4 5\n6 10 12 6 12\n5 10 5 5 5\n3 10 9 3 9\n0 0 0 0 0\n6\n2 2\n1 2\n2 5\n1 5\n3 1\n2 4" | /tmp/i
+1 0 0
+1 0
+0 0
+
+---EX2---
+2 1 0 0 0 0
+[0m
+Both samples match. Submitting I:
+[0m$ [0mpython3 contest/judge.py submit I contest/teams/muse-spark-1.3/I.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (34/34, max 643ms) | peak 8.4MB
+[0m
+I accepted (6/12). Now J:
+[0m← [0mWrite J.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/j /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/J.cpp 2>/dev/null && printf "6\n4\n1 2 1 2\n4\n1 -1 1 -1\n2\n1 1\n1\n5\n2\n-1 -1\n6\n1 2 3 0 2 4" | /tmp/j
+2
+2
+2
+1
+2
+3
+[0m
+Sample matches. Submitting J:
+[0m$ [0mpython3 contest/judge.py submit J contest/teams/muse-spark-1.3/J.cpp --team muse-spark-1.3 2>&1 | tail -3
+WA on test 2 (1/34, max 696ms) | wrong answer 15th answer differs - expected: '1', found: '2'
+[0m
+WA — stress-testing against brute force to find the discrepancy:
+[0m$ [0mcat > /tmp/jbrute.py <<'EOF'
+import random
+MOD=10**9+7
+def fast(a):
+    n=len(a); P=[0]*(n+1)
+    for i in range(1,n+1): P[i]=P[i-1]+a[i-1]
+    S=P[n]
+    if S==0:
+        c=sum(1 for i in range(1,n) if P[i]==0)
+        return pow(2,c,MOD)
+    from collections import Counter
+    freq=Counter(P[1:n])
+    ans=1
+    for k in range(2,n+1):
+        if S%k!=0: continue
+        seg=S//k; prod=1
+        for j in range(1,k):
+            prod=prod*freq.get(j*seg,0)%MOD
+            if prod==0: break
+        ans=(ans+prod)%MOD
+    return ans
+def brute(a):
+    n=len(a); S=sum(a); count=0
+    for mask in range(1<<(n-1)):
+        cuts=[i+1 for i in range(n-1) if mask>>i & 1]
+        bounds=[0]+cuts+[n]
+        sums=[sum(a[bounds[i]:bounds[i+1]]) for i in range(len(bounds)-1)]
+        if all(s==sums[0] for s in sums): count+=1
+    return count
+random.seed(7)
+bad=0
+for t in range(20000):
+    n=random.randint(1,8)
+    a=[random.randint(-3,3) for _ in range(n)]
+    f=fast(a); b=brute(a)%MOD
+    if f!=b:
+        bad+=1; print("MISMATCH",a,"fast",f,"brute",b)
+        if bad>10: break
+print("done bad",bad)
+EOF
+python3 /tmp/jbrute.py
+MISMATCH [2, -1, 3, 2, -3, 3, 2, -3] fast 2 brute 1
+MISMATCH [3, 1, -2, 1, -2, 1, 1] fast 3 brute 2
+MISMATCH [1, -2, 2, 1, -1, 1, -2, 3] fast 7 brute 6
+MISMATCH [2, -1, -3, -1, -3, 3, 2, -2] fast 2 brute 1
+MISMATCH [3, -1, 2, 0, -2, -1, 2] fast 3 brute 1
+MISMATCH [2, 2, 3, 1, -2, 1, 3] fast 2 brute 1
+MISMATCH [-3, 2, -1, -2, 0] fast 3 brute 2
+MISMATCH [0, 1, 3, -2, 2, 3, -1] fast 3 brute 2
+MISMATCH [-3, 1, 0, 1, -2] fast 3 brute 1
+MISMATCH [-1, -1, 1, -3, -1, 2] fast 3 brute 2
+MISMATCH [-1, -1, 1, -1, -1] fast 5 brute 4
+done bad 11
+[0m
+Found it — cut positions must be *increasing*; the product formula ignores order. Fixing with per-k DP:
+[0m← [0mEdit J.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/J.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/J.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/J.cpp
+@@ -34,18 +34,24 @@
+     unordered_map<long long,int> freq;
+     freq.reserve(n * 2);
+     for (int i = 1; i < n; i++) freq[P[i]]++;
+     long long ans = 1; // single segment
++    vector<long long> dp;
+     for (long long k = 2; k <= n; k++) {
+         if (S % k != 0) continue;
+         long long seg = S / k;
+-        long long prod = 1;
+-        for (long long j = 1; j < k; j++) {
+-            auto it = freq.find(j * seg);
+-            if (it == freq.end()) { prod = 0; break; }
+-            prod = prod * (it->second % MOD) % MOD;
++        dp.assign(k, 0);
++        dp[0] = 1;
++        for (int i = 1; i < n; i++) {
++            if (P[i] % seg != 0) continue;
++            long long j = P[i] / seg;
++            if (j >= 1 && j < k) {
++                dp[j] += dp[j-1];
++                if (dp[j] >= MOD) dp[j] -= MOD;
++            }
+         }
+-        ans = (ans + prod) % MOD;
++        ans += dp[k-1];
++        if (ans >= MOD) ans -= MOD;
+     }
+     cout << ans % MOD << '\n';
+ }
+ return 0;
+
+[0m
+[0m$ [0mcat > /tmp/jchk.py <<'EOF'
+import subprocess, random
+MOD=10**9+7
+def brute(a):
+    n=len(a); count=0
+    for mask in range(1<<(n-1)):
+        cuts=[i+1 for i in range(n-1) if mask>>i & 1]
+        bounds=[0]+cuts+[n]
+        sums=[sum(a[bounds[i]:bounds[i+1]]) for i in range(len(bounds)-1)]
+        if all(s==sums[0] for s in sums): count+=1
+    return count
+random.seed(11)
+tests=[]
+for t in range(300):
+    n=random.randint(1,9)
+    tests.append([random.randint(-3,3) for _ in range(n)])
+inp=str(len(tests))+"\n"+"\n".join(f"{len(a)}\n{' '.join(map(str,a))}" for a in tests)+"\n"
+open('/tmp/jin.txt','w').write(inp)
+out=subprocess.run(['/tmp/j2'],stdin=open('/tmp/jin.txt'),capture_output=True,text=True).stdout.split()
+bad=0
+for a,o in zip(tests,out):
+    if int(o)!=brute(a)%MOD: bad+=1; print("MISMATCH",a,int(o),brute(a))
+print("done bad",bad)
+EOF
+g++-14 -O2 -std=gnu++17 -o /tmp/j2 /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/J.cpp 2>/dev/null && python3 /tmp/jchk.py
+done bad 0
+[0m
+All 300 match brute force. Resubmitting J:
+[0m$ [0mpython3 -c "
+import random
+n=100000
+a=[1]*n
+open('/tmp/jbig.txt','w').write('1\n%d\n%s\n'%(n,' '.join(map(str,a))))
+" && time /tmp/j2 < /tmp/jbig.txt && python3 contest/judge.py submit J contest/teams/muse-spark-1.3/J.cpp --team muse-spark-1.3 2>&1 | tail -3
+36
+/tmp/j2 < /tmp/jbig.txt  0.01s user 0.00s system 89% cpu 0.014 total
+OK (34/34, max 616ms) | peak 11.1MB
+[0m
+J accepted (7/12). Now B (GF(2) system) and C (interactive):
+[0m← [0mWrite B.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- J (Equal Sum Segments): TODO — prefix freq, S=0 pow2, else divisor candidates. Easy-medium.','- J: OK (judge, after fixing order bug: per-k DP not product).')
+open(p,'w').write(s)
+EOF
+echo done
+done
+[0m
+The per-query loop is bit-by-bit (too slow) — switching to word-level ops:
+[0m← [0mEdit B.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp
+@@ -34,9 +34,12 @@
+     pivcol.push_back(c);
+     isPivot[c] = 1;
+     r++;
+ }
+-// read queries: N binary chars each (tokens may be "0101" or "0 1 0 1")
++// extract P rows (word-level structures for fast queries)
++vector< bitset<MAXN> > P(N);
++for (int i = 0; i < N; i++)
++    for (int j = 0; j < N; j++) P[i].set(j, a[i].test(MAXN + j));
+ for (int qi = 0; qi < Q; qi++) {
+     string s;
+     s.reserve(N);
+     while ((int)s.size() < N) {
+
+[0m
+[0m← [0mEdit B.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp
+@@ -48,16 +48,11 @@
+ }
+ // c = 1 + s (deficit)
+ bitset<MAXN> c;
+ for (int i = 0; i < N; i++) c.set(i, (s[i] == '0')); // 1 + s_i
+-// d = P * c : d[i] = parity of (row i of P) & c
++// d = P * c (word-level)
+ vector<int> d(N, 0);
+-for (int i = 0; i < N; i++) {
+-    // P row i = bits [MAXN, MAXN+N)
+-    int par = 0;
+-    for (int j = 0; j < N; j++) if (c.test(j) && a[i].test(MAXN + j)) par ^= 1;
+-    d[i] = par;
+-}
++for (int i = 0; i < N; i++) d[i] = (int)((P[i] & c).count() & 1);
+ bool ok = true;
+ for (int i = r; i < N; i++) if (d[i]) { ok = false; break; }
+ if (!ok) {
+     cout << -1 << '\n';
+
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/b /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/B.cpp 2>/dev/null && printf "7 9 5\n1 2\n1 3\n2 4\n2 5\n3 5\n3 6\n4 7\n5 7\n6 7\n0 0 0 1 1 1 1\n1 0 1 1 0 0 1\n1 1 1 1 1 1 1\n0 0 0 0 0 0 0\n1 1 1 1 1 1 0" | /tmp/b
+1 1
+2 1 3
+0
+2 3 4
+-1
+[0m
+Sample matches. Verifying on random small graphs with an independent checker:
+[0m$ [0mcat > /tmp/bchk.py <<'EOF'
+import subprocess, random
+random.seed(5)
+def gen_one():
+    N=random.randint(1,10)
+    medges=[(u,v) for u in range(N) for v in range(u+1,N) if random.random()<0.3]
+    Q=random.randint(1,5)
+    qs=[''.join(random.choice('01') for _ in range(N)) for _ in range(Q)]
+    inp=f"{N} {len(medges)} {Q}\n"
+    for u,v in medges: inp+=f"{u+1} {v+1}\n"
+    for q in qs: inp+=q+"\n"
+    return N,medges,qs,inp
+tests=[gen_one() for _ in range(60)]
+inp="1 0 0\n"  # placeholder
+# run each separately (Q varies)
+bad=0
+for N,medges,qs,inp in tests:
+    p=subprocess.run(['/tmp/b'],input=inp,capture_output=True,text=True)
+    lines=p.stdout.strip().split('\n')
+    assert len(lines)==len(qs),(inp,p.stdout)
+    # adjacency matrix incl self
+    import itertools
+    A=[[1 if i==j else 0 for j in range(N)] for i in range(N)]
+    for u,v in medges: A[u][v]^=1; A[v][u]^=1
+    for s,ln in zip(qs,lines):
+        c=[1^(ord(ch)-48) for ch in s]
+        if ln.strip()=='-1':
+            # brute: exists x with Ax=c?
+            found=False
+            for mask in range(1<<N):
+                x=[(mask>>i)&1 for i in range(N)]
+                if all(sum(A[i][j]*x[j] for j in range(N))%2==c[i] for i in range(N)):
+                    found=True; break
+            if found: bad+=1; print("FALSE -1",N,medges,s)
+        else:
+            parts=list(map(int,ln.split())); K=parts[0]; xs=[v-1 for v in parts[1:]]
+            assert K==len(xs),("count",inp,ln)
+            x=[0]*N
+            for v in xs: x[v]^=1
+            if not all(sum(A[i][j]*x[j] for j in range(N))%2==c[i] for i in range(N)):
+                bad+=1; print("WRONG SOL",N,medges,s,ln)
+print("done bad",bad)
+EOF
+python3 /tmp/bchk.py
+done bad 0
+[0m
+All correct. Checking max-size performance:
+[0m$ [0mpython3 -c "
+import random
+random.seed(9)
+N=3000; M=3000; Q=500
+edges=set()
+while len(edges)<M:
+    u=random.randrange(N); v=random.randrange(N)
+    if u!=v: edges.add((min(u,v),max(u,v)))
+open('/tmp/bbig.txt','w').write(f'{N} {M} {Q}\n'+'\n'.join(f'{u+1} {v+1}' for u,v in edges)+'\n'+'\n'.join(''.join(random.choice('01') for _ in range(N)) for _ in range(Q))+'\n')
+" && time /tmp/b < /tmp/bbig.txt > /tmp/bbig.out && head -3 /tmp/bbig.out
+/tmp/b < /tmp/bbig.txt > /tmp/bbig.out  0.08s user 0.00s system 97% cpu 0.089 total
+-1
+-1
+-1
+[0m
+Suspicious — all -1. The all-ones query must always be solvable (x=0). Testing:
+[0m$ [0mpython3 -c "
+N=3000
+lines=open('/tmp/bbig.txt').read().split('\n')
+hdr=lines[0]
+edges=lines[1:3001]
+open('/tmp/bone.txt','w').write(hdr.split()[0]+' '+hdr.split()[1]+' 3\n'+'\n'.join(edges)+'\n'+'1'*N+'\n'+'0'*N+'\n'+'01'*1500+'\n')
+" && /tmp/b < /tmp/bone.txt | cut -c1-60
+0
+1615 2 4 6 7 8 10 11 12 15 16 18 20 22 24 26 29 32 34 35 36 
+-1
+[0m
+No bug — sparse random graph has huge nullity so random queries are genuinely inconsistent. Submitting B:
+[0m$ [0mpython3 contest/judge.py submit B contest/teams/muse-spark-1.3/B.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (101/101, max 608ms) | peak 8.4MB
+[0m
+B accepted (8/12). Now C (interactive) with a mock-interactor test:
+[0m← [0mWrite C.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- B (Grid Reboot, GF2 linear system N≤3000 Q≤500): TODO — bitset Gaussian elimination. Medium.','- B: OK (judge).')
+open(p,'w').write(s)
+EOF
+echo ok
+ok
+[0m
+[0m← [0mEdit C.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/C.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/C.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/C.cpp
+@@ -47,11 +47,9 @@
+             unsigned long long mid = lo + (hi - lo + 1) / 2;
+             if (exists(mid)) lo = mid;
+             else hi = mid - 1;
+         }
+-        unsigned long long N = ((h + 1 >= 64) ? 0 : ((1ULL << h) - 1ULL)) + 1 + lo + 1;
+-        // N = (2^h - 1) + (lo + 1) = 2^h + lo
+-        N = (1ULL << h) + lo;
++        unsigned long long N = (1ULL << h) + lo;
+         cout << "! " << N << endl;
+     }
+     return 0;
+ }
+
+[0m
+[0m$ [0mcat > /tmp/mock.py <<'EOF'
+import subprocess, random, sys
+# mock interactor for complete binary tree with N nodes; talks to solution over pipes
+def run_case(sol, N):
+    p = subprocess.Popen(['/tmp/solC'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, bufsize=1)
+    def ask(q):
+        p.stdin.write(q+"\n"); p.stdin.flush()
+        return p.stdout.readline().strip()
+    # interactor prints T first
+    p.stdin.write("1\n"); p.stdin.flush()
+    # solution now interacts for one test case; node labels 1..N heap-style; pos=1
+    pos = 1
+    queries = 0
+    import math
+    while True:
+        line = p.stdout.readline().strip()
+        if line.startswith("?"):
+            queries += 1
+            if queries > 9000: print("TOO MANY", N); p.kill(); return False
+            _, d = line.split()
+            if d == 'L':
+                if pos*2 <= N: pos = pos*2; p.stdin.write("1\n")
+                else: p.stdin.write("0\n")
+            elif d == 'R':
+                if pos*2+1 <= N: pos = pos*2+1; p.stdin.write("1\n")
+                else: p.stdin.write("0\n")
+            else:
+                if pos == 1: p.stdin.write("0\n")
+                else: pos //= 2; p.stdin.write("1\n")
+            p.stdin.flush()
+        elif line.startswith("!"):
+            got = int(line.split()[1])
+            p.stdin.flush()
+            p.wait(timeout=5)
+            ok = (got == N)
+            print(f"N={N} got={got} queries={queries} {'OK' if ok else 'FAIL'}")
+            return ok
+        else:
+            print("BAD LINE", repr(line)); p.kill(); return False
+random.seed(0)
+Ns = [1,2,3,4,5,6,7,8,2**59-1,10**18] + [random.randint(1,10**18) for _ in range(12)]
+allok = True
+for N in Ns:
+    if not run_case(None, N): allok = False
+print("ALL", "OK" if allok else "FAIL")
+EOF
+g++-14 -O2 -std=gnu++17 -o /tmp/solC /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/C.cpp 2>/dev/null && python3 /tmp/mock.py
+N=1 got=1 queries=1 OK
+N=2 got=2 queries=4 OK
+N=3 got=3 queries=5 OK
+N=4 got=4 queries=11 OK
+N=5 got=5 queries=12 OK
+N=6 got=6 queries=12 OK
+N=7 got=7 queries=13 OK
+N=8 got=8 queries=22 OK
+N=576460752303423487 got=576460752303423487 queries=6845 OK
+N=1000000000000000000 got=1000000000000000000 queries=7045 OK
+N=444157599796692942 got=444157599796692942 queries=6819 OK
+N=46675314082485334 got=46675314082485334 queries=6135 OK
+N=560236489768887907 got=560236489768887907 queries=6816 OK
+N=956755259049838138 got=956755259049838138 queries=7050 OK
+N=412802820832641541 got=412802820832641541 queries=6812 OK
+N=251847321245586964 got=251847321245586964 queries=6588 OK
+N=160571653790836855 got=160571653790836855 queries=6582 OK
+N=161115915384424052 got=161115915384424052 queries=6578 OK
+N=109332424445158010 got=109332424445158010 queries=6354 OK
+N=921648419000118845 got=921648419000118845 queries=7054 OK
+N=614004066072469867 got=614004066072469867 queries=7048 OK
+N=813008253605106742 got=813008253605106742 queries=7053 OK
+ALL OK
+[0m
+All pass, max 7054 queries < 8000 limit. Submitting C:
+[0m$ [0mpython3 contest/judge.py submit C contest/teams/muse-spark-1.3/C.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (15/15, max 880ms) | peak 0.0MB
+[0m
+C accepted (9/12). Now A — I derived a formula (min blocks with increasing successor-ranks); verifying the construction first:
+[0m$ [0mcat > /tmp/achk.py <<'EOF'
+import random
+def solve_perm(p):
+    n=len(p); r=[0]*(n+1)
+    for i,x in enumerate(p): r[x]=i+1
+    r.append(0)  # r[n+1]=0 ; careful: index n (0-based n) 
+    # use 0-based: positions 0..n-1, p values 0-based; succ rank of x+1 or 0 if x==n-1
+    q=[]
+    for x in p:
+        q.append(r[x+1] if x+1<n else 0)
+    blocks=1
+    for i in range(1,n):
+        if q[i]<=q[i-1]: blocks+=1
+    # construct string
+    s=[0]*n; ch=0
+    # assign block ids
+    bid=[0]*n; b=0
+    for i in range(n):
+        if i>0 and q[i]<=q[i-1]: b+=1
+        bid[i]=b
+    for i,x in enumerate(p): s[x]=bid[i]
+    return blocks,s
+def suffix_array(s):
+    n=len(s)
+    return sorted(range(n),key=lambda i: s[i:])
+random.seed(0)
+bad=0
+for t in range(2000):
+    n=random.randint(1,50)
+    p=list(range(n)); random.shuffle(p)
+    blocks,s=solve_perm(p)
+    if suffix_array(s)!=p:
+        bad+=1; print("MISMATCH",p,s)
+        if bad>3: break
+print("done bad",bad)
+EOF
+python3 /tmp/achk.py
+done bad 0
+[0m
+Construction verified. Writing A:
+[0m← [0mWrite A.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/a /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/A.cpp 2>/dev/null && echo "4
+4 1 2 3" | /tmp/a && echo "4
+4 3 2 1" | /tmp/a && echo "7
+4 3 1 2 6 7 5" | /tmp/a && python3 contest/judge.py submit A contest/teams/muse-spark-1.3/A.cpp --team muse-spark-1.3 2>&1 | tail -3
+2
+1
+4
+OK (103/103, max 668ms) | peak 8.4MB
+[0m
+A accepted (10/12). Now E — coding the forest LE DP:
+[0m← [0mWrite E.cpp
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- C (Hidden Cave, INTERACTIVE, complete binary tree N≤1e18): TODO — height via left walk + binary search last level. Medium.','- C: OK (judge, ≤7054 queries).')
+s=s.replace('- A (Suffix Array, n≤50): TODO — min alphabet for given SA. Hard.','- A: OK (judge, 1+#descents of successor ranks).')
+open(p,'w').write(s)
+EOF
+echo ok
+ok
+[0m
+Direction mapping is swapped (w=1 means child→parent = prefix). Fixing:
+[0m← [0mEdit E.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+@@ -67,9 +67,9 @@
+ vector<long long> &g = dp[u];
+ int su = (int)g.size();
+ // H[b] for b=0..su
+ vector<long long> H(su + 1, 0);
+-if (wuv == 2) { // u before v: prefix
++if (wuv == 1) { // u before v: prefix
+     long long run = 0;
+     for (int b = 0; b <= su; b++) {
+         H[b] = run;
+         if (b < su) { run += g[b]; if (run >= MOD) run -= MOD; }
+
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/e /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp 2>/dev/null && printf "5\n1 2 2\n1 3 0\n3 5 1\n3 4 2" | /tmp/e
+10
+[0m
+Sample matches. Verifying against brute force:
+[0m$ [0mcat > /tmp/echk.py <<'EOF'
+import subprocess, random, itertools
+MOD=998244353
+def brute(n, edges):
+    # count perms respecting fixed edges (w=1: u before v; w=2: v before u)
+    cons=[]
+    for u,v,w in edges:
+        if w==1: cons.append((u,v))
+        elif w==2: cons.append((v,u))
+    c=0
+    for p in itertools.permutations(range(n)):
+        pos=[0]*n
+        for i,x in enumerate(p): pos[x]=i
+        if all(pos[a]<pos[b] for a,b in cons): c+=1
+    return c
+random.seed(4)
+bad=0
+for t in range(120):
+    n=random.randint(1,7)
+    # random tree via prufer
+    if n==1: edges=[]
+    else:
+        pr=[random.randrange(n) for _ in range(n-2)]
+        import collections
+        deg=[1]*n
+        for x in pr: deg[x]+=1
+        import heapq
+        leaves=[i for i in range(n) if deg[i]==1]; heapq.heapify(leaves)
+        deg2=deg[:]
+        edges=[]
+        for x in pr:
+            l=heapq.heappop(leaves)
+            edges.append((l,x,random.choice([0,1,2])))
+            deg2[l]-=1; deg2[x]-=1
+            if deg2[x]==1: heapq.heappush(leaves,x)
+        l1=heapq.heappop(leaves); l2=heapq.heappop(leaves)
+        edges.append((l1,l2,random.choice([0,1,2])))
+    inp=f"{n}\n"+"\n".join(f"{u+1} {v+1} {w}" for u,v,w in edges)+"\n"
+    out=subprocess.run(['/tmp/e'],input=inp,capture_output=True,text=True).stdout.strip()
+    exp=brute(n,edges)%MOD
+    if int(out)!=exp:
+        bad+=1; print("MISMATCH",n,edges,int(out),exp)
+        if bad>5: break
+print("done bad",bad)
+EOF
+python3 /tmp/echk.py
+MISMATCH 6 [(2, 3, 0), (4, 3, 0), (3, 1, 1), (1, 0, 2), (0, 5, 1)] 90 150
+MISMATCH 7 [(0, 5, 0), (1, 6, 0), (3, 2, 1), (4, 6, 1), (5, 2, 2), (2, 6, 2)] 294 126
+MISMATCH 7 [(1, 6, 1), (3, 2, 2), (2, 0, 1), (0, 6, 2), (5, 4, 0), (4, 6, 0)] 462 378
+MISMATCH 3 [(1, 0, 2), (0, 2, 1)] 1 2
+MISMATCH 3 [(0, 2, 2), (1, 2, 1)] 2 1
+MISMATCH 7 [(0, 6, 2), (2, 4, 1), (4, 1, 1), (1, 3, 1), (5, 3, 0), (3, 6, 0)] 315 105
+done bad 6
+[0m
+The stored `w` refers to input order, not parent/child — need per-endpoint direction flags:
+[0m← [0mEdit E.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+@@ -12,15 +12,15 @@
+ int main() {
+     ios::sync_with_stdio(false);
+     cin.tie(nullptr);
+     if (!(cin >> n)) return 0;
+-    // fixed edges only (flexible summed out); dir: to[v] list of (to, w) with w=1: u->v
+-    vector<vector<pair<int,int>>> adj(n);
++    // fixed edges only (flexible summed out); store per-endpoint "me_first" flag
++    vector<vector<pair<int,int>>> adj(n); // (to, me_first?1:0)
+     for (int i = 0; i < n - 1; i++) {
+         int u, v, w;
+         cin >> u >> v >> w; --u; --v;
+-        if (w == 1) { adj[u].push_back({v, 1}); adj[v].push_back({u, 1}); }
+-        else if (w == 2) { adj[u].push_back({v, 2}); adj[v].push_back({u, 2}); }
++        if (w == 1) { adj[u].push_back({v, 1}); adj[v].push_back({u, 0}); }
++        else if (w == 2) { adj[u].push_back({v, 0}); adj[v].push_back({u, 1}); }
+         // w==0 ignored
+     }
+     fac.assign(n + 1, 1); for (int i = 1; i <= n; i++) fac[i] = fac[i-1] * i % MOD;
+     ifac.assign(n + 1, 1);
+
+[0m
+[0m← [0mEdit E.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+@@ -60,11 +60,11 @@
+ int v = order[ii];
+ vector<long long> f = {1}; // f[i]: v has i nodes before it
+ int t = 1;
+ for (int u : children[v]) {
+-    // find edge direction between v and u
+-    int wuv = 0; // 1: v->u (v before u), 2: u->v
+-    for (auto [to, w] : adj[v]) if (to == u) { wuv = w; break; }
++    // direction between parent v and child u: child_first?
++    int child_first = 0;
++    for (auto [to, mf] : adj[u]) if (to == v) { child_first = mf; break; }
+     vector<long long> &g = dp[u];
+     int su = (int)g.size();
+     // H[b] for b=0..su
+     vector<long long> H(su + 1, 0);
+
+[0m
+[0m← [0mEdit E.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp
+@@ -67,9 +67,9 @@
+ vector<long long> &g = dp[u];
+ int su = (int)g.size();
+ // H[b] for b=0..su
+ vector<long long> H(su + 1, 0);
+-if (wuv == 1) { // u before v: prefix
++if (child_first) { // u before v: prefix
+     long long run = 0;
+     for (int b = 0; b <= su; b++) {
+         H[b] = run;
+         if (b < su) { run += g[b]; if (run >= MOD) run -= MOD; }
+
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/e /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/E.cpp 2>/dev/null && printf "5\n1 2 2\n1 3 0\n3 5 1\n3 4 2" | /tmp/e && python3 /tmp/echk.py
+10
+done bad 0
+[0m
+All 120 brute cases pass. Checking worst-case performance (chain n=4000):
+[0m$ [0mpython3 -c "
+n=4000
+open('/tmp/ebig.txt','w').write(str(n)+'\n'+'\n'.join(f'{i} {i+1} {i%3}' for i in range(1,n))+'\n')
+" && time /tmp/e < /tmp/ebig.txt && python3 -c "
+import random
+random.seed(1)
+n=4000
+open('/tmp/estar.txt','w').write(str(n)+'\n'+'\n'.join(f'1 {i} {random.choice([0,1,2])}' for i in range(2,n+1))+'\n')
+" && time /tmp/e < /tmp/estar.txt
+114724053
+/tmp/e < /tmp/ebig.txt  0.00s user 0.00s system 87% cpu 0.009 total
+424141921
+/tmp/e < /tmp/estar.txt  0.01s user 0.00s system 93% cpu 0.010 total
+[0m
+Fast enough. Submitting E:
+[0m$ [0mpython3 contest/judge.py submit E contest/teams/muse-spark-1.3/E.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (101/101, max 572ms) | peak 8.4MB
+[0m
+E accepted (11/12). Only L remains. Analyzing:
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- E (Scheduling, tree orientations × linear extensions): TODO — hard.','- E: OK (judge; key trick: sum over orientations = LE of fixed forest).')
+s=s.replace('- L (Coral Loop, dynamic shortest simple path ring+hub): TODO — hard, defer.','- L: IN PROGRESS. Decomp: ring-only, XX/YY (strict-best monoid), Z/W (range mins), type-H. Two segtrees (orig+rev) + Fenwick.')
+open(p,'w').write(s)
+EOF
+echo ok
+ok
+[0m
+[0m← [0mWrite L.cpp
+Wrote file successfully.
+[0m
+Now a brute-force checker (DFS over all simple paths) to validate:
+[0m$ [0mcat > /tmp/lchk.py <<'EOF'
+import subprocess, random
+def brute(n, a, b, s, t):
+    # nodes 0..n-1 islands, n = hub; s<t (t may be n)
+    adj = {i: [] for i in range(n+1)}
+    for i in range(n):
+        j = (i+1) % n
+        adj[i].append((j, a[i])); adj[j].append((i, a[i]))
+    for i in range(n):
+        adj[i].append((n, b[i])); adj[n].append((i, b[i]))
+    best = None
+    stack = [(s, 1 << s, 0)]
+    # bitmask works for n+1 <= ~12
+    while stack:
+        v, mask, c = stack.pop()
+        if v == t:
+            if best is None or c < best: best = c
+            continue
+        for w, co in adj[v]:
+            if mask >> w & 1: continue
+            stack.append((w, mask | (1 << w), c + co))
+    return best
+def run_prog(n, a, b, events):
+    inp = f"1\n{n} {len(events)}\n{' '.join(map(str,a))}\n{' '.join(map(str,b))}\n"
+    for e in events: inp += ' '.join(map(str,e)) + "\n"
+    p = subprocess.run(['/tmp/l'], input=inp, capture_output=True, text=True)
+    return list(map(int, p.stdout.strip().split()))
+random.seed(0)
+bad = 0
+for trial in range(300):
+    n = random.randint(2, 7)
+    a = [random.randint(-3, 3) for _ in range(n)]
+    b = [random.randint(-3, 3) for _ in range(n)]
+    events = []
+    q = random.randint(1, 12)
+    aa, bb = a[:], b[:]
+    for _ in range(q):
+        ty = random.choice([1,1,1,2,3])
+        if ty == 1:
+            s = random.randint(1, n); t = random.randint(s+1, n+1)
+            events.append((1, s, t))
+        elif ty == 2:
+            x = random.randint(1, n); w = random.randint(-3, 3)
+            events.append((2, x, w))
+        else:
+            x = random.randint(1, n); w = random.randint(-3, 3)
+            events.append((3, x, w))
+    # expected via brute simulating updates
+    exp = []
+    aa, bb = a[:], b[:]
+    for e in events:
+        if e[0] == 1: exp.append(brute(n, aa, bb, e[1]-1, e[2]-1))
+        elif e[0] == 2: aa[e[1]-1] = e[2]
+        else: bb[e[1]-1] = e[2]
+    got = run_prog(n, a, b, events)
+    if got != exp:
+        bad += 1
+        print("MISMATCH n=", n, "a=", a, "b=", b)
+        print(" events=", events)
+        print(" exp=", exp)
+        print(" got=", got)
+        if bad > 4: break
+print("done bad", bad)
+EOF
+g++-14 -O2 -std=gnu++17 -o /tmp/l /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/L.cpp 2>/dev/null && python3 /tmp/lchk.py
+MISMATCH n= 5 a= [2, -3, -1, 2, -3] b= [1, -1, -2, -2, 3]
+ events= [(1, 5, 6), (1, 5, 6), (1, 4, 6), (1, 1, 6), (1, 3, 4), (1, 2, 6), (2, 5, 3), (2, 1, 0)]
+ exp= [-7, -7, -5, -6, -6, -6]
+ got= [-7, -7, -5, -6, -9, -6]
+MISMATCH n= 4 a= [-1, 2, 2, -2] b= [-2, 2, 1, 0]
+ events= [(1, 1, 2), (1, 2, 3), (2, 1, -3), (2, 3, 0), (2, 2, 0), (1, 3, 4), (1, 2, 4), (1, 3, 4), (1, 1, 5), (1, 1, 5), (2, 3, -2)]
+ exp= [-1, -2, -5, -5, -5, -3, -3]
+ got= [-1, -2, -8, -7, -8, -3, -3]
+MISMATCH n= 3 a= [1, -3, -3] b= [1, 1, -1]
+ events= [(2, 1, -2), (1, 2, 3), (1, 1, 3)]
+ exp= [-5, -5]
+ got= [-9, -5]
+MISMATCH n= 6 a= [0, -1, 2, -1, -3, -2] b= [0, 2, -1, 2, 1, -3]
+ events= [(2, 1, 0), (1, 4, 5), (1, 3, 7), (1, 2, 3), (1, 1, 6), (3, 6, -2), (2, 4, -2)]
+ exp= [-5, -6, -6, -5]
+ got= [-10, -6, -8, -5]
+MISMATCH n= 5 a= [0, -2, -2, 0, -1] b= [1, -2, -1, 0, 2]
+ events= [(1, 4, 5), (1, 1, 5), (3, 4, -3), (1, 3, 4), (1, 5, 6), (2, 4, -3), (2, 2, 1), (2, 3, 2), (1, 1, 4), (1, 1, 4), (2, 5, 1)]
+ exp= [-6, -5, -7, -8, -5, -5]
+ got= [-11, -5, -12, -8, -5, -5]
+done bad 5
+[0m
+Mine underestimates — debugging the smallest case:
+[0m$ [0mprintf "1\n3 1\n1 -3 -3\n1 1 -1\n1 2 3" | /tmp/l; echo "---"; printf "1\n3 2\n1 -3 -3\n1 1 -1\n2 1 -2\n1 2 3" | /tmp/l
+-6
+---
+-9
+[0m
+Found it — the rev-wrap query's cross term double-counts the wrap `total`. Fixing:
+[0m← [0mEdit L.cpp
+Index: /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/L.cpp
+===================================================================
+--- /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/L.cpp
++++ /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/L.cpp
+@@ -190,12 +190,25 @@
+ {
+     auto nd = seg.query(s0, t0);
+     ans = min(ans, (Pt - Ps) + nd.best);
+ }
+-// YY
++// YY (rev interval may wrap: cross pairs need offset-total)
+ {
+-    auto nd = seg2.query_wrap(rho(s0), rho(t0));
+-    ans = min(ans, (Ps - Pt + total) + nd.best);
++    int rl = rho(s0), rr = rho(t0);
++    long long off = Ps - Pt + total;
++    if (rl <= rr) {
++        auto nd = seg2.query(rl, rr);
++        ans = min(ans, off + nd.best);
++    } else {
++        auto L = seg2.query(rl, n - 1);
++        auto R = seg2.query(0, rr);
++        long long yy = INFLL;
++        if (!L.empty) yy = min(yy, off + L.best);
++        if (!R.empty) yy = min(yy, off + R.best);
++        if (!L.empty && !R.empty && L.mu < INFLL/2 && R.mv < INFLL/2)
++            yy = min(yy, (off - total) + L.mu + R.mv);
++        ans = min(ans, yy);
++    }
+ }
+ // Z
+ {
+     auto left = seg.query(s0, t0 - 1);
+
+[0m
+[0m$ [0mg++-14 -O2 -std=gnu++17 -o /tmp/l /Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/teams/muse-spark-1.3/L.cpp 2>/dev/null && python3 /tmp/lchk.py
+done bad 0
+[0m
+All pass. More extensive testing + sample + performance:
+[0m$ [0msed -i 's/random.seed(0)/random.seed(123)/; s/range(300)/range(700)/; s/random.randint(-3, 3)/random.randint(-10, 10)/g' /tmp/lchk.py && python3 /tmp/lchk.py && printf "1\n3 6\n4 -2 5\n3 7 1\n1 1 3\n2 2 6\n1 1 3\n3 1 -4\n1 1 3\n1 1 4" | /tmp/l
+sed: 1: "/tmp/lchk.py
+": extra characters at the end of l command
+[0m
+[0m$ [0mpython3 - <<'EOF'
+s = open('/tmp/lchk.py').read()
+s = s.replace('random.seed(0)', 'random.seed(123)')
+s = s.replace('range(300)', 'range(700)')
+s = s.replace('random.randint(-3, 3)', 'random.randint(-10, 10)')
+open('/tmp/lchk.py', 'w').write(s)
+EOF
+python3 /tmp/lchk.py && printf "1\n3 6\n4 -2 5\n3 7 1\n1 1 3\n2 2 6\n1 1 3\n3 1 -4\n1 1 3\n1 1 4" | /tmp/l
+done bad 0
+2
+4
+-3
+-4
+[0m
+700 more pass, sample matches. Performance check:
+[0m$ [0mpython3 -c "
+import random
+random.seed(2)
+n=300000; q=300000
+a=[random.randint(-10**9,10**9) for _ in range(n)]
+b=[random.randint(-10**9,10**9) for _ in range(n)]
+ev=[]
+for _ in range(q):
+    ty=random.choice([1,1,2,3])
+    if ty==1: s=random.randint(1,n); t=random.randint(s+1,n+1); ev.append(f'1 {s} {t}')
+    elif ty==2: ev.append(f'2 {random.randint(1,n)} {random.randint(-10**9,10**9)}')
+    else: ev.append(f'3 {random.randint(1,n)} {random.randint(-10**9,10**9)}')
+open('/tmp/lbig.txt','w').write(f'1\n{n} {q}\n'+' '.join(map(str,a))+'\n'+' '.join(map(str,b))+'\n'+'\n'.join(ev)+'\n')
+" && time /tmp/l < /tmp/lbig.txt > /tmp/lbig.out && head -3 /tmp/lbig.out && wc -l /tmp/lbig.out
+/tmp/l < /tmp/lbig.txt > /tmp/lbig.out  0.51s user 0.03s system 98% cpu 0.542 total
+-211293649923
+-251562087400
+-296127358943
+  150265 /tmp/lbig.out
+[0m
+0.54s at max size. Submitting L:
+[0m$ [0mpython3 contest/judge.py submit L contest/teams/muse-spark-1.3/L.cpp --team muse-spark-1.3 2>&1 | tail -3
+OK (42/42, max 803ms) | peak 105.9MB
+[0m
+All 12 solved! Verifying and writing the mandatory feedback:
+[0m$ [0mpython3 -c "
+import json
+seen={}
+for line in open('contest/results/muse-spark-1.3.jsonl'):
+    d=json.loads(line)
+    seen[d['letter']]=d['verdict']
+print(sorted(seen.items()))
+" && python3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- L: IN PROGRESS. Decomp: ring-only, XX/YY (strict-best monoid), Z/W (range mins), type-H. Two segtrees (orig+rev) + Fenwick.','- L: OK (judge; ring-only + XX/YY strict-best monoid + Z/W + type-H; 2 segtrees + Fenwick).')
+s=s.replace('## Order: D,F,K -> G,H,I,J -> B,C -> A,E,L','## Result: 12/12 OK.')
+open(p,'w').write(s)
+EOF
+cat contest/teams/muse-spark-1.3/STRATEGY.md
+[('A', 'OK'), ('B', 'OK'), ('C', 'OK'), ('D', 'OK'), ('E', 'OK'), ('F', 'OK'), ('G', 'OK'), ('H', 'OK'), ('I', 'OK'), ('J', 'OK'), ('K', 'OK'), ('L', 'OK')]
+# STRATEGY — muse-spark-1.3
+
+## Status
+- A: OK (judge, 1+#descents of successor ranks).
+- B: OK (judge).
+- C: OK (judge, ≤7054 queries).
+- D: OK (judge).
+- E: OK (judge; key trick: sum over orientations = LE of fixed forest).
+- F: OK (judge).
+- G: OK (judge).
+- H (RLU Cache): TODO — BIT over timestamps + map time->key. Easy-medium.
+- I (Coolant Loops): TODO — reverse DSU, ans = E-V+C. Easy-medium.
+- J: OK (judge, after fixing order bug: per-k DP not product).
+- K (Zero Segment): OK (judge).
+- L: OK (judge; ring-only + XX/YY strict-best monoid + Z/W + type-H; 2 segtrees + Fenwick).
+
+## Result: 12/12 OK.
+[0m
+[0m← [0mWrite feedback.md
+Wrote file successfully.
+[0m
+[0m$ [0mpython3 - <<'EOF'
+p='contest/teams/muse-spark-1.3/STRATEGY.md'
+s=open(p).read()
+s=s.replace('- H (RLU Cache): TODO — BIT over timestamps + map time->key. Easy-medium.','- H: OK (judge; BIT over timestamps + ordered time->key map).')
+s=s.replace('- I (Coolant Loops): TODO — reverse DSU, ans = E-V+C. Easy-medium.','- I: OK (judge; reverse DSU, ans = E-V+C; fixed off-by-one + init-neighbor bugs).')
+open(p,'w').write(s)
+EOF
+echo ok
+ok
+[0m
+Contest complete: **12/12 solved**, 1 failed submission (J, fixed and accepted).
+
+| Problem | Approach | Notes |
+|---|---|---|
+| A | 1 + descents of successor-ranks | verified on 2000 perms |
+| B | Bitset Gauss-Jordan once, P·c per query | 0.08s max |
+| C | Left-walk height + binary search | ≤7054/8000 queries |
+| D | ×9/×2 thresholds | trivial |
+| E | Σ orientations = LE of fixed forest + O(n²) tree DP | 1 flag bug, brute-caught |
+| F | Frequency-7 height | trivial |
+| G | 3-condition spiral check | verified on 30k cases |
+| H | BIT over timestamps + ordered map | first-try |
+| I | Reverse DSU, E−V+C | 2 bugs, sample-caught |
+| J | Per-k ordered DP (not product) | 1 WA then fixed |
+| K | Min pair with distance ≥ k−1 | verified on 1600 brute cases |
+| L | ring/XX/YY/Z/W + type-H, 2 segtrees + Fenwick | 1 wrap bug, brute-caught |
+
+STRATEGY.md kept updated throughout; feedback.md written as final action.
+[muse-spark-1.3] opencode exited rc=0
+[muse-spark-1.3] feedback.md present -> done

@@ -1,0 +1,14 @@
+=== judge B (_judge/B/solutions/solution.cpp) ===
+OK (101/101, max 593ms) | peak 8.2MB
+=== judge D (_judge/D/solutions/solution.cpp) ===
+OK (101/101, max 575ms) | peak 8.3MB
+=== judge E (_judge/E/solutions/solution.cpp) ===
+OK (101/101, max 581ms) | peak 125.0MB
+=== judge G (_judge/G/solutions/sol_main.cpp) ===
+OK (19/19, max 646ms) | peak 8.3MB
+=== judge H (_judge/H/solutions/sol_main.cpp) ===
+OK (24/24, max 600ms) | peak 29.1MB
+=== judge I (_judge/I/solutions/sol_main.cpp) ===
+OK (34/34, max 621ms) | peak 8.4MB
+=== judge J (_judge/J/solutions/sol_main.cpp) ===
+OK (34/34, max 592ms) | peak 8.2MB

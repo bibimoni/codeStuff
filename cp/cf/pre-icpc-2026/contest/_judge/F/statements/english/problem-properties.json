@@ -1,0 +1,35 @@
+{
+  "extraResources": {
+    "example.01.mu": "TVXzATkNCmNpdHkgMQ0Kb2YgMQ0Kc2hpbmluZyAxDQpzdGFycyAxDQphcmUgMg0KbWUgMg0KanVzdCAxDQpmb3IgMQ0KeW91IDENCg==",
+    "example.02.mu": "TVXzATcNCnNpZXUgODgyDQpjYXAgODgyDQpiYSA4ODINCmtoaSA4ODINCmJhY2sgODgyDQpraG9hIDg4Mg0KaGNtdXQgODgyDQo="
+  },
+  "scoring": null,
+  "notes": "",
+  "legend": "One day, Snow White and the seven dwarfs were taking a walk in the park.\n\nAt that time, there were $n$ men in the park. \nAll $n$ of these men told Snow White their names and heights. \nDespite living with the seven dwarfs for a long time, Snow White had never asked for their names. \nSnow White only remembered that all seven dwarfs had the exact same height, and no one else had the same height as these dwarfs.\n\nSince the number of men is very large, Snow White asks you to write a program that reads the names and heights of the $n$ men in the park and prints the names of the seven dwarfs.",
+  "authorLogin": "bakhibk",
+  "language": "english",
+  "timeLimit": 250,
+  "output": "Print seven strings --- the names of the seven dwarfs, ordered according to their appearance in the input.\n",
+  "inputFile": "stdin",
+  "outputFile": "stdout",
+  "input": "The first line contains a single integer $n$ ($7 \\le n \\le 100$) --- the number of men in the park.\n\nEach of the next $n$ lines contains a string $S$ and an integer $H$ ($1 \\le |S| \\le 10$, $1 \\le H \\le 1000$) --- the name of a man, consisting of English letters, and his height.\n\nIt is guaranteed that exactly seven of the men have the same height, and that no other man has that height, so the seven dwarfs can be uniquely identified.\n",
+  "authorName": "NHẬT LONG",
+  "sampleTests": [
+    {
+      "output": "city\nof\nshining\nstars\njust\nfor\nyou\n",
+      "input": "9\ncity 1\nof 1\nshining 1\nstars 1\nare 2\nme 2\njust 1\nfor 1\nyou 1\n",
+      "inputFile": "example.01",
+      "outputFile": "example.01.a"
+    },
+    {
+      "output": "sieu\ncap\nba\nkhi\nback\nkhoa\nhcmut\n",
+      "input": "7\nsieu 882\ncap 882\nba 882\nkhi 882\nback 882\nkhoa 882\nhcmut 882\n",
+      "inputFile": "example.02",
+      "outputFile": "example.02.a"
+    }
+  ],
+  "name": "Finding the Seven",
+  "interaction": null,
+  "memoryLimit": 8388608,
+  "tutorial": ""
+}

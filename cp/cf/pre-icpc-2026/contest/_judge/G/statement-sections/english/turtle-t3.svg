@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="500" viewBox="0 0 560 500">
+<line x1="80" y1="25" x2="80" y2="475" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="160" y1="25" x2="160" y2="475" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="240" y1="25" x2="240" y2="475" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="320" y1="25" x2="320" y2="475" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="400" y1="25" x2="400" y2="475" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="480" y1="25" x2="480" y2="475" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="450" x2="535" y2="450" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="370" x2="535" y2="370" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="290" x2="535" y2="290" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="210" x2="535" y2="210" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="130" x2="535" y2="130" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="50" x2="535" y2="50" stroke="#EBEBEB" stroke-width="1.5"/>
+<line x1="25" y1="290" x2="515" y2="290" stroke="#555" stroke-width="3"/>
+<polygon points="515,290 500,281 500,299" fill="#555"/>
+<line x1="320" y1="475" x2="320" y2="42" stroke="#555" stroke-width="3"/>
+<polygon points="320,42 311,56 329,56" fill="#555"/>
+<text x="520" y="276" font-family="Helvetica" font-size="28" fill="#555">x</text>
+<text x="338" y="40" font-family="Helvetica" font-size="28" fill="#555">y</text>
+<line x1="320" y1="290" x2="320" y2="210" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="320,237 314,257 326,257" fill="#1F3864"/>
+<line x1="320" y1="210" x2="240" y2="210" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="267,210 287,216 287,204" fill="#1F3864"/>
+<line x1="240" y1="210" x2="240" y2="290" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="240,263 246,243 234,243" fill="#1F3864"/>
+<line x1="240" y1="290" x2="320" y2="290" stroke="#1F3864" stroke-width="5" stroke-linecap="round"/>
+<polygon points="293,290 273,284 273,296" fill="#1F3864"/>
+<text x="358" y="258" font-family="Helvetica" font-size="24" fill="#1F3864" text-anchor="middle">1</text>
+<text x="280" y="180" font-family="Helvetica" font-size="24" fill="#1F3864" text-anchor="middle">2</text>
+<text x="202" y="258" font-family="Helvetica" font-size="24" fill="#1F3864" text-anchor="middle">3</text>
+<text x="280" y="336" font-family="Helvetica" font-size="24" fill="#1F3864" text-anchor="middle">4</text>
+<line x1="320" y1="290" x2="320" y2="279" stroke="#D62828" stroke-width="3" stroke-linecap="round"/>
+<line x1="320" y1="270" x2="320" y2="259" stroke="#D62828" stroke-width="3" stroke-linecap="round"/>
+<line x1="320" y1="250" x2="320" y2="239" stroke="#D62828" stroke-width="3" stroke-linecap="round"/>
+<line x1="320" y1="230" x2="320" y2="219" stroke="#D62828" stroke-width="3" stroke-linecap="round"/>
+<text x="286" y="260" font-family="Helvetica" font-size="24" fill="#D62828" text-anchor="middle">5</text>
+<circle cx="320" cy="290" r="11" fill="#D62828"/>
+<text x="354" y="334" font-family="Helvetica" font-size="26" fill="#D62828" text-anchor="middle">(0,0)</text>
+</svg>

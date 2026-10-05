@@ -1,0 +1,13 @@
+A 585864 suffix-array tl=1000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/A/tests
+B 585524 grid-reboot tl=3000 ml=512 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/B/tests
+C 584556 the-hidden-cave tl=2000 ml=256 inter=1 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/C/tests
+D 586686 mulgame tl=1000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/D/tests
+E 592142 honeycomb-census tl=1000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/E/tests
+F 586329 snow-white tl=2000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/F/tests
+G 586335 self-crossing-turtle tl=2000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/G/tests
+H 586694 rlu-cache-easy tl=2000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/H/tests
+I 591900 never-read-backwards tl=1000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/I/tests
+J 584874 dp-math-hard tl=2000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/J/tests
+K 581736 zero-segment tl=2000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/K/tests
+L 590582 coral-loop tl=4000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/L/tests
+M 586483 dp-counting-med tl=2000 ml=256 inter=0 samples=1 tests_dir=/Users/distiled/codeStuff/cp/cf/pre-icpc-2026/contest/_judge/M/tests

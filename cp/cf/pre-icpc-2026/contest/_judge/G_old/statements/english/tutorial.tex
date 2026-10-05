@@ -1,0 +1,18 @@
+\begin{tutorial}{Self-Crossing Turtle}
+
+Extending move $i$, the turtle can only hit one of the three most recent parallel-or-perpendicular candidates: the segments drawn $3$, $4$ or $5$ moves ago.
+
+Why? The direction rotates by $90^\circ$ after every move, so segment $i$ is parallel to segment $i - 2$ and perpendicular to segments $i - 1$ and $i - 3$. Segment $i - 1$ only shares the ordinary continuation point, and segment $i - 2$ runs on a different line. Segments $i - 6$ and older are already fenced off: to reach them, segment $i$ would first have to cross one of segments $i - 3$, $i - 4$ or $i - 5$, whose endpoints lie on the closed spiral built so far. So a crossing, if it ever happens, is detected within those three candidates.
+
+Each candidate translates into one condition on the distances (all comparisons are inclusive, so touching counts):
+
+1. Crossing segment $i - 3$ (for $i \ge 3$): $d_i \ge d_{i - 2}$ and $d_{i - 1} \le d_{i - 3}$.
+2. Folding onto segment $i - 4$ (for $i \ge 4$): $d_{i - 1} = d_{i - 3}$ and $d_i + d_{i - 4} \ge d_{i - 2}$.
+3. Reaching segment $i - 5$ (for $i \ge 5$): $d_{i - 2} \ge d_{i - 4}$ and $d_i + d_{i - 4} \ge d_{i - 2}$ and $d_{i - 1} \le d_{i - 3}$ and $d_{i - 1} + d_{i - 5} \ge d_{i - 3}$.
+
+Scan the array once, keeping only the last five distances, and apply the three checks.
+
+The complexity is $O(n)$ per test case and the memory usage is $O(1)$ besides storing the input. Beware: the straightforward check of all pairs of segments takes $O(n^2)$ and is too slow under these constraints.
+
+
+\end{tutorial}

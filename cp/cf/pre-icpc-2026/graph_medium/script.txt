@@ -1,0 +1,34 @@
+gen sample1 > $
+gen sample2 > $
+gen edge > $
+gen mini 1 > $
+gen mini 2 > $
+gen rand 12 12 700 0 0 101 > $
+gen rand 10 20 1000 0 2 102 > $
+gen rand 25 40 500 0 0 103 > $
+gen rand 30 30 1000 1 0 104 > $
+gen rand 25 25 1000 1 1 105 > $
+gen rand 40 50 850 0 0 106 > $
+gen rand 50 50 300 0 2 107 > $
+gen rand 45 45 1000 3 0 108 > $
+gen rand 60 60 950 3 1 109 > $
+gen maze 15 20 0 110 > $
+gen maze 25 25 1 111 > $
+gen maze 50 50 2 112 > $
+gen rand 1 3000 1000 0 0 113 > $
+gen rand 3000 1 800 0 2 114 > $
+gen rand 2 3000 1000 1 0 115 > $
+gen rand 100 100 900 0 0 116 > $
+gen rand 100 100 1000 3 0 117 > $
+gen rand 150 150 400 0 0 118 > $
+gen rand 100 200 700 3 2 119 > $
+gen rand 300 300 1000 0 0 120 > $
+gen maxdense 201 > $
+gen rand 400 500 1000 0 0 202 > $
+gen rand 400 500 600 0 2 203 > $
+gen maze 447 447 0 204 > $
+gen rand 447 447 1000 3 0 205 > $
+gen rand 2 100000 1000 1 0 206 > $
+gen rand 1 200000 1000 0 0 207 > $
+gen sumpack 208 > $
+gen tmax 209 > $

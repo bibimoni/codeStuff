@@ -1,0 +1,31 @@
+\begin{problem}{Duel of the Twin Sisters}{standard input}{standard output}{1 second}{256 megabytes}
+
+Twin sisters often play games involving numbers together. 
+First, they agree on a positive integer $n$. 
+Then, they start playing with the initial value $p = 1$. 
+The two players take turns, with the younger sister always going first. On their turn, the current player multiplies $p$ by any integer $k$ such that $2 \le k \le 9$.
+The winner is the first person to make $p \ge n$.
+
+Determine which player will win if both play optimally.
+
+\InputFile
+The first line contains an integer $T$ ($1 \le T \le 10^4$) --- the number of test cases.\
+
+Each of the following $T$ lines contains a single integer $n$ ($1 \le n \le 10^9$).
+
+\OutputFile
+For each test case, print a single line containing:
+
+\begin{itemize}
+    \item La premiere joueuse gagne. --- if the first player (younger sister) wins.
+    \item La deuxieme joueuse gagne. --- if the second player (older sister) wins.
+\end{itemize}
+
+\Example
+
+\begin{example}
+\exmpfile{example.01}{example.01.a}%
+\end{example}
+
+\end{problem}
+

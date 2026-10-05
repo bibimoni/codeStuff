@@ -1,0 +1,75 @@
+\begin{problem}{Humble RLU Cache}{standard input}{standard output}{2 seconds}{256 megabytes}
+
+Bao is the on-call engineer of a storage node on the university cluster, and its front line is the humblest component of all: an \textbf{RLU cache}. It stores key--value pairs with a fixed capacity of $n$ pairs. At any moment the pairs in the cache have a \emph{recency order}: the most recently used pair has order $1$, the next one has order $2$, and so on; the pair with the largest order is the \emph{least recently used} one, and it is evicted first when space runs out.
+
+Initially the cache is full: it contains exactly the keys $1, 2, \ldots, n$, each with value $0$, inserted in this order --- so key $1$ is initially the least recently used key (order $n$) and key $n$ is the most recently used one (order $1$).
+
+You have to process $q$ queries of two types:
+
+\begin{itemize}
+  \item \texttt{1 a b} --- put key $a$ with value $b$ into the cache:
+    \begin{itemize}
+      \item if key $a$ is already in the cache, its value is replaced by $b$ and $a$ becomes the most recently used key;
+      \item otherwise the least recently used key is \emph{discarded} (invalidated) from the cache, and $a$ with value $b$ is inserted as the most recently used key.
+    \end{itemize}
+  \item \texttt{2 a} --- look up key $a$:
+    \begin{itemize}
+      \item if key $a$ is in the cache, print its value and its current order $r$ ($r = 1$ means most recently used, $r = n$ means least recently used); afterwards $a$ becomes the most recently used key;
+      \item otherwise print $-1$ (the key was never inserted or has already been invalidated).
+    \end{itemize}
+\end{itemize}
+
+
+\InputFile
+The first line contains a single integer $t$ ($1 \le t \le 2 \cdot 10^5$) --- the number of test cases.
+
+The first line of each test case contains two integers $n$ and $q$ ($1 \le n, q \le 2 \cdot 10^5$) --- the capacity of the cache and the number of queries.
+
+The next $q$ lines describe the queries in the order they must be processed. Each line has one of two forms:
+
+\begin{itemize}
+  \item \texttt{1 a b} ($1 \le a \le 10^9$, $1 \le b \le 10^9$) --- put key $a$ with value $b$ into the cache;
+  \item \texttt{2 a} ($1 \le a \le 10^9$) --- look up key $a$.
+\end{itemize}
+
+It is guaranteed that the sum of $n$ over all test cases does not exceed $2 \cdot 10^5$, and the sum of $q$ over all test cases does not exceed $2 \cdot 10^5$.
+
+
+\OutputFile
+For each query of type $2$ (in the order the queries appear, across all test cases), print one line:
+
+\begin{itemize}
+  \item if key $a$ is in the cache, print two integers $b$ and $r$ --- its current value and its current order;
+  \item otherwise print the single integer $-1$.
+\end{itemize}
+
+
+\Example
+
+\begin{example}
+\exmpfile{example.01}{example.01.a}%
+\end{example}
+
+\Note
+In the first test case of the example $n = 3$. Initially the cache holds keys $1, 2, 3$ with value $0$; key $3$ is the most recently used and key $1$ is the least recently used one.
+
+\begin{itemize}
+  \item \texttt{2 2}: key $2$ is present with value $0$ at order $2$, so the answer is \texttt{0 2}. Afterwards the recency order is $(2, 3, 1)$ from most to least recent.
+  \item \texttt{2 5}: key $5$ is not in the cache, answer \texttt{-1}.
+  \item \texttt{1 4 10}: the cache is full, so the least recently used key $1$ is discarded and key $4$ with value $10$ is inserted; the order becomes $(4, 2, 3)$.
+  \item \texttt{2 1}: key $1$ has been invalidated, answer \texttt{-1}.
+  \item \texttt{2 4}: key $4$ has value $10$ and order $1$, answer \texttt{10 1}.
+  \item \texttt{1 2 7}: key $2$ is already in the cache, so only its value changes to $7$ and it becomes most recently used; order is $(2, 4, 3)$.
+  \item \texttt{2 2}: answer \texttt{7 1}.
+  \item \texttt{1 9 1}: the least recently used key $3$ is discarded and key $9$ with value $1$ is inserted; order is $(9, 2, 4)$.
+  \item \texttt{2 3}: key $3$ was discarded, answer \texttt{-1}.
+  \item \texttt{2 9}: answer \texttt{1 1}.
+  \item \texttt{1 4 8}: key $4$ is still in the cache: its value becomes $8$ and it becomes most recently used; order is $(4, 9, 2)$.
+  \item \texttt{2 2}: key $2$ has value $7$ at order $3$, answer \texttt{7 3}.
+\end{itemize}
+
+In the second test case the cache has capacity $1$: inserting key $5$ invalidates key $1$. Note how the first \texttt{2 1} query in the third test case refreshes key $1$, so the subsequent insertion of key $3$ invalidates key $2$ instead.
+
+
+\end{problem}
+
