@@ -37,9 +37,8 @@ public:
 
   SparseFenwick2D(vector<U> &all_x) : xs(all_x) { compress_x(); }
 
-  U get_x(U x) {
-    return static_cast<U>(lower_bound(xs.begin(), xs.end(), x) - xs.begin() +
-                          1);
+  int get_x(U x) {
+    return int(lower_bound(xs.begin(), xs.end(), x) - xs.begin() + 1);
   }
 
   void fake_add(U x, U y) {
@@ -50,7 +49,8 @@ public:
 
   void update(U r, U c, T del) {
     for (U i = get_x(r); i <= n; i += i & -i) {
-      int j = lower_bound(ys[i].begin(), ys[i].end(), c) - ys[i].begin() + 1;
+      int j =
+          int(lower_bound(ys[i].begin(), ys[i].end(), c) - ys[i].begin() + 1);
       for (; j < int(a[i].size()); j += j & -j) {
         a[i][j] += del;
       }
@@ -60,7 +60,8 @@ public:
   T query(U r, U c) {
     T res = 0;
     for (U i = get_x(r); i > 0; i -= i & -i) {
-      int j = lower_bound(ys[i].begin(), ys[i].end(), c) - ys[i].begin() + 1;
+      int j =
+          int(lower_bound(ys[i].begin(), ys[i].end(), c) - ys[i].begin() + 1);
       for (; j > 0; j -= j & -j) {
         res += a[i][j];
       }
