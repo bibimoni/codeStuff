@@ -100,14 +100,6 @@ template <typename T> void __print_sdtin(const queue<T> &x, ostream &in) {
     v.push_back(q.front());
   __print_sdtin(v, in);
 } // front first
-void _print_stdin(ostream &in) { in << "]\n"; }
-template <typename T, typename... V>
-void _print_stdin(T t, V... v, ostream &in) {
-  __print_sdtin(t, in);
-  if (sizeof...(v))
-    in << ", ";
-  _print_stdin(v..., in);
-}
 
 #define dbg(x...)                                                              \
   cerr << __func__ << ":" << __LINE__ << " [" << #x << "] = [";                \
@@ -131,11 +123,8 @@ template <typename T> void __table(const char *name, int line, const T &x) {
       vector<string> rc;
       for (auto &c : r) {
         ostringstream ss;
-        _print_stdin(c, ss);
-        string c_ = ss.str();
-        c_.pop_back(); // _print_stdin closes with ']'; that bracket is the
-                       // table
-        rc.push_back(c_);
+        __print_sdtin(c, ss);
+        rc.push_back(ss.str());
       }
       W = max(W, rc.size());
       cells.push_back(std::move(rc));
@@ -144,10 +133,8 @@ template <typename T> void __table(const char *name, int line, const T &x) {
     vector<string> rc;
     for (auto &c : x) {
       ostringstream ss;
-      _print_stdin(c, ss);
-      string c_ = ss.str();
-      c_.pop_back();
-      rc.push_back(c_);
+      __print_sdtin(c, ss);
+      rc.push_back(ss.str());
     }
     W = rc.size();
     cells.push_back(std::move(rc));
