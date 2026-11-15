@@ -10,7 +10,7 @@ template <class T, class U> class SparseFenwick2D {
     xs.erase(unique(xs.begin(), xs.end()), xs.end());
     n = (int)xs.size();
     ys.resize(n + 1);
-    a.resize(n + 1);
+    a.resize(n + 5);
   }
 
 public:
@@ -18,7 +18,7 @@ public:
     for (int i = 1; i <= n; i++) {
       sort(ys[i].begin(), ys[i].end());
       ys[i].erase(unique(ys[i].begin(), ys[i].end()), ys[i].end());
-      a[i].assign(ys[i].size() + 1, static_cast<U>(0));
+      a[i].assign(ys[i].size() + 5, static_cast<U>(0));
     }
   }
 
